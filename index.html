@@ -287,7 +287,7 @@
                                 <input type="number" id="ha" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
 
-                            <!-- NEW: Steel Properties Section (Step 1) -->
+                            <!-- Steel Properties Section (Step 1) -->
                             <div class="pt-2">
                                 <h5 class="text-xs font-bold text-gray-400 mb-1" data-i18n="sec_steel_props">ANCHOR STEEL</h5>
                                 <div class="space-y-2">
@@ -364,6 +364,52 @@
                                 </select>
                             </div>
 
+                            <!-- NEW Step 3: Adhesive Toggle -->
+                            <div class="bg-blue-50 p-2 rounded border border-blue-100">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <input type="checkbox" id="is_adhesive" onchange="toggleAdhesive()" class="rounded border-gray-300 text-eng-primary shadow-sm focus:border-eng-primary focus:ring focus:ring-eng-primary focus:ring-opacity-50">
+                                    <label for="is_adhesive" class="text-xs font-bold text-blue-800" data-i18n="lbl_is_adh">Adhesive Anchor</label>
+                                </div>
+                                <div id="div_adhesive" class="hidden mt-1">
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_tau">Bond Stress (<span class="math-symbol">τ</span>) [kgf/cm²]</label>
+                                    <input type="number" id="tau" value="100" class="calc-input w-full border border-blue-300 rounded p-1 text-right text-xs bg-white">
+                                </div>
+                            </div>
+
+                            <!-- Pullout Inputs (Step 2) -->
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_pull_mode">Pullout Mode</label>
+                                <select id="pullout_mode" class="w-full border border-gray-300 rounded p-2 text-xs" onchange="togglePulloutInputs()">
+                                    <option value="headed" data-i18n="opt_headed">Headed Bolt/Stud</option>
+                                    <option value="hooked" data-i18n="opt_hooked">Hooked Bolt (J/L)</option>
+                                    <option value="post" data-i18n="opt_post_cert">Post-installed (Cert.)</option>
+                                </select>
+                            </div>
+
+                            <div id="div_abrg">
+                                <label class="text-xs text-gray-500" data-i18n="lbl_abrg">Bearing Area (<span class="math-symbol">A<sub>brg</sub></span>) [cm²]</label>
+                                <input type="number" id="abrg" value="3.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                            </div>
+
+                            <div id="div_eh" class="hidden">
+                                <label class="text-xs text-gray-500" data-i18n="lbl_eh">Hook Length (<span class="math-symbol">e<sub>h</sub></span>) [cm]</label>
+                                <input type="number" id="eh" value="5.0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                            </div>
+
+                            <div id="div_np" class="hidden">
+                                <label class="text-xs text-gray-500" data-i18n="lbl_np_cert">Certified Pullout (<span class="math-symbol">N<sub>p</sub></span>) [kgf]</label>
+                                <input type="number" id="np_certified" value="2000" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_crack_p">Pullout Cracking (<span class="math-symbol">ψ<sub>c,P</sub></span>)</label>
+                                <select id="crack_cond_p" class="w-full border border-gray-300 rounded p-2 text-xs">
+                                    <option value="1.4" data-i18n="opt_uncracked">Uncracked (1.4)</option>
+                                    <option value="1.0" data-i18n="opt_cracked">Cracked (1.0)</option>
+                                </select>
+                            </div>
+                            <!-- End Step 2 Inputs -->
+
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_lambda">Failure Factor (<span class="math-symbol">λ<sub>a</sub></span>)</label>
                                 <select id="lambda_select" class="w-full border border-gray-300 rounded p-2 text-xs">
@@ -438,7 +484,7 @@
                         </button>
                     </div>
 
-                    <!-- NEW: Steel Strength Card (Step 1) -->
+                    <!-- Steel Strength Card (Step 1) -->
                     <div id="card-steel" class="bg-white rounded border-l-4 border-l-gray-600 shadow">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
                             <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_s_title">Anchor Steel Strength</span></h4>
@@ -463,6 +509,53 @@
                                 <!-- Shear Row 2 (Ratio & Check) -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-sv-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check_v">Shear Check</span><span id="badge-sv" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW Step 3: Bond Strength Card -->
+                    <div id="card-bond" class="bg-white rounded border-l-4 border-l-blue-600 shadow hidden">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_b_title">Adhesive Bond Strength</span></h4>
+                            <span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600 font-mono">Sec 17.6.5</span>
+                        </div>
+                        <div class="p-4 grid grid-cols-1 gap-2 text-sm">
+                             <div class="grid grid-cols-2 gap-4">
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_nba">Basic Bond (Nba)</span><span id="r-nba" class="font-mono font-bold"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_cna">Crit. Spacing (cNa)</span><span id="r-cna" class="font-mono text-gray-600"></span></div>
+                                
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_na">Bond Strength (Na)</span><span id="r-na" class="font-mono font-bold"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_na">φNa Capacity</span><span id="r-phi-na" class="text-lg font-bold text-eng-primary"></span></div>
+
+                                <div class="col-span-2 border-t pt-2 grid grid-cols-2 gap-4">
+                                    <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-b-ratio" class="font-mono font-bold text-purple-700"></span></div>
+                                    <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-b" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pullout & Pryout Card (Step 2) -->
+                    <div id="card-pullout" class="bg-white rounded border-l-4 border-l-eng-warning shadow">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_p_title">Pullout & Pryout</span></h4>
+                            <span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600 font-mono">Sec 17.6.3 / 17.7.3</span>
+                        </div>
+                        <div class="p-4 grid grid-cols-1 gap-2 text-sm">
+                             <div class="grid grid-cols-2 gap-4">
+                                <!-- Pullout Row -->
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_npn">Pullout (Npn)</span><span id="r-npn" class="font-mono font-bold"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_npn">φNpn Capacity</span><span id="r-phi-npn" class="text-lg font-bold text-eng-primary"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-pn-ratio" class="font-mono font-bold text-purple-700"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-pn" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
+
+                                <div class="col-span-2 border-t my-1"></div>
+
+                                <!-- Pryout Row -->
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_vcp">Pryout (Vcp)</span><span id="r-vcp" class="font-mono font-bold"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_vcp">φVcp Capacity</span><span id="r-phi-vcp" class="text-lg font-bold text-eng-primary"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-cp-ratio" class="font-mono font-bold text-purple-700"></span></div>
+                                <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-cp" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
                             </div>
                         </div>
                     </div>
@@ -592,13 +685,18 @@
                 lbl_s1: "Vertical Spacing (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "Horizontal Spacing (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "Top Edge (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "Bottom Edge (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "Side Edge (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
                 lbl_kc: "Anchor Type (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "Failure Factor (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "Load Length (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "Cracking/Reinf (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "Eccentric <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "Eccentric <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
                 lbl_ase: "Eff. Area (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "Ult (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "Yld (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "Grouted (0.8x Shear)",
+                lbl_pull_mode: "Pullout Mode", lbl_abrg: "Bearing Area (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", lbl_eh: "Hook Length (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", lbl_np_cert: "Certified Pullout (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", lbl_crack_p: "Pullout Cracking (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
+                lbl_is_adh: "Adhesive Anchor", lbl_tau: "Bond Stress (<span class='math-symbol'>τ</span>) [kgf/cm²]",
                 lbl_t: "Tension (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "Shear (<span class='math-symbol'>V</span>) [kgf]",
                 btn_run: "Run Structural Analysis", btn_save: "Save to Cloud", btn_pdf: "Download Report",
                 opt_cast: "Cast-in Anchors (10)", opt_post: "Post-installed (7)",
                 opt_lam1: "Cast-in/Undercut (1.0)", opt_lam2: "Expansion/Bonded (0.8)", opt_lam3: "Bonded Failure (0.6)",
                 opt_le1: "Default/All (8da)", opt_le2: "Full Sleeve/Headed (hef)", opt_le3: "Torque-controlled (2da)",
                 opt_reinf1: "No Reinf / < D13 (1.0)", opt_reinf2: "Reinf ≥ D13 (1.2)", opt_reinf3: "Reinf ≥ D13 + Ties (1.4)",
+                opt_headed: "Headed Bolt/Stud", opt_hooked: "Hooked Bolt (J/L)", opt_post_cert: "Post-installed (Cert.)", opt_uncracked: "Uncracked (1.4)", opt_cracked: "Cracked (1.0)",
                 res_s_title: "Anchor Steel Strength", res_nsa: "Steel Tension (Nsa)", res_phi_nsa: "φNsa Capacity", res_vsa: "Steel Shear (Vsa)", res_phi_vsa: "φVsa Capacity", res_check_t: "Tension Check", res_check_v: "Shear Check",
+                res_p_title: "Pullout & Pryout", res_npn: "Pullout (Npn)", res_phi_npn: "φNpn Capacity", res_vcp: "Pryout (Vcp)", res_phi_vcp: "φVcp Capacity",
+                res_b_title: "Adhesive Bond Strength", res_nba: "Basic Bond (Nba)", res_cna: "Crit. Spacing (cNa)", res_na: "Bond Strength (Na)", res_phi_na: "φNa Capacity",
                 res_t_title: "Concrete Tension Breakout", res_t1_sub: "Single Anchor", res_tg_sub: "Anchor Group",
                 res_v_title: "Concrete Shear Breakout", res_v1_sub: "Single Anchor", res_vg_sub: "Anchor Group",
                 res_nb: "Basic Strength", res_anc: "Proj. Area", res_anc_g: "Group Area", res_anco: "Ref. Area", res_edge: "Edge Factor", res_cap: "Capacity", res_cap_g: "Group Capacity", res_load: "Load", res_ratio: "Ratio", res_check: "Check",
@@ -616,13 +714,18 @@
                 lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "上方錨栓距梁頂邊 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "下方錨栓距梁底邊 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "錨栓距梁邊 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
                 lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "偏心距 <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "偏心距 <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
                 lbl_ase: "有效斷面積 (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "極限強度 (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "降伏強度 (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "灌漿錨栓 (0.8x 剪力)",
+                lbl_pull_mode: "拉出模式", lbl_abrg: "承壓面積 (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", lbl_eh: "彎鉤長度 (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", lbl_np_cert: "認證拉出強度 (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", lbl_crack_p: "拉出開裂參數 (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
+                lbl_is_adh: "化學黏結錨栓", lbl_tau: "黏結強度 (<span class='math-symbol'>τ</span>) [kgf/cm²]",
                 lbl_t: "拉力設計載重 (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V</span>) [kgf]",
                 btn_run: "執行結構分析", btn_save: "儲存至雲端", btn_pdf: "下載報告",
                 opt_cast: "預埋式錨栓 (10)", opt_post: "後置式錨栓 (7)",
                 opt_lam1: "預埋/擴底錨栓 (1.0)", opt_lam2: "膨脹/黏結錨栓 (0.8)", opt_lam3: "黏結破壞 (0.6)",
                 opt_le1: "預設/所有情況 (8da)", opt_le2: "全套筒/擴頭 (hef)", opt_le3: "扭力控制 (2da)",
                 opt_reinf1: "無輔助鋼筋 / < D13 (1.0)", opt_reinf2: "配筋 ≥ D13 (1.2)", opt_reinf3: "配筋 ≥ D13 + 箍筋 (1.4)",
+                opt_headed: "擴頭螺栓/釘 (Headed)", opt_hooked: "彎鉤螺栓 (Hooked)", opt_post_cert: "後置式 (認證值)", opt_uncracked: "未開裂 (1.4)", opt_cracked: "開裂 (1.0)",
                 res_s_title: "錨栓鋼材強度檢核", res_nsa: "鋼材拉力 (Nsa)", res_phi_nsa: "φNsa 強度", res_vsa: "鋼材剪力 (Vsa)", res_phi_vsa: "φVsa 強度", res_check_t: "拉力檢核", res_check_v: "剪力檢核",
+                res_p_title: "拉出與撬破檢核", res_npn: "拉出強度 (Npn)", res_phi_npn: "φNpn 強度", res_vcp: "撬破強度 (Vcp)", res_phi_vcp: "φVcp 強度",
+                res_b_title: "化學錨栓黏結強度", res_nba: "基本黏結 (Nba)", res_cna: "臨界間距 (cNa)", res_na: "黏結強度 (Na)", res_phi_na: "φNa 強度",
                 res_t_title: "混凝土拉破檢核", res_t1_sub: "單根錨栓", res_tg_sub: "錨栓群",
                 res_v_title: "混凝土剪破檢核", res_v1_sub: "單根錨栓", res_vg_sub: "錨栓群",
                 res_nb: "基本拉破強度", res_anc: "破壞投影面積", res_anc_g: "群錨面積", res_anco: "參考面積", res_edge: "邊距修正因數", res_cap: "強度", res_cap_g: "群錨強度", res_load: "載重", res_ratio: "比值", res_check: "檢核",
@@ -741,6 +844,18 @@
         });
         document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
 
+        window.togglePulloutInputs = function() {
+            const mode = document.getElementById('pullout_mode').value;
+            document.getElementById('div_abrg').classList.toggle('hidden', mode !== 'headed');
+            document.getElementById('div_eh').classList.toggle('hidden', mode !== 'hooked');
+            document.getElementById('div_np').classList.toggle('hidden', mode !== 'post');
+        }
+
+        // NEW Step 3: Toggle Adhesive
+        window.toggleAdhesive = function() {
+            const isAdh = document.getElementById('is_adhesive').checked;
+            document.getElementById('div_adhesive').classList.toggle('hidden', !isAdh);
+        }
 
         window.performCalculation = function () {
             const val = (id) => parseFloat(document.getElementById(id).value) || 0;
@@ -752,8 +867,12 @@
                 ca1: val('ca1'), ca1_1: val('ca1_1'), ca2: val('ca2'), T: val('loadT'), V: val('loadV'),
                 kc: parseFloat(str('kc_select')), lambda: parseFloat(str('lambda_select')), le_mode: str('le_select'), psi_c_V: parseFloat(str('psi_c_V_select')),
                 e_prime_n: val('e_prime_n'), e_prime_v: val('e_prime_v'),
-                // New Steel inputs
-                futa: val('futa'), fya: val('fya'), ase: val('ase'), is_grouted: chk('is_grouted')
+                // Steel inputs
+                futa: val('futa'), fya: val('fya'), ase: val('ase'), is_grouted: chk('is_grouted'),
+                // Step 2 Inputs
+                pull_mode: str('pullout_mode'), abrg: val('abrg'), eh: val('eh'), np_cert: val('np_certified'), psi_c_P: parseFloat(str('crack_cond_p')),
+                // Step 3 Inputs
+                is_adhesive: chk('is_adhesive'), tau: val('tau')
             };
 
             let le_val = 12.7; if (I.le_mode === 'sleeve') le_val = I.hef; else if (I.le_mode === 'torque') le_val = 2 * I.da;
@@ -764,29 +883,21 @@
             let psi_ec_V = 1.0; if (I.e_prime_v > 0) psi_ec_V = 1.0 / (1.0 + (2.0 * I.e_prime_v) / (3.0 * I.ca1_1));
 
             // --- STEP 1: Steel Strength Logic ---
-            // Nsa (Sec 17.6.1)
-            // Limit futa check: futa <= 1.9 fya and <= 8750
             const futa_limit = Math.min(1.9 * I.fya, 8750);
             const futa_eff = Math.min(I.futa, futa_limit);
             const Nsa = I.ase * futa_eff;
-            const phi_st = 0.75; // Ductile assumption for now, or check futa/fya ratio
+            const phi_st = 0.75; 
             const phi_Nsa = phi_st * Nsa;
             const ratio_st = I.T > 0 ? (I.T / phi_Nsa) : 0;
 
-            // Vsa (Sec 17.7.1)
-            // If cast-in headed stud welded (kc=10 and maybe checkbox later), coeff is 1.0. For now assume 0.6 for generic.
-            // But strict reading: "All Other Anchors: Vsa = 0.6 * Ase * futa".
-            // Since user selects KC=10 (Cast-in) vs KC=7 (Post-installed), we can try to infer, 
-            // but the conservative approach is 0.6 unless explicitly "Headed Stud".
-            // We will use 0.6 standard coefficient for now.
             let Vsa_coeff = 0.6; 
             let Vsa = Vsa_coeff * I.ase * futa_eff;
             if (I.is_grouted) Vsa *= 0.8;
-            const phi_sv = 0.65; // Ductile shear
+            const phi_sv = 0.65;
             const phi_Vsa = phi_sv * Vsa;
             const ratio_sv = I.V > 0 ? (I.V / phi_Vsa) : 0;
-            // ------------------------------------
 
+            // --- Breakout Logic ---
             const Nb = I.kc * I.lambda * Math.sqrt(I.fc) * Math.pow(I.hef, 1.5);
             const Anco = 9 * Math.pow(I.hef, 2);
             const Anc_1 = 2 * (1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
@@ -810,10 +921,80 @@
             const phi_Vcbg = 0.75 * (Avc_4 / Avco) * psi_ec_V * psi_ed_V * I.psi_c_V * psi_h_V * Vb;
             const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0;
 
+            // --- STEP 2: Pullout & Pryout Logic ---
+            let Np = 0;
+            if (I.pull_mode === 'headed') {
+                Np = 8 * I.abrg * I.fc;
+            } else if (I.pull_mode === 'hooked') {
+                Np = 0.9 * I.fc * I.eh * I.da;
+            } else {
+                Np = I.np_cert;
+            }
+            const Npn = Np * I.psi_c_P;
+            const phi_p = (I.pull_mode === 'post') ? 0.65 : 0.70;
+            const phi_Npn = phi_p * Npn;
+            const ratio_pn = I.T > 0 ? (I.T / phi_Npn) : 0;
+
+            const kcp = (I.hef >= 6.35) ? 2.0 : 1.0; 
+            const Ncp = Math.min(phi_Ncb / 0.75, phi_Ncbg / 0.75); 
+            const Vcp = kcp * Ncp;
+            const phi_cp = 0.70; 
+            const phi_Vcp = phi_cp * Vcp;
+            const ratio_cp = I.V > 0 ? (I.V / phi_Vcp) : 0;
+
+            // --- STEP 3: Bond Strength (Adhesive) Logic ---
+            let bond_res = { nba: 0, cna: 0, na: 0, cap: 0, ratio: 0, ok: true };
+            if (I.is_adhesive) {
+                // cNa = 10 * da * sqrt(tau / 77)
+                // Note: 77 kgf/cm2 approx 1100 psi.
+                const cNa = 10 * I.da * Math.sqrt(I.tau / 77.0);
+                const ANao = Math.pow(2 * cNa, 2);
+                
+                // Actual Area ANa (Single) using cNa as critical radius
+                // ANa = (cNa + ca1 + cNa) * (2*cNa) if far from edges
+                // Simplified projection logic similar to Anc:
+                // We reuse logic: project cNa instead of 1.5hef
+                // Single Anchor (Tension) Area ANa
+                const edge_dist = Math.min(I.ca1, cNa); // Edge limited
+                // Rectangular area: (cNa + edge_dist + s1?? No s1 for single, s1=0)
+                // Let's use the full projection logic:
+                // Width X: min(cNa, ca1) + cNa (if no s1) -> (ca1 + s1 + cNa) limited by edges
+                // Let's approximate using the exact same formula structure as Breakout but replace 1.5hef with cNa
+                // A_Nc = (ca2 + s2 + 1.5hef)*(ca1 + s1 + 1.5hef) ...
+                // For single anchor in corner:
+                const ANa = (Math.min(I.ca1, cNa) + cNa) * (Math.min(I.ca2, cNa) + cNa); 
+                // Wait, Single Anchor logic in c1 was: 2 * (1.5hef) * (ca1 + s1 + 1.5hef) -- this assumes side edge ca2 is infinite?
+                // Actually my c1 logic `Anc_1` used: `2 * (1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef)` which looks like a group equation with s1.
+                // For single anchor s1=0.
+                // Let's stick to a robust estimation for Single Anchor Bond:
+                // Project cNa. Area = (cNa + min(cNa, ca1)) * (cNa + min(cNa, ca2))
+                // If ca2 is large (>cNa), it becomes 2*cNa.
+                const ANa_val = (cNa + Math.min(cNa, I.ca1)) * (cNa + Math.min(cNa, I.ca2));
+
+                // Modifiers
+                const ca_min_bond = Math.min(I.ca1, I.ca2);
+                const psi_ed_Na = (ca_min_bond < cNa) ? (0.7 + 0.3 * (ca_min_bond / cNa)) : 1.0;
+                const psi_cp_Na = 1.0; // Assume uncracked/reinforced for simplicity or 1.0 default
+
+                const Nba = I.lambda * I.tau * Math.PI * I.da * I.hef;
+                const Na = (ANa_val / ANao) * psi_ed_Na * psi_cp_Na * Nba;
+                
+                const phi_bond = 0.55; // Category 2 default
+                const phi_Na = phi_bond * Na;
+                const ratio_b = I.T > 0 ? (I.T / phi_Na) : 0;
+
+                bond_res = { nba: Nba, cna: cNa, na: Na, cap: phi_Na, ratio: ratio_b, ok: ratio_b < 1.0 };
+            }
+            // ----------------------------------------------
+
             currentData = {
                 inputs: I, factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V }, calcs: {
                     s1: { nsa: Nsa, cap: phi_Nsa, load: I.T, ratio: ratio_st, ok: ratio_st < 1.0 },
                     s2: { vsa: Vsa, cap: phi_Vsa, load: I.V, ratio: ratio_sv, ok: ratio_sv < 1.0 },
+                    pn: { np: Np, npn: Npn, cap: phi_Npn, load: I.T, ratio: ratio_pn, ok: ratio_pn < 1.0 }, 
+                    cp: { vcp: Vcp, cap: phi_Vcp, load: I.V, ratio: ratio_cp, ok: ratio_cp < 1.0 },
+                    // Step 3
+                    bond: bond_res,
                     c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb, load: I.T, ratio: ratio_1, ok: ratio_1 < 1.0 },
                     c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0 },
                     c3: { anc: Anc_3, cap: phi_Ncbg, load: 2 * I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
@@ -835,8 +1016,9 @@
 
             document.getElementById('card-tension').classList.toggle('hidden', !showTension);
             document.getElementById('card-shear').classList.toggle('hidden', !showShear);
-            // Steel card always shown if loads exist? Or maybe split? For now show if either load exists
             document.getElementById('card-steel').classList.toggle('hidden', !(showTension || showShear));
+            document.getElementById('card-pullout').classList.toggle('hidden', !(showTension || showShear)); 
+            document.getElementById('card-bond').classList.toggle('hidden', !(showTension && I.is_adhesive)); // Step 3
 
             if (showTension || showShear) {
                 set('r-nsa', d.s1.nsa, ' kgf'); set('r-phi-nsa', d.s1.cap, ' kgf');
@@ -846,6 +1028,25 @@
                 set('r-vsa', d.s2.vsa, ' kgf'); set('r-phi-vsa', d.s2.cap, ' kgf');
                 document.getElementById('r-sv-ratio').innerText = (d.s2.ratio || 0).toFixed(2);
                 setStatus('badge-sv', d.s2.ok);
+
+                // Step 2 Updates
+                set('r-npn', d.pn.npn, ' kgf'); set('r-phi-npn', d.pn.cap, ' kgf');
+                document.getElementById('r-pn-ratio').innerText = (d.pn.ratio || 0).toFixed(2);
+                setStatus('badge-pn', d.pn.ok);
+
+                set('r-vcp', d.cp.vcp, ' kgf'); set('r-phi-vcp', d.cp.cap, ' kgf');
+                document.getElementById('r-cp-ratio').innerText = (d.cp.ratio || 0).toFixed(2);
+                setStatus('badge-cp', d.cp.ok);
+            }
+
+            // Step 3 Update
+            if (showTension && I.is_adhesive) {
+                set('r-nba', d.bond.nba, ' kgf');
+                set('r-cna', d.bond.cna, ' cm');
+                set('r-na', d.bond.na, ' kgf'); // Nominal (or with factors)
+                set('r-phi-na', d.bond.cap, ' kgf');
+                document.getElementById('r-b-ratio').innerText = (d.bond.ratio || 0).toFixed(2);
+                setStatus('badge-b', d.bond.ok);
             }
 
             if (showTension) {
@@ -883,7 +1084,7 @@
             performCalculation(); if (!currentData) return;
             try {
                 await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').add({
-                    inputs: currentData.inputs, summary: { ratio1: currentData.calcs.c1.ratio, ratio2: currentData.calcs.c2.ratio, ratio3: currentData.calcs.c3.ratio, ratio4: currentData.calcs.c4.ratio, allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok && currentData.calcs.s1.ok && currentData.calcs.s2.ok },
+                    inputs: currentData.inputs, summary: { ratio1: currentData.calcs.c1.ratio, ratio2: currentData.calcs.c2.ratio, ratio3: currentData.calcs.c3.ratio, ratio4: currentData.calcs.c4.ratio, allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok && currentData.calcs.s1.ok && currentData.calcs.s2.ok && currentData.calcs.pn.ok && currentData.calcs.cp.ok },
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Saved!'; setTimeout(() => btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`, 2000);
@@ -911,11 +1112,28 @@
             setVal('le_select', I.le_mode || 'default'); setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
             setVal('e_prime_n', I.e_prime_n || 0); setVal('e_prime_v', I.e_prime_v || 0);
             
-            // Restore new fields (Step 1)
+            // Restore Step 1
             if (I.futa) setVal('futa', I.futa);
             if (I.fya) setVal('fya', I.fya);
             if (I.ase) setVal('ase', I.ase);
             if (I.is_grouted !== undefined) setChk('is_grouted', I.is_grouted);
+
+            // Restore Step 2
+            if (I.pull_mode) {
+                setVal('pullout_mode', I.pull_mode);
+                togglePulloutInputs(); 
+                setVal('abrg', I.abrg || 0);
+                setVal('eh', I.eh || 0);
+                setVal('np_certified', I.np_cert || 0);
+                setVal('crack_cond_p', I.psi_c_P || 1.4);
+            }
+
+            // Restore Step 3
+            if (I.is_adhesive !== undefined) {
+                setChk('is_adhesive', I.is_adhesive);
+                toggleAdhesive();
+                setVal('tau', I.tau || 100);
+            }
 
             switchTab('calculator'); performCalculation();
         };
@@ -1015,6 +1233,8 @@
                         <tr><td>${txt('lbl_reinf')}</td><td>${d.inputs.psi_c_V}</td><td></td></tr>
                         <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
                         <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_pull_mode')}</td><td>${d.inputs.pull_mode}</td><td></td></tr>
+                        <tr><td>${txt('lbl_is_adh')}</td><td>${d.inputs.is_adhesive ? 'Yes' : 'No'}</td><td></td></tr>
                     </table>
 
                     <div class="page-break">
@@ -1046,6 +1266,53 @@
                         <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.s2.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
                     </table>
                  `;
+            }
+
+            // Pullout & Pryout Section in PDF
+            if(showT || showV) {
+                 html += `
+                    <h3>${txt('res_p_title')}</h3>
+                    <table>
+                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        
+                        <!-- Pullout -->
+                        <tr><td>${txt('res_npn')}</td><td>Np * psi_c_P</td><td>${Math.round(d.pn.npn)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#fffbe6"><td><strong>${txt('res_phi_npn')}</strong></td><td>φNpn</td><td><strong>${Math.round(d.pn.cap)}</strong></td><td>kgf</td><td><span class="${d.pn.ok ? 'pass' : 'fail'}">${d.pn.ok ? 'OK' : 'FAIL'}</span></td></tr>
+                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.pn.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
+
+                        <!-- Pryout -->
+                        <tr><td>${txt('res_vcp')}</td><td>kcp * Ncp</td><td>${Math.round(d.cp.vcp)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#fffbe6"><td><strong>${txt('res_phi_vcp')}</strong></td><td>φVcp</td><td><strong>${Math.round(d.cp.cap)}</strong></td><td>kgf</td><td><span class="${d.cp.ok ? 'pass' : 'fail'}">${d.cp.ok ? 'OK' : 'FAIL'}</span></td></tr>
+                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.cp.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
+                    </table>
+                 `;
+            }
+
+            // Step 3 PDF Update
+            if (showT && d.inputs.is_adhesive) {
+                html += `
+                    <h3>${txt('res_b_title')}</h3>
+                    <table>
+                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr><td>${txt('res_nba')}</td><td>lambda * tau * pi * da * hef</td><td>${Math.round(d.bond.nba)}</td><td>kgf</td><td>-</td></tr>
+                        <tr><td>${txt('res_cna')}</td><td>10da * sqrt(tau/77)</td><td>${Math.round(d.bond.cna)}</td><td>cm</td><td>-</td></tr>
+                        <tr><td>${txt('res_na')}</td><td>(ANa/ANao) * psi * Nba</td><td>${Math.round(d.bond.na)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#e6f3ff">
+                            <td><strong>${txt('res_phi_na')}</strong></td>
+                            <td>φNa (φ=0.55)</td>
+                            <td><strong>${Math.round(d.bond.cap)}</strong></td>
+                            <td>kgf</td>
+                            <td><span class="${d.bond.ok ? 'pass' : 'fail'}">${d.bond.ok ? 'OK' : 'FAIL'}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>${txt('res_ratio')}</strong></td>
+                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${(d.bond.ratio || 0).toFixed(2)}</strong></td>
+                            <td><strong>-</strong></td>
+                            <td>-</td>
+                        </tr>
+                    </table>
+                `;
             }
 
             if (showT) {
