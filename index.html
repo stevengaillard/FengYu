@@ -612,8 +612,75 @@
 
         document.getElementById('login-btn').addEventListener('click', () => document.getElementById('auth-modal').classList.remove('hidden'));
         document.getElementById('guest-login').addEventListener('click', async () => { await auth.signInAnonymously(); document.getElementById('auth-modal').classList.add('hidden'); });
-        document.getElementById('email-login-btn').addEventListener('click', async () => { /* ... */ });
-        document.getElementById('email-register-btn').addEventListener('click', async () => { /* ... */ });
+        // --- EMAIL LOGIN LOGIC ---
+        document.getElementById('email-login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorMsg = document.getElementById('auth-error');
+        
+            // Reset error
+            errorMsg.classList.add('hidden');
+            errorMsg.innerText = '';
+        
+            if (!email || !password) {
+                errorMsg.innerText = "Please enter both email and password.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+        
+            try {
+                // Change button text to indicate loading
+                const btn = document.getElementById('email-login-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Processing...';
+        
+                await auth.signInWithEmailAndPassword(email, password);
+                
+                // Modal will close automatically via the onAuthStateChanged listener you already wrote
+                
+                // Reset button text
+                btn.innerText = originalText;
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerText = error.message;
+                errorMsg.classList.remove('hidden');
+                document.getElementById('email-login-btn').innerText = "Login";
+            }
+        });
+        
+        // --- EMAIL REGISTER LOGIC ---
+        document.getElementById('email-register-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const errorMsg = document.getElementById('auth-error');
+        
+            // Reset error
+            errorMsg.classList.add('hidden');
+            errorMsg.innerText = '';
+        
+            if (!email || !password) {
+                errorMsg.innerText = "Please enter both email and password.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+        
+            try {
+                const btn = document.getElementById('email-register-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Creating...';
+        
+                await auth.createUserWithEmailAndPassword(email, password);
+                
+                // Modal closes automatically via onAuthStateChanged
+                
+                btn.innerText = originalText;
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerText = error.message;
+                errorMsg.classList.remove('hidden');
+                document.getElementById('email-register-btn').innerText = "Register";
+            }
+        });
         document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
 
 
@@ -972,3 +1039,4 @@
     </script>
 </body>
 </html>
+
