@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Structural Anchor Analysis</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23004a99%22/></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23004a99%22/></svg>">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -25,11 +25,11 @@
             theme: {
                 extend: {
                     colors: {
-                        eng: { 
-                            primary: '#004a99', 
-                            secondary: '#f0f2f5', 
-                            dark: '#1e293b', 
-                            success: '#10b981', 
+                        eng: {
+                            primary: '#004a99',
+                            secondary: '#f0f2f5',
+                            dark: '#1e293b',
+                            success: '#10b981',
                             danger: '#ef4444',
                             warning: '#f59e0b'
                         }
@@ -39,17 +39,33 @@
         }
     </script>
     <style>
-        .calc-input { font-family: 'Courier New', monospace; font-weight: 600; }
-        .math-symbol { font-family: 'Times New Roman', serif; font-style: italic; }
-        select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; -webkit-appearance: none; appearance: none; }
-        
+        .calc-input {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
         /* PRINT SPECIFIC STYLES */
         @media print {
             @page {
                 size: A4;
                 margin: 15mm;
             }
-            
+
             /* Hide the web app UI */
             #root, #auth-modal, nav {
                 display: none !important;
@@ -78,26 +94,85 @@
                 display: block;
                 clear: both;
             }
-            
+
             table, tr, td, th {
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
 
             /* Report Styling */
-            h1 { color: #004a99; font-size: 24pt; margin-bottom: 5px; font-weight: bold; border-bottom: 2px solid #004a99; padding-bottom: 10px; }
-            h2 { color: #333; font-size: 14pt; margin-top: 20px; margin-bottom: 10px; background: #eee; padding: 5px 10px; font-weight: bold; }
-            h3 { color: #004a99; font-size: 14pt; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-            h4 { color: #555; font-size: 11pt; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
-            
-            table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 10pt; }
-            th { background-color: #004a99; color: white; padding: 8px; text-align: left; font-weight: bold; }
-            td { border: 1px solid #ddd; padding: 8px; vertical-align: middle; }
-            tr:nth-child(even) { background-color: #f9f9f9; }
-            
-            .pass { color: green; font-weight: bold; }
-            .fail { color: red; font-weight: bold; }
-            
+            h1 {
+                color: #004a99;
+                font-size: 24pt;
+                margin-bottom: 5px;
+                font-weight: bold;
+                border-bottom: 2px solid #004a99;
+                padding-bottom: 10px;
+            }
+
+            h2 {
+                color: #333;
+                font-size: 14pt;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                background: #eee;
+                padding: 5px 10px;
+                font-weight: bold;
+            }
+
+            h3 {
+                color: #004a99;
+                font-size: 14pt;
+                margin-top: 20px;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;
+            }
+
+            h4 {
+                color: #555;
+                font-size: 11pt;
+                margin-top: 15px;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+                font-weight: bold;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 15px;
+                font-size: 10pt;
+            }
+
+            th {
+                background-color: #004a99;
+                color: white;
+                padding: 8px;
+                text-align: left;
+                font-weight: bold;
+            }
+
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                vertical-align: middle;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            .pass {
+                color: green;
+                font-weight: bold;
+            }
+
+            .fail {
+                color: red;
+                font-weight: bold;
+            }
+
             .report-footer {
                 margin-top: 30px;
                 border-top: 1px solid #ccc;
@@ -105,20 +180,21 @@
                 font-size: 8pt;
                 color: #888;
                 text-align: center;
-                position: fixed; 
-                bottom: 0; 
+                /* position: fixed; bottom: 0; width: 100%; - Removed fixed position to allow content flow */
                 width: 100%;
             }
         }
-        
+
         /* Hide print staging on normal screen */
-        #print-staging { display: none; }
+        #print-staging {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans">
 
     <div id="root" class="min-h-screen flex flex-col">
-        
+
         <!-- Navbar -->
         <nav class="bg-eng-primary text-white shadow-md sticky top-0 z-50">
             <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -146,13 +222,13 @@
 
         <!-- Main Content -->
         <main class="flex-grow max-w-5xl mx-auto w-full p-4 space-y-6">
-            
+
             <!-- Auth Modal -->
             <div id="auth-modal" class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
                 <div class="bg-white rounded-lg shadow-2xl p-8 w-11/12 max-w-sm border-t-4 border-eng-primary">
                     <h2 class="text-2xl font-bold mb-2 text-center text-eng-primary" data-i18n="modal_title">Access Portal</h2>
                     <p class="text-gray-500 mb-4 text-center text-sm" data-i18n="modal_desc">Sign in to sync your data across devices.</p>
-                    
+
                     <div class="space-y-3 mb-4">
                         <input type="email" id="auth-email" placeholder="Email" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-eng-primary outline-none">
                         <input type="password" id="auth-password" placeholder="Password" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-eng-primary outline-none">
@@ -188,57 +264,75 @@
 
             <!-- TAB: CALCULATOR -->
             <div id="view-calculator" class="space-y-6 pb-20">
-                
+
                 <!-- INPUTS -->
                 <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
                     <div class="bg-gray-100 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
                         <h3 class="font-bold text-slate-700"><i class="fa-solid fa-pen-to-square mr-2"></i><span data-i18n="sec_params">Design Parameters</span></h3>
                         <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border">Units: kgf, cm</span>
                     </div>
-                    
+
                     <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        
+
                         <!-- 1. Geometry -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_mat">Material & Geometry</h4>
-                            
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_fc">Concrete Strength (<span class="math-symbol">f'c</span>) [kgf/cm²]</label>
-                            <input type="number" id="fc" value="280" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
-                            
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_ha">Wall Thickness (<span class="math-symbol">h<sub>a</sub></span>) [cm]</label>
-                            <input type="number" id="ha" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
 
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_da">Anchor Diameter (<span class="math-symbol">d<sub>a</sub></span>) [cm]</label>
-                            <input type="number" id="da" value="1.6" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
-                            
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_hef">Embedment (<span class="math-symbol">h<sub>ef</sub></span>) [cm]</label>
-                            <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_fc">Concrete Strength (<span class="math-symbol">f'c</span>) [kgf/cm²]</label>
+                                <input type="number" id="fc" value="280" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ha">Wall Thickness (<span class="math-symbol">h<sub>a</sub></span>) [cm]</label>
+                                <input type="number" id="ha" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_da">Anchor Diameter (<span class="math-symbol">d<sub>a</sub></span>) [cm]</label>
+                                <input type="number" id="da" value="1.6" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_hef">Embedment (<span class="math-symbol">h<sub>ef</sub></span>) [cm]</label>
+                                <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
                         </div>
 
                         <!-- 2. Spacing -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_space">Spacing & Edge Dist</h4>
-                            
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_s1">Vertical Spacing (<span class="math-symbol">S<sub>1</sub></span>) [cm]</label>
-                            <input type="number" id="s1" value="22" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
-                            
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_s2">Horizontal Spacing (<span class="math-symbol">S<sub>2</sub></span>) [cm]</label>
-                            <input type="number" id="s2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
-                            
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_ca1">Top Edge (<span class="math-symbol">C<sub>a1</sub></span>) [cm]</label>
-                            <input type="number" id="ca1" value="13" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
 
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_ca1_1">Bottom Edge (<span class="math-symbol">C<sub>a1,1</sub></span>) [cm]</label>
-                            <input type="number" id="ca1_1" value="35" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_s1">Vertical Spacing (<span class="math-symbol">S<sub>1</sub></span>) [cm]</label>
+                                <input type="number" id="s1" value="22" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
 
-                            <div><label class="text-xs text-gray-500" data-i18n="lbl_ca2">Side Edge (<span class="math-symbol">C<sub>a2</sub></span>) [cm]</label>
-                            <input type="number" id="ca2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right"></div>
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_s2">Horizontal Spacing (<span class="math-symbol">S<sub>2</sub></span>) [cm]</label>
+                                <input type="number" id="s2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ca1">Top Edge (<span class="math-symbol">C<sub>a1</sub></span>) [cm]</label>
+                                <input type="number" id="ca1" value="13" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ca1_1">Bottom Edge (<span class="math-symbol">C<sub>a1,1</sub></span>) [cm]</label>
+                                <input type="number" id="ca1_1" value="35" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ca2">Side Edge (<span class="math-symbol">C<sub>a2</sub></span>) [cm]</label>
+                                <input type="number" id="ca2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
                         </div>
 
                         <!-- 3. Coefficients -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_factors">Factors & Coefficients</h4>
-                            
+
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_kc">Anchor Type (<span class="math-symbol">k<sub>c</sub></span>)</label>
                                 <select id="kc_select" class="w-full border border-gray-300 rounded p-2 text-xs">
@@ -265,7 +359,7 @@
                                 </select>
                             </div>
 
-                             <div>
+                            <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_reinf">Cracking/Reinf (<span class="math-symbol">ψ<sub>c,V</sub></span>)</label>
                                 <select id="psi_c_V_select" class="w-full border border-gray-300 rounded p-2 text-xs">
                                     <option value="1.0" data-i18n="opt_reinf1">No Reinf / &lt; D13 (1.0)</option>
@@ -273,32 +367,32 @@
                                     <option value="1.4" data-i18n="opt_reinf3">Reinf ≥ D13 + Ties (1.4)</option>
                                 </select>
                             </div>
-                             
-                             <div class="grid grid-cols-2 gap-2">
-                                 <div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
                                     <label class="text-xs text-gray-500" data-i18n="lbl_en">Eccentric <span class="math-symbol">e'<sub>N</sub></span> [cm]</label>
                                     <input type="number" id="e_prime_n" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
-                                 </div>
-                                 <div>
+                                </div>
+                                <div>
                                     <label class="text-xs text-gray-500" data-i18n="lbl_ev">Eccentric <span class="math-symbol">e'<sub>V</sub></span> [cm]</label>
                                     <input type="number" id="e_prime_v" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
-                                 </div>
+                                </div>
                             </div>
 
                         </div>
                     </div>
 
                     <!-- Loads -->
-                     <div class="px-6 pb-6">
+                    <div class="px-6 pb-6">
                         <h4 class="text-xs font-bold text-eng-danger uppercase border-b pb-1 mb-2 text-red-600" data-i18n="sec_loads">Applied Loads</h4>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-red-50 p-3 rounded border border-red-100">
                                 <label class="text-xs font-bold text-red-700" data-i18n="lbl_t">Tension (<span class="math-symbol">T</span>) [kgf]</label>
-                                <input type="number" id="loadT" value="1733" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                                <input type="number" id="loadT" value="100" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
                             </div>
                             <div class="bg-red-50 p-3 rounded border border-red-100">
                                 <label class="text-xs font-bold text-red-700" data-i18n="lbl_v">Shear (<span class="math-symbol">V</span>) [kgf]</label>
-                                <input type="number" id="loadV" value="608" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                                <input type="number" id="loadV" value="100" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
                             </div>
                         </div>
                     </div>
@@ -326,29 +420,29 @@
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
                             <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_t_title">Concrete Tension Breakout</span></h4>
                         </div>
-                        
+
                         <!-- Single Tension Results -->
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm border-b">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_t1_sub">Single Anchor</h5>
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_nb">Basic Strength</span><span id="r1-nb" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_anc">Proj. Area</span><span id="r1-anc" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_cap">Capacity</span><span id="r1-cap" class="text-lg font-bold text-eng-primary"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r1-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-1" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
-                             </div>
+                            </div>
                         </div>
 
-                         <!-- Group Tension Results -->
-                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
+                        <!-- Group Tension Results -->
+                        <div class="p-4 grid grid-cols-1 gap-2 text-sm">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_tg_sub">Anchor Group</h5>
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_anc_g">Group Area</span><span id="r3-anc" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ecc">Eccentricity</span><span id="r3-psi" class="font-mono text-gray-600"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_cap_g">Group Capacity</span><span id="r3-cap" class="text-lg font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r3-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-3" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
-                             </div>
+                            </div>
                         </div>
                     </div>
 
@@ -357,28 +451,28 @@
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
                             <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_v_title">Concrete Shear Breakout</span></h4>
                         </div>
-                         <!-- Single Shear Results -->
-                         <div class="p-4 grid grid-cols-1 gap-2 text-sm border-b">
+                        <!-- Single Shear Results -->
+                        <div class="p-4 grid grid-cols-1 gap-2 text-sm border-b">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_v1_sub">Single Anchor</h5>
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_vb">Basic Shear</span><span id="r2-vb" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_avc">Proj. Area</span><span id="r2-avc" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_cap">Capacity</span><span id="r2-cap" class="text-lg font-bold text-eng-primary"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r2-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-2" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
-                             </div>
+                            </div>
                         </div>
 
-                         <!-- Group Shear Results -->
-                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
+                        <!-- Group Shear Results -->
+                        <div class="p-4 grid grid-cols-1 gap-2 text-sm">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_vg_sub">Anchor Group</h5>
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_avc_g">Group Area</span><span id="r4-avc" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ecc">Eccentricity</span><span id="r4-psi" class="font-mono text-gray-600"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_cap_g">Group Capacity</span><span id="r4-cap" class="text-lg font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r4-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-4" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
-                             </div>
+                            </div>
                         </div>
                     </div>
 
@@ -387,8 +481,8 @@
 
             <!-- TAB: HISTORY -->
             <div id="view-history" class="hidden">
-               <!-- ... existing history code ... -->
-               <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <!-- ... existing history code ... -->
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
                     <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                         <h3 class="font-bold text-gray-700" data-i18n="history_title">Database Records</h3>
                         <div class="flex space-x-3">
@@ -406,9 +500,9 @@
             </div>
 
         </main>
-        
+
     </div>
-    
+
     <!-- PRINT STAGING AREA (Hidden on Screen, Visible on Print) -->
     <!-- MOVED OUTSIDE OF #ROOT TO PREVENT BEING HIDDEN BY CSS -->
     <div id="print-staging"></div>
@@ -417,13 +511,13 @@
     <script>
         // ... existing firebase config ...
         const firebaseConfig = {
-          apiKey: "AIzaSyAP0nsg3Saf_W0lEk5Mdt4oVKhFQJ69BOg",
-          authDomain: "anchor-app-a1426.firebaseapp.com",
-          projectId: "anchor-app-a1426",
-          storageBucket: "anchor-app-a1426.firebasestorage.app",
-          messagingSenderId: "822722897072",
-          appId: "1:822722897072:web:32f8dabc44735718af0775",
-          measurementId: "G-5GVPXDBJM1"
+            apiKey: "AIzaSyAP0nsg3Saf_W0lEk5Mdt4oVKhFQJ69BOg",
+            authDomain: "anchor-app-a1426.firebaseapp.com",
+            projectId: "anchor-app-a1426",
+            storageBucket: "anchor-app-a1426.firebasestorage.app",
+            messagingSenderId: "822722897072",
+            appId: "1:822722897072:web:32f8dabc44735718af0775",
+            measurementId: "G-5GVPXDBJM1"
         };
         // ... existing auth init ...
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -432,7 +526,7 @@
 
         let currentUser = null;
         let currentData = null;
-        let historyCache = {}; 
+        let historyCache = {};
         let currentLang = 'en';
 
         // --- TRANSLATION DATA ---
@@ -482,27 +576,6 @@
         };
 
         // --- FORMULA IMAGES (SVG) ---
-        // Basic Equations for Display
-        const eq_Nb = `<svg height="20" viewBox="0 0 150 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">N<tspan dy="3" font-size="10">b</tspan><tspan dy="-3" font-size="14"> = k</tspan><tspan dy="3" font-size="10">c</tspan><tspan dy="-3" font-size="14"> λ</tspan><tspan dy="3" font-size="10">a</tspan><tspan dy="-3" font-size="14"> √f'</tspan><tspan dy="3" font-size="10">c</tspan><tspan dy="-3" font-size="14"> h</tspan><tspan dy="3" font-size="10">ef</tspan><tspan dy="-8" font-size="10">1.5</tspan></text></svg>`;
-        const eq_Anc = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">A<tspan dy="3" font-size="10">Nc</tspan></text></svg>`;
-        const eq_Anco = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">A<tspan dy="3" font-size="10">Nco</tspan><tspan dy="-3" font-size="14"> = 9h</tspan><tspan dy="3" font-size="10">ef</tspan><tspan dy="-8" font-size="10">2</tspan></text></svg>`;
-        const eq_psiedN = `<svg height="20" viewBox="0 0 50 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ψ<tspan dy="3" font-size="10">ed,N</tspan></text></svg>`;
-        const eq_phiNcb = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ϕN<tspan dy="3" font-size="10">cb</tspan></text></svg>`;
-
-        const eq_Vb = `<svg height="20" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">V<tspan dy="3" font-size="10">b</tspan></text></svg>`;
-        const eq_Avc = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">A<tspan dy="3" font-size="10">Vc</tspan></text></svg>`;
-        const eq_Avco = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">A<tspan dy="3" font-size="10">Vco</tspan><tspan dy="-3" font-size="14"> = 4.5c</tspan><tspan dy="3" font-size="10">a1</tspan><tspan dy="-8" font-size="10">2</tspan></text></svg>`;
-        const eq_psiedV = `<svg height="20" viewBox="0 0 50 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ψ<tspan dy="3" font-size="10">ed,V</tspan></text></svg>`;
-        const eq_phiVcb = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ϕV<tspan dy="3" font-size="10">cb</tspan></text></svg>`;
-
-        const eq_Ancg = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">A<tspan dy="3" font-size="10">Nc(g)</tspan></text></svg>`;
-        const eq_psiecN = `<svg height="20" viewBox="0 0 50 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ψ<tspan dy="3" font-size="10">ec,N</tspan></text></svg>`;
-        const eq_phiNcbg = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ϕN<tspan dy="3" font-size="10">cbg</tspan></text></svg>`;
-
-        const eq_Avcg = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">A<tspan dy="3" font-size="10">Vc(g)</tspan></text></svg>`;
-        const eq_psiecV = `<svg height="20" viewBox="0 0 50 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ψ<tspan dy="3" font-size="10">ec,V</tspan></text></svg>`;
-        const eq_phiVcbg = `<svg height="20" viewBox="0 0 80 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="Times New Roman" font-size="14" font-style="italic">ϕV<tspan dy="3" font-size="10">cbg</tspan></text></svg>`;
-        
         // Detailed Formula Images for PDF Header
         const math_Nb_pdf = `<svg height="30" viewBox="0 0 250 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><text x="0" y="22" font-family="Times New Roman" font-size="18" font-style="italic">N<tspan dy="5" font-size="12">b</tspan><tspan dy="-5" font-size="18"> = </tspan>k<tspan dy="5" font-size="12">c</tspan><tspan dy="-5" font-size="18"> </tspan>λ<tspan dy="5" font-size="12">a</tspan><tspan dy="-5" font-size="18"> √f'</tspan><tspan dy="5" font-size="12">c</tspan><tspan dy="-5" font-size="18"> h</tspan><tspan dy="5" font-size="12">ef</tspan><tspan dy="-10" font-size="12">1.5</tspan></text></svg>`;
         const math_Vb_pdf = `<svg height="30" viewBox="0 0 250 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><text x="0" y="22" font-family="Times New Roman" font-size="18" font-style="italic">V<tspan dy="5" font-size="12">b</tspan><tspan dy="-5" font-size="18"> = min(V</tspan><tspan dy="5" font-size="12">b1</tspan><tspan dy="-5" font-size="18">, V</tspan><tspan dy="5" font-size="12">b2</tspan><tspan dy="-5" font-size="18">)</tspan></text></svg>`;
@@ -516,10 +589,10 @@
             document.getElementById('lang-label').innerText = currentLang === 'en' ? '中文' : 'EN';
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if(translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+                if (translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
             });
-            if(currentData) updateUI();
-            if(!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
+            if (currentData) updateUI();
+            if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
         }
 
         auth.onAuthStateChanged((user) => {
@@ -528,9 +601,9 @@
                 document.getElementById('auth-modal').classList.add('hidden');
                 document.getElementById('user-info').classList.remove('hidden');
                 document.getElementById('login-btn').classList.add('hidden');
-                const label = user.email ? user.email : `Guest: ${user.uid.substring(0,6)}`;
+                const label = user.email ? user.email : `Guest: ${user.uid.substring(0, 6)}`;
                 document.getElementById('user-email').innerText = label;
-                if(!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
+                if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
             } else {
                 document.getElementById('user-info').classList.add('hidden');
                 document.getElementById('login-btn').classList.remove('hidden');
@@ -544,7 +617,7 @@
         document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
 
 
-        window.performCalculation = function() {
+        window.performCalculation = function () {
             const val = (id) => parseFloat(document.getElementById(id).value) || 0;
             const str = (id) => document.getElementById(id).value;
             const I = {
@@ -554,7 +627,7 @@
                 e_prime_n: val('e_prime_n'), e_prime_v: val('e_prime_v')
             };
 
-            let le_val = 12.7; if(I.le_mode === 'sleeve') le_val = I.hef; else if(I.le_mode === 'torque') le_val = 2 * I.da;
+            let le_val = 12.7; if (I.le_mode === 'sleeve') le_val = I.hef; else if (I.le_mode === 'torque') le_val = 2 * I.da;
             const ca_min = Math.min(I.ca1, I.ca1_1, I.ca2);
             let psi_ed_N = (ca_min < 1.5 * I.hef) ? (0.7 + 0.3 * (ca_min / (1.5 * I.hef))) : 1.0;
             let psi_ed_V = (I.ca2 < 1.5 * I.ca1_1) ? (0.7 + 0.3 * (I.ca2 / (1.5 * I.ca1_1))) : 1.0;
@@ -565,62 +638,64 @@
             const Anco = 9 * Math.pow(I.hef, 2);
             const Anc_1 = 2 * (1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
             const phi_Ncb = 0.75 * (Anc_1 / Anco) * psi_ed_N * 1.0 * 1.0 * Nb;
-            const ratio_1 = I.T > 0 ? (I.T / phi_Ncb) : 0; 
+            const ratio_1 = I.T > 0 ? (I.T / phi_Ncb) : 0;
 
-            const Vb1 = 1.86 * Math.pow(le_val/I.da, 0.2) * Math.sqrt(I.da) * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5);
+            const Vb1 = 1.86 * Math.pow(le_val / I.da, 0.2) * Math.sqrt(I.da) * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5);
             const Vb2 = 3.8 * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5);
             const Vb = Math.min(Vb1, Vb2);
             const Avco = 4.5 * Math.pow(I.ca1_1, 2);
             const Avc_2 = 2 * (1.5 * I.ca1_1) * I.ha;
-            let psi_h_V = Math.pow((1.5 * I.ca1_1) / I.ha, 0.5); if(psi_h_V < 1.0) psi_h_V = 1.0;
+            let psi_h_V = Math.pow((1.5 * I.ca1_1) / I.ha, 0.5); if (psi_h_V < 1.0) psi_h_V = 1.0;
             const phi_Vcb = 0.75 * (Avc_2 / Avco) * psi_ed_V * I.psi_c_V * psi_h_V * Vb;
             const ratio_2 = I.V > 0 ? (I.V / phi_Vcb) : 0;
 
-            const Anc_3 = (I.ca2 + I.s2 + 1.5*I.hef) * (I.ca1 + I.s1 + 1.5*I.hef);
+            const Anc_3 = (I.ca2 + I.s2 + 1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
             const phi_Ncbg = 0.75 * (Anc_3 / Anco) * psi_ec_N * psi_ed_N * 1.0 * 1.0 * Nb;
             const ratio_3 = I.T > 0 ? ((2 * I.T) / phi_Ncbg) : 0;
 
             const Avc_4 = ((2 * 1.5 * I.ca1_1) + I.s2) * I.ha;
-            const phi_Vcbg = 0.75 * (Avc_4 / Avco) * psi_ec_V * psi_ed_V * I.psi_c_V * psi_h_V * Vb; 
+            const phi_Vcbg = 0.75 * (Avc_4 / Avco) * psi_ec_V * psi_ed_V * I.psi_c_V * psi_h_V * Vb;
             const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0;
 
-            currentData = { inputs: I, factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V }, calcs: {
-                c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb, load: I.T, ratio: ratio_1, ok: ratio_1 < 1.0 },
-                c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0 },
-                c3: { anc: Anc_3, cap: phi_Ncbg, load: 2*I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
-                c4: { avc: Avc_4, cap: phi_Vcbg, load: I.V, ratio: ratio_4, psih: psi_h_V, ok: ratio_4 < 1.0 }
-            }, timestamp: new Date() };
+            currentData = {
+                inputs: I, factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V }, calcs: {
+                    c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb, load: I.T, ratio: ratio_1, ok: ratio_1 < 1.0 },
+                    c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0 },
+                    c3: { anc: Anc_3, cap: phi_Ncbg, load: 2 * I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
+                    c4: { avc: Avc_4, cap: phi_Vcbg, load: I.V, ratio: ratio_4, psih: psi_h_V, ok: ratio_4 < 1.0 }
+                }, timestamp: new Date()
+            };
             updateUI();
         };
 
         function updateUI() {
-            if(!currentData) return;
+            if (!currentData) return;
             const d = currentData.calcs; const f = currentData.factors;
             const I = currentData.inputs;
             document.getElementById('results-container').classList.remove('hidden');
-            const set = (id, val, unit='') => document.getElementById(id).innerText = Math.round(val) + unit;
-            
+            const set = (id, val, unit = '') => document.getElementById(id).innerText = Math.round(val) + unit;
+
             const showTension = I.T > 0;
             const showShear = I.V > 0;
 
             document.getElementById('card-tension').classList.toggle('hidden', !showTension);
             document.getElementById('card-shear').classList.toggle('hidden', !showShear);
 
-            if(showTension) {
-                set('r1-nb', d.c1.nb, ' kgf'); set('r1-anc', d.c1.anc, ' cm²'); set('r1-cap', d.c1.cap, ' kgf'); 
+            if (showTension) {
+                set('r1-nb', d.c1.nb, ' kgf'); set('r1-anc', d.c1.anc, ' cm²'); set('r1-cap', d.c1.cap, ' kgf');
                 document.getElementById('r1-ratio').innerText = (d.c1.ratio || 0).toFixed(2);
                 setStatus('badge-1', d.c1.ok);
-                
+
                 set('r3-anc', d.c3.anc, ' cm²'); set('r3-cap', d.c3.cap, ' kgf'); set('r3-psi', f.psi_ec_N.toFixed(2));
                 document.getElementById('r3-ratio').innerText = (d.c3.ratio || 0).toFixed(2);
                 setStatus('badge-3', d.c3.ok);
             }
 
-            if(showShear) {
-                set('r2-vb', d.c2.vb, ' kgf'); set('r2-avc', d.c2.avc, ' cm²'); set('r2-cap', d.c2.cap, ' kgf'); 
+            if (showShear) {
+                set('r2-vb', d.c2.vb, ' kgf'); set('r2-avc', d.c2.avc, ' cm²'); set('r2-cap', d.c2.cap, ' kgf');
                 document.getElementById('r2-ratio').innerText = (d.c2.ratio || 0).toFixed(2);
                 setStatus('badge-2', d.c2.ok);
-                
+
                 set('r4-avc', d.c4.avc, ' cm²'); set('r4-cap', d.c4.cap, ' kgf'); set('r4-psi', f.psi_ec_V.toFixed(2));
                 document.getElementById('r4-ratio').innerText = (d.c4.ratio || 0).toFixed(2);
                 setStatus('badge-4', d.c4.ok);
@@ -628,17 +703,17 @@
 
             document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
         }
-        
+
         function setStatus(id, isOk) {
             const el = document.getElementById(id);
-            if(isOk) { el.innerText = t('pass'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-green-100 text-green-800 border border-green-200"; } 
+            if (isOk) { el.innerText = t('pass'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-green-100 text-green-800 border border-green-200"; }
             else { el.innerText = t('fail'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-red-100 text-red-800 border border-red-200"; }
         }
 
-        window.saveResult = async function() {
-             if (!currentUser) { alert("Please login first."); return; }
+        window.saveResult = async function () {
+            if (!currentUser) { alert("Please login first."); return; }
             const btn = document.getElementById('save-btn'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>' + (currentLang === 'en' ? 'Saving...' : '儲存中...');
-            performCalculation(); if(!currentData) return;
+            performCalculation(); if (!currentData) return;
             try {
                 await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').add({
                     inputs: currentData.inputs, summary: { ratio1: currentData.calcs.c1.ratio, ratio2: currentData.calcs.c2.ratio, ratio3: currentData.calcs.c3.ratio, ratio4: currentData.calcs.c4.ratio, allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok },
@@ -647,20 +722,20 @@
                 btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Saved!'; setTimeout(() => btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`, 2000);
             } catch (e) { console.error(e); btn.innerHTML = 'Error'; }
         };
-        
-         window.clearHistory = async function() {
-            if (!currentUser) return; if(!confirm("Are you sure?")) return;
+
+        window.clearHistory = async function () {
+            if (!currentUser) return; if (!confirm("Are you sure?")) return;
             const list = document.getElementById('history-list'); list.innerHTML = '<div class="p-6 text-center text-red-500"><i class="fa-solid fa-trash fa-bounce mr-2"></i>Deleting...</div>';
             try {
                 const snapshot = await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').get();
-                const batch = db.batch(); snapshot.docs.forEach((doc) => batch.delete(doc.ref)); await batch.commit(); loadHistory(); 
+                const batch = db.batch(); snapshot.docs.forEach((doc) => batch.delete(doc.ref)); await batch.commit(); loadHistory();
             } catch (e) { console.error(e); alert("Error deleting history."); }
         };
 
-        window.restoreFromHistory = function(docId) {
-            const data = historyCache[docId]; if(!data || !data.inputs) return;
+        window.restoreFromHistory = function (docId) {
+            const data = historyCache[docId]; if (!data || !data.inputs) return;
             const setVal = (id, v) => document.getElementById(id).value = v; const I = data.inputs;
-            setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef); setVal('s1', I.s1); setVal('s2', I.s2); 
+            setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef); setVal('s1', I.s1); setVal('s2', I.s2);
             setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2); setVal('loadT', I.T); setVal('loadV', I.V);
             setVal('kc_select', I.kc || 10); setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);
             setVal('le_select', I.le_mode || 'default'); setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
@@ -668,23 +743,23 @@
             switchTab('calculator'); performCalculation();
         };
 
-        window.loadHistory = function() {
+        window.loadHistory = function () {
             if (!currentUser) return; const list = document.getElementById('history-list');
             list.innerHTML = '<div class="p-6 text-center text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Loading...</div>';
             db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').limit(50).onSnapshot(snap => {
                 if (snap.empty) { list.innerHTML = `<div class="p-8 text-center text-gray-400">${t('msg_no_rec')}</div>`; return; }
-                let docs = []; historyCache = {}; 
+                let docs = []; historyCache = {};
                 snap.forEach(doc => { const data = doc.data(); docs.push({ id: doc.id, ...data }); historyCache[doc.id] = data; });
-                docs.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 let html = '';
                 docs.forEach(d => {
                     const status = d.summary.allPass ? `<span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded">${t('pass')}</span>` : `<span class="text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded">${t('fail')}</span>`;
-                    const date = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleDateString() : 'N/A';
+                    const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
                     html += `<div onclick="restoreFromHistory('${d.id}')" class="p-4 hover:bg-blue-50 flex justify-between items-center border-b cursor-pointer transition active:bg-blue-100">
-                            <div><div class="flex items-center gap-2 mb-1">${status}<span class="text-xs font-mono text-gray-500">${date}</span></div>
-                            <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V}</div>
-                            <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1"><span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span><span class="bg-gray-100 px-1 rounded border">da: ${d.inputs.da}</span></div></div>
-                            <div class="text-eng-primary text-xs font-bold flex items-center">${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i></div></div>`;
+                                <div><div class="flex items-center gap-2 mb-1">${status}<span class="text-xs font-mono text-gray-500">${date}</span></div>
+                                <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V}</div>
+                                <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1"><span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span><span class="bg-gray-100 px-1 rounded border">da: ${d.inputs.da}</span></div></div>
+                                <div class="text-eng-primary text-xs font-bold flex items-center">${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i></div></div>`;
                 });
                 list.innerHTML = html;
             });
@@ -693,9 +768,9 @@
         // ==========================================
         //  NEW PDF EXPORT (NATIVE PRINTING)
         // ==========================================
-        window.printReport = function() {
+        window.printReport = function () {
             if (!currentData) { alert("Please run the analysis first."); return; }
-            
+
             const d = currentData;
             const f = currentData.factors;
             const dateStr = new Date().toLocaleDateString();
@@ -705,153 +780,173 @@
             const showT = d.inputs.T > 0;
             const showV = d.inputs.V > 0;
 
+            // Define rich equation strings for Table
+            const e_Nb = `<span class="math-symbol">N<sub>b</sub> = k<sub>c</sub>λ<sub>a</sub>√f'<sub>c</sub>h<sub>ef</sub><sup>1.5</sup></span>`;
+            const e_Anc = `<span class="math-symbol">A<sub>Nc</sub> = 2(1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
+            const e_psiN = `<span class="math-symbol">ψ<sub>ed,N</sub> = 0.7+0.3(c<sub>a,min</sub>/1.5h<sub>ef</sub>)</span>`;
+            const e_phiN = `<span class="math-symbol">ϕN<sub>cb</sub> = 0.75(A<sub>Nc</sub>/A<sub>Nco</sub>)ψ<sub>ed,N</sub>ψ<sub>c,N</sub>ψ<sub>cp,N</sub>N<sub>b</sub></span>`;
+
+            const e_Ancg = `<span class="math-symbol">A<sub>Nc(g)</sub> = (C<sub>a2</sub>+S<sub>2</sub>+1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
+            const e_pecN = `<span class="math-symbol">ψ<sub>ec,N</sub> = 1/(1+2e'<sub>N</sub>/3h<sub>ef</sub>)</span>`;
+            const e_phiNg = `<span class="math-symbol">ϕN<sub>cbg</sub> = 0.75(A<sub>Nc(g)</sub>/A<sub>Nco</sub>)ψ<sub>ec,N</sub>ψ<sub>ed,N</sub>ψ<sub>c,N</sub>...N<sub>b</sub></span>`;
+
+            const e_Vb = `<span class="math-symbol">V<sub>b</sub> = min(V<sub>b1</sub>, V<sub>b2</sub>)</span>`;
+            const e_Avc = `<span class="math-symbol">A<sub>Vc</sub> = 2(1.5C<sub>a1</sub>)h<sub>a</sub></span>`;
+            const e_psiV = `<span class="math-symbol">ψ<sub>ed,V</sub> = 0.7+0.3(C<sub>a2</sub>/1.5C<sub>a1</sub>)</span>`;
+            const e_phiV = `<span class="math-symbol">ϕV<sub>cb</sub> = 0.75(A<sub>Vc</sub>/A<sub>Vco</sub>)ψ<sub>ed,V</sub>ψ<sub>c,V</sub>ψ<sub>h,V</sub>V<sub>b</sub></span>`;
+
+            const e_Avcg = `<span class="math-symbol">A<sub>Vc(g)</sub> = [(3C<sub>a1</sub>)+S<sub>2</sub>]h<sub>a</sub></span>`;
+            const e_pecV = `<span class="math-symbol">ψ<sub>ec,V</sub> = 1/(1+2e'<sub>V</sub>/3C<sub>a1</sub>)</span>`;
+            const e_phiVg = `<span class="math-symbol">ϕV<sub>cbg</sub> = 0.75(A<sub>Vc(g)</sub>/A<sub>Vco</sub>)ψ<sub>ec,V</sub>ψ<sub>ed,V</sub>ψ<sub>c,V</sub>...V<sub>b</sub></span>`;
+
+
             let html = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
-                    <div>
-                        <h1 style="color: #004a99; font-size: 20pt; margin: 0; font-weight:bold;">Anchor Analysis</h1>
-                        <p style="font-size: 10pt; color: #555; margin: 2px 0 0 0;">ACI/Structural Compliance Tool</p>
-                    </div>
-                    <div style="text-align: right; font-size: 9pt; color: #777;">
-                        ${dateStr}
-                    </div>
-                </div>
-                
-                <h2>${txt('sec_mat')}</h2>
-                <table>
-                    <tr><th>${txt('Parameter') || 'Parameter'}</th><th>${txt('Value') || 'Value'}</th><th>${txt('Unit') || 'Unit'}</th></tr>
-                    <tr><td>${txt('lbl_fc')}</td><td>${d.inputs.fc}</td><td>kgf/cm²</td></tr>
-                    <tr><td>${txt('lbl_ha')}</td><td>${d.inputs.ha}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_da')}</td><td>${d.inputs.da}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_hef')}</td><td>${d.inputs.hef}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_s1')}</td><td>${d.inputs.s1}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_s2')}</td><td>${d.inputs.s2}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_ca1')}</td><td>${d.inputs.ca1}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_ca1_1')}</td><td>${d.inputs.ca1_1}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_ca2')}</td><td>${d.inputs.ca2}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_t')}</td><td>${d.inputs.T}</td><td>kgf</td></tr>
-                    <tr><td>${txt('lbl_v')}</td><td>${d.inputs.V}</td><td>kgf</td></tr>
-                </table>
-
-                <h2>${txt('sec_factors')}</h2>
-                <table>
-                    <tr><th>Factor</th><th>Value</th><th>Note</th></tr>
-                    <tr><td>${txt('lbl_kc')}</td><td>${d.inputs.kc}</td><td></td></tr>
-                    <tr><td>${txt('lbl_lambda')}</td><td>${d.inputs.lambda}</td><td></td></tr>
-                    <tr><td>${txt('lbl_le')}</td><td>${d.inputs.le_mode}</td><td></td></tr>
-                    <tr><td>${txt('lbl_reinf')}</td><td>${d.inputs.psi_c_V}</td><td></td></tr>
-                    <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
-                </table>
-
-                <div class="page-break">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
                         <div>
-                            <h1 style="color: #666; font-size: 14pt; margin: 0; font-weight:bold;">Results</h1>
+                            <h1 style="color: #004a99; font-size: 20pt; margin: 0; font-weight:bold;">Anchor Analysis</h1>
+                            <p style="font-size: 10pt; color: #555; margin: 2px 0 0 0;">ACI/Structural Compliance Tool</p>
                         </div>
                         <div style="text-align: right; font-size: 9pt; color: #777;">
                             ${dateStr}
                         </div>
                     </div>
-                </div>`;
 
-            if(showT) {
+                    <h2>${txt('sec_mat')}</h2>
+                    <table>
+                        <tr><th>${txt('Parameter') || 'Parameter'}</th><th>${txt('Value') || 'Value'}</th><th>${txt('Unit') || 'Unit'}</th></tr>
+                        <tr><td>${txt('lbl_fc')}</td><td>${d.inputs.fc}</td><td>kgf/cm²</td></tr>
+                        <tr><td>${txt('lbl_ha')}</td><td>${d.inputs.ha}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_da')}</td><td>${d.inputs.da}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_hef')}</td><td>${d.inputs.hef}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_s1')}</td><td>${d.inputs.s1}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_s2')}</td><td>${d.inputs.s2}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_ca1')}</td><td>${d.inputs.ca1}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_ca1_1')}</td><td>${d.inputs.ca1_1}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_ca2')}</td><td>${d.inputs.ca2}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_t')}</td><td>${d.inputs.T}</td><td>kgf</td></tr>
+                        <tr><td>${txt('lbl_v')}</td><td>${d.inputs.V}</td><td>kgf</td></tr>
+                    </table>
+
+                    <h2>${txt('sec_factors')}</h2>
+                    <table>
+                        <tr><th>Factor</th><th>Value</th><th>Note</th></tr>
+                        <tr><td>${txt('lbl_kc')}</td><td>${d.inputs.kc}</td><td></td></tr>
+                        <tr><td>${txt('lbl_lambda')}</td><td>${d.inputs.lambda}</td><td></td></tr>
+                        <tr><td>${txt('lbl_le')}</td><td>${d.inputs.le_mode}</td><td></td></tr>
+                        <tr><td>${txt('lbl_reinf')}</td><td>${d.inputs.psi_c_V}</td><td></td></tr>
+                        <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
+                        <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
+                    </table>
+
+                    <div class="page-break">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px;">
+                            <div>
+                                <h1 style="color: #666; font-size: 14pt; margin: 0; font-weight:bold;">Results</h1>
+                            </div>
+                            <div style="text-align: right; font-size: 9pt; color: #777;">
+                                ${dateStr}
+                            </div>
+                        </div>
+                    </div>`;
+
+            if (showT) {
                 html += `
-                <h3>${txt('res_t_title')}</h3>
-                <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Nb_pdf}</div>
-                
-                <h4>${txt('res_t1_sub')}</h4>
-                <table>
-                    <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                    <tr><td>${txt('res_nb')}</td><td>${eq_Nb}</td><td>${Math.round(d.calcs.c1.nb)}</td><td>kgf</td><td>-</td></tr>
-                    <tr><td>${txt('res_anc')}</td><td>${eq_Anc}</td><td>${Math.round(d.calcs.c1.anc)}</td><td>cm²</td><td>-</td></tr>
-                    <tr><td>${txt('res_edge')}</td><td>${eq_psiedN}</td><td>${f.psi_ed_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                    <tr style="background:#e6f3ff">
-                        <td><strong>${txt('res_cap')}</strong></td>
-                        <td><strong>${eq_phiNcb}</strong></td>
-                        <td><strong>${Math.round(d.calcs.c1.cap)}</strong></td>
-                        <td><strong>kgf</strong></td>
-                        <td><span class="${d.calcs.c1.ok ? 'pass':'fail'}">${d.calcs.c1.ok ? 'OK':'FAIL'}</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>${txt('res_ratio')}</strong></td>
-                        <td><strong>Load / Capacity</strong></td>
-                        <td><strong>${(d.calcs.c1.ratio || 0).toFixed(2)}</strong></td>
-                        <td><strong>-</strong></td>
-                        <td>-</td>
-                    </tr>
-                </table>
+                    <h3>${txt('res_t_title')}</h3>
+                    <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Nb_pdf}</div>
 
-                <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Ncbg_pdf}</div>
-                <h4>${txt('res_tg_sub')}</h4>
-                <table>
-                    <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                    <tr><td>${txt('res_anc_g')}</td><td>${eq_Ancg}</td><td>${Math.round(d.calcs.c3.anc)}</td><td>cm²</td><td>-</td></tr>
-                    <tr><td>${txt('res_ecc')}</td><td>${eq_psiecN}</td><td>${f.psi_ec_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                    <tr style="background:#f9f9e0">
-                        <td><strong>${txt('res_cap_g')}</strong></td>
-                        <td><strong>${eq_phiNcbg}</strong></td>
-                        <td><strong>${Math.round(d.calcs.c3.cap)}</strong></td>
-                        <td><strong>kgf</strong></td>
-                        <td><span class="${d.calcs.c3.ok ? 'pass':'fail'}">${d.calcs.c3.ok ? 'OK':'FAIL'}</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>${txt('res_ratio')}</strong></td>
-                        <td><strong>Load / Capacity</strong></td>
-                        <td><strong>${(d.calcs.c3.ratio || 0).toFixed(2)}</strong></td>
-                        <td><strong>-</strong></td>
-                        <td>-</td>
-                    </tr>
-                </table>`;
+                    <h4>${txt('res_t1_sub')}</h4>
+                    <table>
+                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr><td>${txt('res_nb')}</td><td>${e_Nb}</td><td>${Math.round(d.calcs.c1.nb)}</td><td>kgf</td><td>-</td></tr>
+                        <tr><td>${txt('res_anc')}</td><td>${e_Anc}</td><td>${Math.round(d.calcs.c1.anc)}</td><td>cm²</td><td>-</td></tr>
+                        <tr><td>${txt('res_edge')}</td><td>${e_psiN}</td><td>${f.psi_ed_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
+                        <tr style="background:#e6f3ff">
+                            <td><strong>${txt('res_cap')}</strong></td>
+                            <td><strong>${e_phiN}</strong></td>
+                            <td><strong>${Math.round(d.calcs.c1.cap)}</strong></td>
+                            <td><strong>kgf</strong></td>
+                            <td><span class="${d.calcs.c1.ok ? 'pass' : 'fail'}">${d.calcs.c1.ok ? 'OK' : 'FAIL'}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>${txt('res_ratio')}</strong></td>
+                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${(d.calcs.c1.ratio || 0).toFixed(2)}</strong></td>
+                            <td><strong>-</strong></td>
+                            <td>-</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Ncbg_pdf}</div>
+                    <h4>${txt('res_tg_sub')}</h4>
+                    <table>
+                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr><td>${txt('res_anc_g')}</td><td>${e_Ancg}</td><td>${Math.round(d.calcs.c3.anc)}</td><td>cm²</td><td>-</td></tr>
+                        <tr><td>${txt('res_ecc')}</td><td>${e_pecN}</td><td>${f.psi_ec_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
+                        <tr style="background:#f9f9e0">
+                            <td><strong>${txt('res_cap_g')}</strong></td>
+                            <td><strong>${e_phiNg}</strong></td>
+                            <td><strong>${Math.round(d.calcs.c3.cap)}</strong></td>
+                            <td><strong>kgf</strong></td>
+                            <td><span class="${d.calcs.c3.ok ? 'pass' : 'fail'}">${d.calcs.c3.ok ? 'OK' : 'FAIL'}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>${txt('res_ratio')}</strong></td>
+                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${(d.calcs.c3.ratio || 0).toFixed(2)}</strong></td>
+                            <td><strong>-</strong></td>
+                            <td>-</td>
+                        </tr>
+                    </table>`;
             }
 
-            if(showV) {
+            if (showV) {
                 html += `
-                <h3>${txt('res_v_title')}</h3>
-                <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vb_pdf}</div>
-                
-                <h4>${txt('res_v1_sub')}</h4>
-                <table>
-                    <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                    <tr><td>${txt('res_vb')}</td><td>${eq_Vb}</td><td>${Math.round(d.calcs.c2.vb)}</td><td>kgf</td><td>-</td></tr>
-                    <tr><td>${txt('res_avc')}</td><td>${eq_Avc}</td><td>${Math.round(d.calcs.c2.avc)}</td><td>cm²</td><td>-</td></tr>
-                    <tr><td>${txt('res_edge')}</td><td>${eq_psiedV}</td><td>${f.psi_ed_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                    <tr style="background:#e6f3ff">
-                        <td><strong>${txt('res_cap')}</strong></td>
-                        <td><strong>${eq_phiVcb}</strong></td>
-                        <td><strong>${Math.round(d.calcs.c2.cap)}</strong></td>
-                        <td><strong>kgf</strong></td>
-                        <td><span class="${d.calcs.c2.ok ? 'pass':'fail'}">${d.calcs.c2.ok ? 'OK':'FAIL'}</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>${txt('res_ratio')}</strong></td>
-                        <td><strong>Load / Capacity</strong></td>
-                        <td><strong>${(d.calcs.c2.ratio || 0).toFixed(2)}</strong></td>
-                        <td><strong>-</strong></td>
-                        <td>-</td>
-                    </tr>
-                </table>
+                    <h3>${txt('res_v_title')}</h3>
+                    <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vb_pdf}</div>
 
-                <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vcbg_pdf}</div>
-                <h4>${txt('res_vg_sub')}</h4>
-                <table>
-                    <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                    <tr><td>${txt('res_avc_g')}</td><td>${eq_Avcg}</td><td>${Math.round(d.calcs.c4.avc)}</td><td>cm²</td><td>-</td></tr>
-                    <tr><td>${txt('res_ecc')}</td><td>${eq_psiecV}</td><td>${f.psi_ec_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                    <tr style="background:#f9f9e0">
-                        <td><strong>${txt('res_cap_g')}</strong></td>
-                        <td><strong>${eq_phiVcbg}</strong></td>
-                        <td><strong>${Math.round(d.calcs.c4.cap)}</strong></td>
-                        <td><strong>kgf</strong></td>
-                        <td><span class="${d.calcs.c4.ok ? 'pass':'fail'}">${d.calcs.c4.ok ? 'OK':'FAIL'}</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>${txt('res_ratio')}</strong></td>
-                        <td><strong>Load / Capacity</strong></td>
-                        <td><strong>${(d.calcs.c4.ratio || 0).toFixed(2)}</strong></td>
-                        <td><strong>-</strong></td>
-                        <td>-</td>
-                    </tr>
-                </table>`;
+                    <h4>${txt('res_v1_sub')}</h4>
+                    <table>
+                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr><td>${txt('res_vb')}</td><td>${e_Vb}</td><td>${Math.round(d.calcs.c2.vb)}</td><td>kgf</td><td>-</td></tr>
+                        <tr><td>${txt('res_avc')}</td><td>${e_Avc}</td><td>${Math.round(d.calcs.c2.avc)}</td><td>cm²</td><td>-</td></tr>
+                        <tr><td>${txt('res_edge')}</td><td>${e_psiV}</td><td>${f.psi_ed_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
+                        <tr style="background:#e6f3ff">
+                            <td><strong>${txt('res_cap')}</strong></td>
+                            <td><strong>${e_phiV}</strong></td>
+                            <td><strong>${Math.round(d.calcs.c2.cap)}</strong></td>
+                            <td><strong>kgf</strong></td>
+                            <td><span class="${d.calcs.c2.ok ? 'pass' : 'fail'}">${d.calcs.c2.ok ? 'OK' : 'FAIL'}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>${txt('res_ratio')}</strong></td>
+                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${(d.calcs.c2.ratio || 0).toFixed(2)}</strong></td>
+                            <td><strong>-</strong></td>
+                            <td>-</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vcbg_pdf}</div>
+                    <h4>${txt('res_vg_sub')}</h4>
+                    <table>
+                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr><td>${txt('res_avc_g')}</td><td>${e_Avcg}</td><td>${Math.round(d.calcs.c4.avc)}</td><td>cm²</td><td>-</td></tr>
+                        <tr><td>${txt('res_ecc')}</td><td>${e_pecV}</td><td>${f.psi_ec_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
+                        <tr style="background:#f9f9e0">
+                            <td><strong>${txt('res_cap_g')}</strong></td>
+                            <td><strong>${e_phiVg}</strong></td>
+                            <td><strong>${Math.round(d.calcs.c4.cap)}</strong></td>
+                            <td><strong>kgf</strong></td>
+                            <td><span class="${d.calcs.c4.ok ? 'pass' : 'fail'}">${d.calcs.c4.ok ? 'OK' : 'FAIL'}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>${txt('res_ratio')}</strong></td>
+                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${(d.calcs.c4.ratio || 0).toFixed(2)}</strong></td>
+                            <td><strong>-</strong></td>
+                            <td>-</td>
+                        </tr>
+                    </table>`;
             }
 
             html += `<div class="report-footer">Report generated on ${dateStr}</div>`;
@@ -860,10 +955,10 @@
             window.print();
         };
 
-        window.switchTab = function(t) {
+        window.switchTab = function (t) {
             const calc = document.getElementById('view-calculator'); const hist = document.getElementById('view-history');
             const tabC = document.getElementById('tab-calculator'); const tabH = document.getElementById('tab-history');
-            if(t === 'calculator') {
+            if (t === 'calculator') {
                 calc.classList.remove('hidden'); hist.classList.add('hidden');
                 tabC.classList.add('text-eng-primary', 'border-b-4', 'border-eng-primary', 'font-bold'); tabC.classList.remove('text-gray-500', 'font-medium');
                 tabH.classList.remove('text-eng-primary', 'border-b-4', 'border-eng-primary', 'font-bold'); tabH.classList.add('text-gray-500', 'font-medium');
