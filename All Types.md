@@ -39,7 +39,7 @@ The following inputs are required to perform the structural calculations.
 | **Embedment Depth** | $h_{ef}$ | Effective embedment depth | $cm$ | Screw anchors: $5d_a \le h_{ef} \le 10d_a$ and $h_{ef} \ge 4$ cm<br>Adhesive: $4d_a \le h_{ef} \le 20d_a$ |
 | **Tensile Strength** | $f_{uta}$ | Specified tensile strength of anchor steel | $kgf/cm^2$ | ≤ min($1.9f_{ya}$, 8750 kgf/cm²) |
 | **Yield Strength** | $f_{ya}$ | Specified yield strength of anchor steel | $kgf/cm^2$ | For ductility checks |
-| **Effective Area (Tension)** | $A_{se,N}$ | Effective cross-sectional area (tension) | $cm^2$ | For threaded: $A_{se,N} = \frac{\pi}{4}\left[0.9743\left(d_a - \frac{1}{n_t}\right)\right]^2$ |
+| **Effective Area (Tension)** | $A_{se,N}$ | Effective cross-sectional area (tension) | $cm^2$ | For threaded: $A_{se,N} = \frac{\pi}{4}[0.9743(d_a - \frac{1}{n_t})]^2$ |
 | **Effective Area (Shear)** | $A_{se,V}$ | Effective cross-sectional area (shear) | $cm^2$ | Same as $A_{se,N}$ unless specified |
 
 ### 2.2 Layout & Spacing
@@ -167,7 +167,7 @@ $$A_{Nco} = 9h_{ef}^2$$
 - Reduced by overlapping cones or edges
 
 **Special Case - Thin Members:** When 3+ edges have $c_a < 1.5h_{ef}$:
-$$h'_{ef} = \max \left(\frac{c_{a,max}}{1.5}, \frac{s_{max}}{3}\right)$$
+$$h'_{ef} = \max\left(\frac{c_{a,max}}{1.5}, \frac{s_{max}}{3}\right)$$
 Use $h'_{ef}$ in place of $h_{ef}$ for $A_{Nc}$, $A_{Nco}$, and $\psi$ calculations.
 
 #### 4.2.5 Modification Factors ($\psi$)
@@ -391,7 +391,7 @@ $$A_{Vco} = 4.5c_{a1}^2$$
 - Limited by: $A_{Vc} \le n \times A_{Vco}$
 
 **Special Case - Thin/Narrow Members:** When $c_{a2}$ and $h_a < 1.5c_{a1}$:
-$$c'_{a1} = \max \left(\frac{c_{a2,max}}{1.5}, \frac{h_a}{1.5}, \frac{s_{max}}{3}\right)$$
+$$c'_{a1} = \max\left(\frac{c_{a2,max}}{1.5}, \frac{h_a}{1.5}, \frac{s_{max}}{3}\right)$$
 Use $c'_{a1}$ in place of $c_{a1}$ for all calculations.
 
 **Load Distribution in Groups:**
@@ -595,13 +595,13 @@ If requirements met:
 For Options (b), (c), and (d):
 
 **Reduced Design Strengths** [17.10.5.4]:
-\phi N_n = \min \begin{cases}
+$\phi N_n = \min \begin{cases}
 \phi N_{sa} & \text{(use standard } \phi \text{)} \\
 0.75 \phi N_{cb} \text{ or } 0.75 \phi N_{cbg} & \text{(unless anchor reinforcement per 17.5.2.1(a))} \\
-0.75 \phi N_{pn} & \text{(pullout strength)} \\
-0.75 \phi N_{sb} \text{ or } 0.75 \phi N_{sbg} & \text{(side-face blowout)} \\
-0.75 \phi N_a \text{ or } 0.75 \phi N_{ag} & \text{(bond strength)}
-\end{cases}
+0.75 \phi N_{pn} \\
+0.75 \phi N_{sb} \text{ or } 0.75 \phi N_{sbg} \\
+0.75 \phi N_a \text{ or } 0.75 \phi N_{ag}
+\end{cases}$
 
 - Concrete assumed **cracked** unless analysis proves uncracked at service load
 - $\phi$ = standard values from Table 3.1b/c
@@ -1703,4 +1703,3 @@ class AnchorDesignUI:
 **END OF DOCUMENTATION**
 
 This comprehensive documentation provides complete guidance for implementing a Chapter 17 compliant anchor design system, including all calculation methods, validation rules, output specifications, and practical implementation guidance.
-
