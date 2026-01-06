@@ -1,0 +1,989 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Anchor Analysis</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23004a99%22/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23004a99%22/></svg>">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        eng: {
+                            primary: '#004a99',
+                            secondary: '#f0f2f5',
+                            dark: '#1e293b',
+                            success: '#10b981',
+                            danger: '#ef4444',
+                            warning: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .calc-input {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .math-symbol {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 font-sans">
+
+    <div id="root" class="min-h-screen flex flex-col">
+
+        <!-- Navbar -->
+        <nav class="bg-eng-primary text-white shadow-md sticky top-0 z-50">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-ruler-combined text-xl"></i>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight" data-i18n="app_title">Anchor Analysis</h1>
+                        <p class="text-xs opacity-80 font-light" data-i18n="app_subtitle">ACI/Structural Compliance Tool</p>
+                    </div>
+                </div>
+                <div id="auth-section" class="flex items-center gap-2">
+                    <button onclick="toggleLanguage()" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold border border-blue-600 transition">
+                        <i class="fa-solid fa-language mr-1"></i> <span id="lang-label">中文</span>
+                    </button>
+                    <button id="login-btn" class="bg-white text-eng-primary px-4 py-1.5 rounded text-sm font-bold shadow hover:bg-gray-100 transition" data-i18n="btn_login">
+                        <i class="fa-solid fa-user mr-2"></i>Login
+                    </button>
+                    <div id="user-info" class="hidden flex items-center space-x-4">
+                        <span id="user-email" class="text-xs opacity-90 hidden sm:inline font-mono bg-blue-900 px-2 py-1 rounded"></span>
+                        <button id="logout-btn" class="text-sm hover:text-gray-200"><i class="fa-solid fa-right-from-bracket"></i></button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow max-w-5xl mx-auto w-full p-4 space-y-6">
+
+            <!-- Auth Modal -->
+            <div id="auth-modal" class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
+                <div class="bg-white rounded-lg shadow-2xl p-8 w-11/12 max-w-sm border-t-4 border-eng-primary">
+                    <h2 class="text-2xl font-bold mb-2 text-center text-eng-primary" data-i18n="modal_title">Access Portal</h2>
+                    <p class="text-gray-500 mb-4 text-center text-sm" data-i18n="modal_desc">Sign in to sync your data across devices.</p>
+
+                    <!-- Email/Pass Form -->
+                    <div class="space-y-3 mb-4">
+                        <input type="email" id="auth-email" placeholder="Email" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-eng-primary outline-none">
+                        <input type="password" id="auth-password" placeholder="Password" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-eng-primary outline-none">
+                    </div>
+
+                    <div class="flex gap-2 mb-4">
+                        <button id="email-login-btn" class="flex-1 bg-eng-primary text-white py-2 rounded text-sm font-bold hover:bg-blue-800 transition" data-i18n="btn_login_submit">Login</button>
+                        <button id="email-register-btn" class="flex-1 bg-white text-eng-primary border border-eng-primary py-2 rounded text-sm font-bold hover:bg-blue-50 transition" data-i18n="btn_register">Register</button>
+                    </div>
+
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink mx-4 text-gray-400 text-xs">OR</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+
+                    <button id="guest-login" class="w-full bg-gray-200 text-gray-700 py-2 rounded mb-3 text-sm font-semibold hover:bg-gray-300 transition shadow-sm" data-i18n="btn_guest">
+                        Continue as Guest
+                    </button>
+                    <p id="auth-error" class="text-xs text-red-500 text-center hidden mt-2"></p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-300 bg-white rounded-t-lg shadow-sm">
+                <button onclick="switchTab('calculator')" id="tab-calculator" class="flex-1 py-4 text-center font-bold text-eng-primary border-b-4 border-eng-primary transition-colors">
+                    <i class="fa-solid fa-calculator mr-2"></i><span data-i18n="tab_analysis">Analysis</span>
+                </button>
+                <button onclick="switchTab('history')" id="tab-history" class="flex-1 py-4 text-center font-medium text-gray-500 hover:text-eng-primary transition-colors">
+                    <i class="fa-solid fa-server mr-2"></i><span data-i18n="tab_database">Database</span>
+                </button>
+            </div>
+
+            <!-- TAB: CALCULATOR -->
+            <div id="view-calculator" class="space-y-6 pb-20">
+
+                <!-- INPUTS -->
+                <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-100 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-700"><i class="fa-solid fa-pen-to-square mr-2"></i><span data-i18n="sec_params">Design Parameters</span></h3>
+                        <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border">Units: kgf, cm</span>
+                    </div>
+
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                        <!-- 1. Geometry -->
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_mat">1. Material & Geometry</h4>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_fc">Concrete Strength (<span class="math-symbol">f'c</span>) [kgf/cm²]</label>
+                                <input type="number" id="fc" value="280" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ha">Wall Thickness (<span class="math-symbol">h<sub>a</sub></span>) [cm]</label>
+                                <input type="number" id="ha" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_da">Anchor Diameter (<span class="math-symbol">d<sub>a</sub></span>) [cm]</label>
+                                <input type="number" id="da" value="1.6" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_hef">Embedment (<span class="math-symbol">h<sub>ef</sub></span>) [cm]</label>
+                                <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+                        </div>
+
+                        <!-- 2. Spacing -->
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_space">2. Spacing & Edge Dist</h4>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_s1">Vertical Spacing (<span class="math-symbol">S<sub>1</sub></span>) [cm]</label>
+                                <input type="number" id="s1" value="22" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_s2">Horizontal Spacing (<span class="math-symbol">S<sub>2</sub></span>) [cm]</label>
+                                <input type="number" id="s2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ca1">Top Edge (<span class="math-symbol">C<sub>a1</sub></span>) [cm]</label>
+                                <input type="number" id="ca1" value="13" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ca1_1">Bottom Edge (<span class="math-symbol">C<sub>a1,1</sub></span>) [cm]</label>
+                                <input type="number" id="ca1_1" value="35" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ca2">Side Edge (<span class="math-symbol">C<sub>a2</sub></span>) [cm]</label>
+                                <input type="number" id="ca2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                            </div>
+                        </div>
+
+                        <!-- 3. Coefficients (New) -->
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_factors">3. Factors & Coefficients</h4>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_kc">Anchor Type (<span class="math-symbol">k<sub>c</sub></span>)</label>
+                                <select id="kc_select" class="w-full border border-gray-300 rounded p-2 text-xs">
+                                    <option value="10" data-i18n="opt_cast">Cast-in Anchors (10)</option>
+                                    <option value="7" data-i18n="opt_post">Post-installed (7)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_lambda">Failure Factor (<span class="math-symbol">λ<sub>a</sub></span>)</label>
+                                <select id="lambda_select" class="w-full border border-gray-300 rounded p-2 text-xs">
+                                    <option value="1.0" data-i18n="opt_lam1">Cast-in/Undercut (1.0)</option>
+                                    <option value="0.8" data-i18n="opt_lam2">Expansion/Bonded (0.8)</option>
+                                    <option value="0.6" data-i18n="opt_lam3">Bonded Failure (0.6)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_le">Load Length (<span class="math-symbol">l<sub>e</sub></span>)</label>
+                                <select id="le_select" class="w-full border border-gray-300 rounded p-2 text-xs">
+                                    <option value="default" data-i18n="opt_le1">Default/All (8da)</option>
+                                    <option value="sleeve" data-i18n="opt_le2">Full Sleeve/Headed (hef)</option>
+                                    <option value="torque" data-i18n="opt_le3">Torque-controlled (2da)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_reinf">Cracking/Reinf (<span class="math-symbol">ψ<sub>c,V</sub></span>)</label>
+                                <select id="psi_c_V_select" class="w-full border border-gray-300 rounded p-2 text-xs">
+                                    <option value="1.0" data-i18n="opt_reinf1">No Reinf / &lt; D13 (1.0)</option>
+                                    <option value="1.2" data-i18n="opt_reinf2">Reinf ≥ D13 (1.2)</option>
+                                    <option value="1.4" data-i18n="opt_reinf3">Reinf ≥ D13 + Ties (1.4)</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_en">Eccentric <span class="math-symbol">e'<sub>N</sub></span> [cm]</label>
+                                    <input type="number" id="e_prime_n" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_ev">Eccentric <span class="math-symbol">e'<sub>V</sub></span> [cm]</label>
+                                    <input type="number" id="e_prime_v" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Loads -->
+                    <div class="px-6 pb-6">
+                        <h4 class="text-xs font-bold text-eng-danger uppercase border-b pb-1 mb-2 text-red-600" data-i18n="sec_loads">4. Applied Loads</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-red-50 p-3 rounded border border-red-100">
+                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_t">Tension (<span class="math-symbol">T</span>) [kgf]</label>
+                                <input type="number" id="loadT" value="1733" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                            </div>
+                            <div class="bg-red-50 p-3 rounded border border-red-100">
+                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_v">Shear (<span class="math-symbol">V</span>) [kgf]</label>
+                                <input type="number" id="loadV" value="608" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 border-t border-gray-200">
+                        <button onclick="performCalculation()" class="w-full bg-eng-primary hover:bg-blue-800 text-white font-bold py-3 px-6 rounded shadow-lg transform transition active:scale-[0.99] flex justify-center items-center">
+                            <i class="fa-solid fa-gears mr-2"></i> <span data-i18n="btn_run">Run Structural Analysis</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RESULTS CONTAINER -->
+                <div id="results-container" class="hidden space-y-6">
+
+                    <div class="flex space-x-2">
+                        <button onclick="saveResult()" id="save-btn" class="flex-1 bg-green-600 text-white py-2 rounded shadow hover:bg-green-700 transition font-bold text-sm">
+                            <i class="fa-solid fa-cloud-arrow-up mr-2"></i><span data-i18n="btn_save">Save to Cloud</span>
+                        </button>
+                        <button onclick="downloadPDF()" class="flex-1 bg-gray-700 text-white py-2 rounded shadow hover:bg-gray-800 transition font-bold text-sm">
+                            <i class="fa-solid fa-file-pdf mr-2"></i><span data-i18n="btn_pdf">Download Report</span>
+                        </button>
+                    </div>
+
+                    <!-- 1. Tension Breakout (Single) -->
+                    <div class="bg-white rounded border-l-4 border-l-eng-primary shadow">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_t1">1. Concrete Tension (Single Anchor)</span></h4>
+                            <span id="badge-1" class="text-xs px-2 py-0.5 rounded font-bold"></span>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_nb">Basic Strength (<span class="math-symbol">N<sub>b</sub></span>)</span><span id="r1-nb" class="font-mono font-bold"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_anc">Proj. Area (<span class="math-symbol">A<sub>Nc</sub></span>)</span><span id="r1-anc" class="font-mono font-bold"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_anco">Ref. Area (<span class="math-symbol">A<sub>Nco</sub></span>)</span><span id="r1-anco" class="font-mono text-gray-600"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_edge">Edge Factor (<span class="math-symbol">ψ<sub>ed,N</sub></span>)</span><span id="r1-psi" class="font-mono text-gray-600"></span></div>
+                            <div class="col-span-2 border-t pt-2 mt-1 flex justify-between items-center">
+                                <span class="text-eng-primary font-bold"><span data-i18n="res_cap">Capacity</span> (<span class="math-symbol">ϕN<sub>cb</sub></span>):</span>
+                                <span id="r1-cap" class="text-lg font-bold"></span>
+                            </div>
+                            <div class="col-span-2 flex justify-between items-center">
+                                <span class="text-red-600 font-bold"><span data-i18n="res_load">Load</span> (<span class="math-symbol">T</span>):</span>
+                                <span id="r1-load" class="text-md font-bold"></span>
+                            </div>
+                            <div class="col-span-2 text-right text-xs text-gray-400">Ratio: <span id="r1-ratio"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Shear Breakout (Single) -->
+                    <div class="bg-white rounded border-l-4 border-l-eng-primary shadow">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_v1">2. Concrete Shear (Single)</span></h4>
+                            <span id="badge-2" class="text-xs px-2 py-0.5 rounded font-bold"></span>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_vb">Basic Shear (<span class="math-symbol">V<sub>b</sub></span>)</span><span id="r2-vb" class="font-mono font-bold"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_h">Height Factor (<span class="math-symbol">ψ<sub>h,V</sub></span>)</span><span id="r2-psi" class="font-mono text-gray-600"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_avc">Proj. Area (<span class="math-symbol">A<sub>Vc</sub></span>)</span><span id="r2-avc" class="font-mono font-bold"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_avco">Ref. Area (<span class="math-symbol">A<sub>Vco</sub></span>)</span><span id="r2-avco" class="font-mono text-gray-600"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_edge">Edge Factor (<span class="math-symbol">ψ<sub>ed,V</sub></span>)</span><span id="r2-psi-ed" class="font-mono text-gray-600"></span></div>
+                            <div class="col-span-2 border-t pt-2 mt-1 flex justify-between items-center">
+                                <span class="text-eng-primary font-bold"><span data-i18n="res_cap">Capacity</span> (<span class="math-symbol">ϕV<sub>cb</sub></span>):</span>
+                                <span id="r2-cap" class="text-lg font-bold"></span>
+                            </div>
+                            <div class="col-span-2 flex justify-between items-center">
+                                <span class="text-red-600 font-bold"><span data-i18n="res_load">Load</span> (<span class="math-symbol">V</span>):</span>
+                                <span id="r2-load" class="text-md font-bold"></span>
+                            </div>
+                            <div class="col-span-2 text-right text-xs text-gray-400">Ratio: <span id="r2-ratio"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Tension Group -->
+                    <div class="bg-white rounded border-l-4 border-l-purple-600 shadow">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_tg">3. Concrete Tension (Group)</span></h4>
+                            <span id="badge-3" class="text-xs px-2 py-0.5 rounded font-bold"></span>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_anc">Proj. Area (<span class="math-symbol">A<sub>Nc</sub></span>)</span><span id="r3-anc" class="font-mono font-bold"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_ecc">Ecc. Factor (<span class="math-symbol">ψ<sub>ec,N</sub></span>)</span><span id="r3-psi" class="font-mono text-gray-600"></span></div>
+                            <div class="col-span-2 border-t pt-2 mt-1 flex justify-between items-center">
+                                <span class="text-purple-700 font-bold"><span data-i18n="res_cap">Capacity</span> (<span class="math-symbol">ϕN<sub>cbg</sub></span>):</span>
+                                <span id="r3-cap" class="text-lg font-bold"></span>
+                            </div>
+                            <div class="col-span-2 flex justify-between items-center">
+                                <span class="text-red-600 font-bold"><span data-i18n="res_load">Load</span> (<span class="math-symbol">2T</span>):</span>
+                                <span id="r3-load" class="text-md font-bold"></span>
+                            </div>
+                            <div class="col-span-2 text-right text-xs text-gray-400">Ratio: <span id="r3-ratio"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Shear Group -->
+                    <div class="bg-white rounded border-l-4 border-l-purple-600 shadow">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_vg">4. Concrete Shear (Group)</span></h4>
+                            <span id="badge-4" class="text-xs px-2 py-0.5 rounded font-bold"></span>
+                        </div>
+                        <div class="p-4 grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_avc">Proj. Area (<span class="math-symbol">A<sub>Vc</sub></span>)</span><span id="r4-avc" class="font-mono font-bold"></span></div>
+                            <div><span class="text-gray-500 text-xs block" data-i18n="res_ecc">Ecc. Factor (<span class="math-symbol">ψ<sub>ec,V</sub></span>)</span><span id="r4-psi" class="font-mono text-gray-600"></span></div>
+                            <div class="col-span-2 border-t pt-2 mt-1 flex justify-between items-center">
+                                <span class="text-purple-700 font-bold"><span data-i18n="res_cap">Capacity</span> (<span class="math-symbol">ϕV<sub>cbg</sub></span>):</span>
+                                <span id="r4-cap" class="text-lg font-bold"></span>
+                            </div>
+                            <div class="col-span-2 flex justify-between items-center">
+                                <span class="text-red-600 font-bold"><span data-i18n="res_load">Load</span> (<span class="math-symbol">V</span>):</span>
+                                <span id="r4-load" class="text-md font-bold"></span>
+                            </div>
+                            <div class="col-span-2 text-right text-xs text-gray-400">Ratio: <span id="r4-ratio"></span></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TAB: HISTORY -->
+            <div id="view-history" class="hidden">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-700" data-i18n="history_title">Database Records</h3>
+                        <div class="flex space-x-3">
+                            <button onclick="clearHistory()" class="text-red-500 text-sm hover:underline font-bold"><i class="fa-solid fa-trash mr-1"></i><span data-i18n="btn_clear">Clear All</span></button>
+                            <button onclick="loadHistory()" class="text-eng-primary text-sm hover:underline"><i class="fa-solid fa-rotate mr-1"></i><span data-i18n="btn_refresh">Refresh</span></button>
+                        </div>
+                    </div>
+                    <div id="history-list" class="divide-y divide-gray-200 max-h-[70vh] overflow-y-auto">
+                        <div class="p-10 text-center text-gray-400 flex flex-col items-center">
+                            <i class="fa-solid fa-server text-4xl mb-3 opacity-30"></i>
+                            <p data-i18n="msg_auth_req">Authentication required to view records.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Logic Script -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAP0nsg3Saf_W0lEk5Mdt4oVKhFQJ69BOg",
+            authDomain: "anchor-app-a1426.firebaseapp.com",
+            projectId: "anchor-app-a1426",
+            storageBucket: "anchor-app-a1426.firebasestorage.app",
+            messagingSenderId: "822722897072",
+            appId: "1:822722897072:web:32f8dabc44735718af0775",
+            measurementId: "G-5GVPXDBJM1"
+        };
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let currentData = null;
+        let historyCache = {};
+        let currentLang = 'en';
+
+        // --- TRANSLATION DATA (Traditional Chinese) ---
+        const translations = {
+            en: {
+                app_title: "Anchor Analysis", app_subtitle: "ACI/Structural Compliance Tool",
+                tab_analysis: "Analysis", tab_database: "Database",
+                sec_params: "Design Parameters", sec_mat: "1. Material & Geometry", sec_space: "2. Spacing & Edge Dist", sec_factors: "3. Factors & Coefficients", sec_loads: "4. Applied Loads",
+                lbl_fc: "Concrete Strength (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "Wall Thickness (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "Anchor Diameter (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "Embedment (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_s1: "Vertical Spacing (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "Horizontal Spacing (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "Top Edge (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "Bottom Edge (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "Side Edge (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
+                lbl_kc: "Anchor Type (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "Failure Factor (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "Load Length (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "Cracking/Reinf (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "Eccentric <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "Eccentric <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
+                lbl_t: "Tension (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "Shear (<span class='math-symbol'>V</span>) [kgf]",
+                btn_run: "Run Structural Analysis", btn_save: "Save to Cloud", btn_pdf: "Download Report",
+                opt_cast: "Cast-in Anchors (10)", opt_post: "Post-installed (7)",
+                opt_lam1: "Cast-in/Undercut (1.0)", opt_lam2: "Expansion/Bonded (0.8)", opt_lam3: "Bonded Failure (0.6)",
+                opt_le1: "Default/All (8da)", opt_le2: "Full Sleeve/Headed (hef)", opt_le3: "Torque-controlled (2da)",
+                opt_reinf1: "No Reinf / < D13 (1.0)", opt_reinf2: "Reinf ≥ D13 (1.2)", opt_reinf3: "Reinf ≥ D13 + Ties (1.4)",
+                res_t1: "1. Concrete Tension (Single Anchor)", res_v1: "2. Concrete Shear (Single)", res_tg: "3. Concrete Tension (Group)", res_vg: "4. Concrete Shear (Group)",
+                res_nb: "Basic Strength", res_anc: "Proj. Area", res_anco: "Ref. Area", res_edge: "Edge Factor", res_cap: "Capacity", res_load: "Load",
+                res_vb: "Basic Shear", res_h: "Height Factor", res_avc: "Proj. Area", res_avco: "Ref. Area", res_ecc: "Ecc. Factor",
+                modal_title: "Access Portal", modal_desc: "Sign in to sync your data across devices.", btn_login: "Login", btn_login_submit: "Login", btn_register: "Register", btn_guest: "Continue as Guest",
+                history_title: "Database Records", btn_clear: "Clear All", btn_refresh: "Refresh", msg_auth_req: "Authentication required to view records.", msg_no_rec: "No records found.",
+                open: "Open", pass: "PASS", fail: "FAIL"
+            },
+            zh: {
+                app_title: "錨栓設計分析", app_subtitle: "ACI/結構規範檢核工具",
+                tab_analysis: "結構分析", tab_database: "資料庫",
+                sec_params: "設計參數", sec_mat: "1. 材料與幾何", sec_space: "2. 間距與邊距", sec_factors: "3. 修正因數/參數", sec_loads: "4. 設計載重",
+                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "垂牆厚 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "上方錨栓距梁頂邊 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "下方錨栓距梁底邊 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "錨栓距梁邊 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
+                lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "偏心距 <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "偏心距 <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
+                lbl_t: "拉力設計載重 (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V</span>) [kgf]",
+                btn_run: "執行結構分析", btn_save: "儲存至雲端", btn_pdf: "下載報告",
+                opt_cast: "預埋式錨栓 (10)", opt_post: "後置式錨栓 (7)",
+                opt_lam1: "預埋/擴底錨栓 (1.0)", opt_lam2: "膨脹/黏結錨栓 (0.8)", opt_lam3: "黏結破壞 (0.6)",
+                opt_le1: "預設/所有情況 (8da)", opt_le2: "全套筒/擴頭 (hef)", opt_le3: "扭力控制 (2da)",
+                opt_reinf1: "無輔助鋼筋 / < D13 (1.0)", opt_reinf2: "配筋 ≥ D13 (1.2)", opt_reinf3: "配筋 ≥ D13 + 箍筋 (1.4)",
+                res_t1: "1. 混凝土拉破檢核 (單根)", res_v1: "2. 混凝土剪破檢核 (單根)", res_tg: "3. 混凝土拉破檢核 (群)", res_vg: "4. 混凝土剪破檢核 (群)",
+                res_nb: "基本拉破強度", res_anc: "破壞投影面積", res_anco: "參考面積", res_edge: "邊距修正因數", res_cap: "強度", res_load: "載重",
+                res_vb: "基本剪破強度", res_h: "厚度修正因數", res_avc: "破壞投影面積", res_avco: "參考面積", res_ecc: "偏心修正因數",
+                modal_title: "存取入口", modal_desc: "登入以同步您的資料。", btn_login: "登入", btn_login_submit: "登入", btn_register: "註冊", btn_guest: "訪客登入",
+                history_title: "資料庫紀錄", btn_clear: "清除全部", btn_refresh: "重新整理", msg_auth_req: "需驗證才能查看紀錄。", msg_no_rec: "找不到紀錄。",
+                open: "開啟", pass: "通過", fail: "失敗"
+            }
+        };
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            document.getElementById('lang-label').innerText = currentLang === 'en' ? '中文' : 'EN';
+
+            // Update all static text
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.innerHTML = translations[currentLang][key];
+                }
+            });
+
+            // Update Dynamic Content (Results & History)
+            if (currentData) updateUI();
+            if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
+        }
+
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            if (user) {
+                document.getElementById('auth-modal').classList.add('hidden');
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('login-btn').classList.add('hidden');
+
+                const label = user.email ? user.email : `Guest: ${user.uid.substring(0, 6)}`;
+                document.getElementById('user-email').innerText = label;
+
+                if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
+            } else {
+                document.getElementById('user-info').classList.add('hidden');
+                document.getElementById('login-btn').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('login-btn').addEventListener('click', () => document.getElementById('auth-modal').classList.remove('hidden'));
+
+        // --- AUTH HANDLERS ---
+        document.getElementById('guest-login').addEventListener('click', async () => {
+            await auth.signInAnonymously();
+            document.getElementById('auth-modal').classList.add('hidden');
+        });
+
+        document.getElementById('email-login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            const err = document.getElementById('auth-error');
+            err.classList.add('hidden');
+
+            if (!email || !pass) { err.innerText = "Please enter email and password."; err.classList.remove('hidden'); return; }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (e) {
+                err.innerText = e.message;
+                err.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('email-register-btn').addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            const err = document.getElementById('auth-error');
+            err.classList.add('hidden');
+
+            if (!email || !pass) { err.innerText = "Please enter email and password."; err.classList.remove('hidden'); return; }
+
+            try {
+                await auth.createUserWithEmailAndPassword(email, pass);
+            } catch (e) {
+                err.innerText = e.message;
+                err.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
+
+        window.performCalculation = function () {
+            const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const str = (id) => document.getElementById(id).value;
+
+            // Inputs
+            const I = {
+                fc: val('fc'), ha: val('ha'), da: val('da'),
+                hef: val('hef'), s1: val('s1'), s2: val('s2'),
+                ca1: val('ca1'), ca1_1: val('ca1_1'), ca2: val('ca2'),
+                T: val('loadT'), V: val('loadV'),
+                kc: parseFloat(str('kc_select')),
+                lambda: parseFloat(str('lambda_select')),
+                le_mode: str('le_select'),
+                psi_c_V: parseFloat(str('psi_c_V_select')),
+                e_prime_n: val('e_prime_n'),
+                e_prime_v: val('e_prime_v')
+            };
+
+            // 1. Calculate le
+            let le_val = 12.7;
+            if (I.le_mode === 'sleeve') le_val = I.hef;
+            else if (I.le_mode === 'torque') le_val = 2 * I.da;
+
+            // 2. Calculate psi_ed_N (Automatic)
+            const ca_min = Math.min(I.ca1, I.ca1_1, I.ca2);
+            let psi_ed_N = (ca_min < 1.5 * I.hef) ? (0.7 + 0.3 * (ca_min / (1.5 * I.hef))) : 1.0;
+
+            // 3. Calculate psi_ed_V (Automatic)
+            let psi_ed_V = (I.ca2 < 1.5 * I.ca1_1) ? (0.7 + 0.3 * (I.ca2 / (1.5 * I.ca1_1))) : 1.0;
+
+            // 4. Calculate psi_ec_N (Eccentricity)
+            let psi_ec_N = 1.0;
+            if (I.e_prime_n > 0) {
+                psi_ec_N = 1.0 / (1.0 + (2.0 * I.e_prime_n) / (3.0 * I.hef));
+            }
+
+            // 5. Calculate psi_ec_V (Eccentricity)
+            let psi_ec_V = 1.0;
+            if (I.e_prime_v > 0) {
+                psi_ec_V = 1.0 / (1.0 + (2.0 * I.e_prime_v) / (3.0 * I.ca1_1));
+            }
+
+            // --- 1. TENSION SINGLE ---
+            const Nb = I.kc * I.lambda * Math.sqrt(I.fc) * Math.pow(I.hef, 1.5);
+            const Anco = 9 * Math.pow(I.hef, 2);
+            const Anc_1 = 2 * (1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
+
+            const psi_c_N = 1.0;
+            const psi_cp_N = 1.0;
+
+            const phi_Ncb = 0.75 * (Anc_1 / Anco) * psi_ed_N * psi_c_N * psi_cp_N * Nb;
+            const ratio_1 = I.T / phi_Ncb;
+
+            // --- 2. SHEAR SINGLE ---
+            const Vb1 = 1.86 * Math.pow(le_val / I.da, 0.2) * Math.sqrt(I.da) * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5);
+            const Vb2 = 3.8 * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5);
+            const Vb = Math.min(Vb1, Vb2);
+
+            const Avco = 4.5 * Math.pow(I.ca1_1, 2);
+            const Avc_2 = 2 * (1.5 * I.ca1_1) * I.ha;
+
+            let psi_h_V = Math.pow((1.5 * I.ca1_1) / I.ha, 0.5);
+            if (psi_h_V < 1.0) psi_h_V = 1.0;
+
+            const phi_Vcb = 0.75 * (Avc_2 / Avco) * psi_ed_V * I.psi_c_V * psi_h_V * Vb;
+            const ratio_2 = I.V / phi_Vcb;
+
+            // --- 3. TENSION GROUP ---
+            const Anc_3 = (I.ca2 + I.s2 + 1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
+            const phi_Ncbg = 0.75 * (Anc_3 / Anco) * psi_ec_N * psi_ed_N * psi_c_N * psi_cp_N * Nb;
+            const ratio_3 = (2 * I.T) / phi_Ncbg;
+
+            // --- 4. SHEAR GROUP ---
+            const Avc_4 = ((2 * 1.5 * I.ca1_1) + I.s2) * I.ha;
+            const phi_Vcbg = 0.75 * (Avc_4 / Avco) * psi_ec_V * psi_ed_V * I.psi_c_V * psi_h_V * Vb;
+            const ratio_4 = I.V / phi_Vcbg;
+
+            currentData = {
+                inputs: I,
+                factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V },
+                calcs: {
+                    c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb, load: I.T, ratio: ratio_1, ok: ratio_1 < 1.0 },
+                    c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0 },
+                    c3: { anc: Anc_3, cap: phi_Ncbg, load: 2 * I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
+                    c4: { avc: Avc_4, cap: phi_Vcbg, load: I.V, ratio: ratio_4, psih: psi_h_V, ok: ratio_4 < 1.0 }
+                },
+                timestamp: new Date()
+            };
+
+            updateUI();
+        };
+
+        function updateUI() {
+            if (!currentData) return;
+            const d = currentData.calcs;
+            const f = currentData.factors;
+            document.getElementById('results-container').classList.remove('hidden');
+
+            const set = (id, val, unit = '') => document.getElementById(id).innerText = Math.round(val) + unit;
+            const setFloat = (id, val) => document.getElementById(id).innerText = val.toFixed(2);
+
+            // Tension Single
+            set('r1-nb', d.c1.nb, ' kgf'); set('r1-anc', d.c1.anc, ' cm²'); set('r1-anco', d.c1.anco, ' cm²');
+            setFloat('r1-psi', f.psi_ed_N);
+            set('r1-cap', d.c1.cap, ' kgf'); set('r1-load', d.c1.load, ' kgf'); setFloat('r1-ratio', d.c1.ratio); setStatus('badge-1', d.c1.ok);
+
+            // Shear Single
+            set('r2-vb', d.c2.vb, ' kgf'); setFloat('r2-psi', d.c2.psih); set('r2-avc', d.c2.avc, ' cm²'); set('r2-avco', d.c2.avco, ' cm²');
+            setFloat('r2-psi-ed', f.psi_ed_V);
+            set('r2-cap', d.c2.cap, ' kgf'); set('r2-load', d.c2.load, ' kgf'); setFloat('r2-ratio', d.c2.ratio); setStatus('badge-2', d.c2.ok);
+
+            // Tension Group
+            set('r3-anc', d.c3.anc, ' cm²');
+            setFloat('r3-psi', f.psi_ec_N);
+            set('r3-cap', d.c3.cap, ' kgf'); set('r3-load', d.c3.load, ' kgf'); setFloat('r3-ratio', d.c3.ratio); setStatus('badge-3', d.c3.ok);
+
+            // Shear Group
+            set('r4-avc', d.c4.avc, ' cm²');
+            setFloat('r4-psi', f.psi_ec_V);
+            set('r4-cap', d.c4.cap, ' kgf'); set('r4-load', d.c4.load, ' kgf'); setFloat('r4-ratio', d.c4.ratio); setStatus('badge-4', d.c4.ok);
+
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function setStatus(id, isOk) {
+            const el = document.getElementById(id);
+            if (isOk) { el.innerText = t('pass'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-green-100 text-green-800 border border-green-200"; }
+            else { el.innerText = t('fail'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-red-100 text-red-800 border border-red-200"; }
+        }
+
+        window.saveResult = async function () {
+            if (!currentUser) { alert("Please login first."); return; }
+            const btn = document.getElementById('save-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>' + (currentLang === 'en' ? 'Saving...' : '儲存中...');
+
+            performCalculation();
+
+            if (!currentData) return;
+
+            try {
+                await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').add({
+                    inputs: currentData.inputs,
+                    summary: {
+                        ratio1: currentData.calcs.c1.ratio,
+                        ratio2: currentData.calcs.c2.ratio,
+                        ratio3: currentData.calcs.c3.ratio,
+                        ratio4: currentData.calcs.c4.ratio,
+                        allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok
+                    },
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Saved!';
+                setTimeout(() => btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`, 2000);
+            } catch (e) { console.error(e); btn.innerHTML = 'Error'; }
+        };
+
+        window.clearHistory = async function () {
+            if (!currentUser) return;
+            if (!confirm("Are you sure?")) return;
+
+            const list = document.getElementById('history-list');
+            list.innerHTML = '<div class="p-6 text-center text-red-500"><i class="fa-solid fa-trash fa-bounce mr-2"></i>Deleting...</div>';
+
+            try {
+                const snapshot = await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').get();
+                const batch = db.batch();
+                snapshot.docs.forEach((doc) => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                loadHistory();
+            } catch (e) {
+                console.error(e);
+                alert("Error deleting history.");
+            }
+        };
+
+        window.restoreFromHistory = function (docId) {
+            const data = historyCache[docId];
+            if (!data || !data.inputs) return;
+
+            const setVal = (id, v) => document.getElementById(id).value = v;
+            const I = data.inputs;
+
+            setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef);
+            setVal('s1', I.s1); setVal('s2', I.s2);
+            setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2);
+            setVal('loadT', I.T); setVal('loadV', I.V);
+
+            setVal('kc_select', I.kc || 10);
+            setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);
+            setVal('le_select', I.le_mode || 'default');
+            setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
+            setVal('e_prime_n', I.e_prime_n || 0);
+            setVal('e_prime_v', I.e_prime_v || 0);
+
+            switchTab('calculator');
+            performCalculation();
+        };
+
+        window.loadHistory = function () {
+            if (!currentUser) return;
+            const list = document.getElementById('history-list');
+            list.innerHTML = '<div class="p-6 text-center text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Loading...</div>';
+
+            // REMOVED .orderBy() to enable simple client-side sorting without indexes
+            db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history')
+                .limit(50).onSnapshot(snap => {
+
+                    if (snap.empty) { list.innerHTML = `<div class="p-8 text-center text-gray-400">${t('msg_no_rec')}</div>`; return; }
+
+                    let docs = [];
+                    historyCache = {};
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        docs.push({ id: doc.id, ...data });
+                        historyCache[doc.id] = data;
+                    });
+
+                    // Client-side Sort
+                    docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+                    let html = '';
+                    docs.forEach(d => {
+                        const status = d.summary.allPass ? `<span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded">${t('pass')}</span>` : `<span class="text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded">${t('fail')}</span>`;
+                        const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
+                        const time = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                        html += `<div onclick="restoreFromHistory('${d.id}')" class="p-4 hover:bg-blue-50 flex justify-between items-center border-b cursor-pointer transition active:bg-blue-100">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        ${status}
+                                        <span class="text-xs font-mono text-gray-500">${date} ${time}</span>
+                                    </div>
+                                    <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V}</div>
+                                    <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1">
+                                        <span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span>
+                                        <span class="bg-gray-100 px-1 rounded border">da: ${d.inputs.da}</span>
+                                    </div>
+                                </div>
+                                <div class="text-eng-primary text-xs font-bold flex items-center">
+                                    ${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i>
+                                </div>
+                            </div>`;
+                    });
+                    list.innerHTML = html;
+                });
+        };
+
+        window.downloadPDF = function () {
+            if (!currentData) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const d = currentData;
+            const f = currentData.factors;
+
+            // Helper: Select language and STRIP HTML TAGS for PDF
+            // FORCE ENGLISH ('en') to ensure professional output without broken characters
+            const pdfLang = 'en';
+            const txt = (key) => {
+                let text = translations[pdfLang][key] || key;
+                // Remove HTML tags (e.g., <span ...>...</span>) and replace Greek symbols with text
+                text = text.replace(/<[^>]*>?/gm, '');
+                text = text.replace(/λ/g, 'lambda').replace(/ψ/g, 'psi').replace(/ϕ/g, 'phi');
+                return text;
+            };
+
+            // -- HEADER --
+            doc.setFillColor(0, 74, 153); doc.rect(0, 0, 210, 30, 'F'); doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text(txt("app_title"), 14, 15);
+            doc.setFontSize(10);
+            doc.text(txt("app_subtitle"), 14, 23);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 195, 23, { align: 'right' });
+
+            let y = 40;
+
+            // -- SECTION 1: PARAMETERS --
+            doc.setTextColor(0, 0, 0); doc.setFontSize(12);
+            doc.text(txt("sec_mat"), 14, y);
+            y += 3;
+
+            doc.autoTable({
+                startY: y,
+                head: [[txt("Parameter") || "Parameter", "Value", "Unit"]],
+                body: [
+                    [txt("lbl_fc"), d.inputs.fc, "kgf/cm2"],
+                    [txt("lbl_ha"), d.inputs.ha, "cm"],
+                    [txt("lbl_da"), d.inputs.da, "cm"],
+                    [txt("lbl_hef"), d.inputs.hef, "cm"],
+                    [txt("lbl_s1"), d.inputs.s1, "cm"],
+                    [txt("lbl_s2"), d.inputs.s2, "cm"],
+                    [txt("lbl_ca1"), d.inputs.ca1, "cm"],
+                    [txt("lbl_ca1_1"), d.inputs.ca1_1, "cm"],
+                    [txt("lbl_ca2"), d.inputs.ca2, "cm"],
+                    [txt("lbl_t"), d.inputs.T, "kgf"],
+                    [txt("lbl_v"), d.inputs.V, "kgf"],
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [60, 60, 60] },
+                styles: { fontSize: 9 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // -- SECTION 2: FACTORS & COEFFICIENTS --
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.text(txt("sec_factors"), 14, y);
+            y += 3;
+
+            doc.autoTable({
+                startY: y, head: [['Factor', 'Value', 'Description']],
+                body: [
+                    [txt("lbl_kc"), d.inputs.kc, ''],
+                    [txt("lbl_lambda").replace('lambda', 'lambda_a'), d.inputs.lambda, ''], // Explicit replacement for clarity
+                    [txt("lbl_le"), d.inputs.le_mode, ''],
+                    [txt("lbl_reinf").replace('psi', 'psi'), d.inputs.psi_c_V, ''],
+                    [txt("lbl_en"), d.inputs.e_prime_n, 'cm'],
+                    [txt("lbl_ev"), d.inputs.e_prime_v, 'cm']
+                ],
+                theme: 'striped', headStyles: { fillColor: [100, 100, 100] },
+                styles: { fontSize: 9 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // -- SECTION 3: TENSION SINGLE --
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.setFontSize(11);
+            doc.text(txt("res_t1"), 14, y);
+            y += 3;
+
+            doc.autoTable({
+                startY: y,
+                head: [[txt("Item") || "Item", "Symbol", "Value", "Unit"]],
+                body: [
+                    [txt("res_nb"), "Nb", Math.round(d.calcs.c1.nb), "kgf"],
+                    [txt("res_anc"), "ANc", Math.round(d.calcs.c1.anc), "cm2"],
+                    [txt("res_anco"), "ANco", Math.round(d.calcs.c1.anco), "cm2"],
+                    [txt("res_edge"), "psi_ed,N", f.psi_ed_N.toFixed(2), "-"],
+                    ["Cracking Factor", "psi_c,N", "1.00", "-"],
+                    ["Splitting Factor", "psi_cp,N", "1.00", "-"],
+                    [txt("res_cap"), "phi Ncb", Math.round(d.calcs.c1.cap), "kgf"],
+                    ["Check Result", "T vs Cap", `${d.inputs.T} < ${Math.round(d.calcs.c1.cap)}`, d.calcs.c1.ok ? "OK" : "FAIL"],
+                    ["D/C Ratio", "Ratio", d.calcs.c1.ratio.toFixed(2), "-"]
+                ],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 74, 153] },
+                columnStyles: { 0: { cellWidth: 80 } }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // -- SECTION 4: SHEAR SINGLE --
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.text(txt("res_v1"), 14, y);
+            y += 3;
+
+            doc.autoTable({
+                startY: y,
+                head: [[txt("Item") || "Item", "Symbol", "Value", "Unit"]],
+                body: [
+                    [txt("res_vb"), "Vb", Math.round(d.calcs.c2.vb), "kgf"],
+                    [txt("res_avc"), "AVc", Math.round(d.calcs.c2.avc), "cm2"],
+                    [txt("res_avco"), "AVco", Math.round(d.calcs.c2.avco), "cm2"],
+                    [txt("res_edge"), "psi_ed,V", f.psi_ed_V.toFixed(2), "-"],
+                    ["Reinf/Cracking", "psi_c,V", d.inputs.psi_c_V.toFixed(2), "-"],
+                    [txt("res_h"), "psi_h,V", d.calcs.c2.psih.toFixed(2), "-"],
+                    [txt("res_cap"), "phi Vcb", Math.round(d.calcs.c2.cap), "kgf"],
+                    ["Check Result", "V vs Cap", `${d.inputs.V} < ${Math.round(d.calcs.c2.cap)}`, d.calcs.c2.ok ? "OK" : "FAIL"],
+                    ["D/C Ratio", "Ratio", d.calcs.c2.ratio.toFixed(2), "-"]
+                ],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 74, 153] },
+                columnStyles: { 0: { cellWidth: 80 } }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // -- SECTION 5: TENSION GROUP --
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.text(txt("res_tg"), 14, y);
+            y += 3;
+
+            doc.autoTable({
+                startY: y,
+                head: [[txt("Item") || "Item", "Symbol", "Value", "Unit"]],
+                body: [
+                    [txt("res_anc") + " (Group)", "ANc(g)", Math.round(d.calcs.c3.anc), "cm2"],
+                    [txt("res_ecc"), "psi_ec,N", f.psi_ec_N.toFixed(2), "-"],
+                    [txt("res_cap"), "phi Ncbg", Math.round(d.calcs.c3.cap), "kgf"],
+                    [txt("res_load"), "2T", Math.round(d.calcs.c3.load), "kgf"],
+                    ["Check Result", "Load vs Cap", `${Math.round(d.calcs.c3.load)} < ${Math.round(d.calcs.c3.cap)}`, d.calcs.c3.ok ? "OK" : "FAIL"],
+                    ["D/C Ratio", "Ratio", d.calcs.c3.ratio.toFixed(2), "-"]
+                ],
+                theme: 'grid',
+                headStyles: { fillColor: [100, 50, 150] },
+                columnStyles: { 0: { cellWidth: 80 } }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+
+            // -- SECTION 6: SHEAR GROUP --
+            if (y > 250) { doc.addPage(); y = 20; }
+            doc.text(txt("res_vg"), 14, y);
+            y += 3;
+
+            doc.autoTable({
+                startY: y,
+                head: [[txt("Item") || "Item", "Symbol", "Value", "Unit"]],
+                body: [
+                    [txt("res_avc") + " (Group)", "AVc(g)", Math.round(d.calcs.c4.avc), "cm2"],
+                    [txt("res_ecc"), "psi_ec,V", f.psi_ec_V.toFixed(2), "-"],
+                    [txt("res_cap"), "phi Vcbg", Math.round(d.calcs.c4.cap), "kgf"],
+                    [txt("res_load"), "V", Math.round(d.calcs.c4.load), "kgf"],
+                    ["Check Result", "Load vs Cap", `${Math.round(d.calcs.c4.load)} < ${Math.round(d.calcs.c4.cap)}`, d.calcs.c4.ok ? "OK" : "FAIL"],
+                    ["D/C Ratio", "Ratio", d.calcs.c4.ratio.toFixed(2), "-"]
+                ],
+                theme: 'grid',
+                headStyles: { fillColor: [100, 50, 150] },
+                columnStyles: { 0: { cellWidth: 80 } }
+            });
+
+            doc.save("anchor-report-detailed.pdf");
+        };
+
+        window.switchTab = function (t) {
+            const calc = document.getElementById('view-calculator'); const hist = document.getElementById('view-history');
+            const tabC = document.getElementById('tab-calculator'); const tabH = document.getElementById('tab-history');
+            if (t === 'calculator') {
+                calc.classList.remove('hidden'); hist.classList.add('hidden');
+                tabC.classList.add('text-eng-primary', 'border-b-4', 'border-eng-primary', 'font-bold'); tabC.classList.remove('text-gray-500', 'font-medium');
+                tabH.classList.remove('text-eng-primary', 'border-b-4', 'border-eng-primary', 'font-bold'); tabH.classList.add('text-gray-500', 'font-medium');
+            } else {
+                calc.classList.add('hidden'); hist.classList.remove('hidden');
+                tabH.classList.add('text-eng-primary', 'border-b-4', 'border-eng-primary', 'font-bold'); tabH.classList.remove('text-gray-500', 'font-medium');
+                tabC.classList.remove('text-eng-primary', 'border-b-4', 'border-eng-primary', 'font-bold'); tabC.classList.add('text-gray-500', 'font-medium');
+                loadHistory();
+            }
+        }
+    </script>
+</body>
+</html>
