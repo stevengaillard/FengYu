@@ -584,14 +584,61 @@
         let historyCache = {};
         let currentLang = 'en';
 
-        // --- TRANSLATION DATA (Simplified for brevity) ---
+        // --- TRANSLATION DATA ---
         const translations = {
-            en: { app_title: "Anchor Analysis", btn_run: "Run Structural Analysis (Ch. 17)", btn_save: "Save to Cloud", btn_pdf: "Download Report" },
-            zh: { app_title: "錨栓設計分析", btn_run: "執行結構分析 (Ch. 17)", btn_save: "儲存至雲端", btn_pdf: "下載報告" }
+            en: { 
+                app_title: "Anchor Analysis", app_subtitle: "ACI 318-19 Chapter 17 Compliance",
+                tab_analysis: "Analysis", tab_database: "Database",
+                sec_params: "Design Parameters", sec_mat: "Material & Geometry", sec_space: "Spacing & Edge Dist", sec_factors: "Factors & Conditions", sec_loads: "Applied Factored Loads",
+                lbl_fc: "Concrete Strength (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "Wall Thickness (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "Anchor Diameter (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "Embedment (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_s1: "Vertical Spacing (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "Horizontal Spacing (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "Top Edge (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "Bottom Edge (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "Side Edge (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
+                lbl_kc: "Anchor Type (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "Lightweight Factor (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "Load Length (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "Reinforcement Condition", lbl_en: "Eccentric <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "Eccentric <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
+                lbl_t: "Tension (<span class='math-symbol'>N<sub>ua</sub></span>) [kgf]", lbl_v: "Shear (<span class='math-symbol'>V<sub>ua</sub></span>) [kgf]",
+                btn_run: "Run Structural Analysis (Ch. 17)", btn_save: "Save to Cloud", btn_pdf: "Download Report",
+                opt_cast: "Cast-in Anchors (10)", opt_post: "Post-installed (7)",
+                opt_lam1: "Normal Weight (1.0)", opt_le1: "Default/All (8da)", opt_le2: "Full Sleeve/Headed (hef)", opt_le3: "Torque-controlled (2da)",
+                opt_reinf1: "None / < D13", opt_reinf2: "Reinf ≥ D13", opt_reinf3: "Reinf ≥ D13 + Ties",
+                modal_title: "Access Portal", modal_desc: "Sign in to sync your data across devices.", btn_login: "Login", btn_login_submit: "Login", btn_register: "Register", btn_guest: "Continue as Guest",
+                history_title: "Database Records", btn_clear: "Clear All", btn_refresh: "Refresh", msg_auth_req: "Authentication required to view records.", msg_no_rec: "No records found.",
+                open: "Open", pass: "PASS", fail: "FAIL",
+                res_t_title: "Tension Analysis", res_t1_sub: "Single Anchor", res_tg_sub: "Anchor Group",
+                res_v_title: "Shear Analysis", res_v1_sub: "Single Anchor", res_vg_sub: "Anchor Group",
+                res_nb: "Basic Strength", res_anc: "Proj. Area", res_anc_g: "Group Area", res_edge: "Edge Factor", res_cap: "Capacity", res_ratio: "Ratio",
+                res_vb: "Basic Shear", res_avc: "Proj. Area", res_avc_g: "Group Area", res_ecc: "Eccentricity"
+            },
+            zh: { 
+                app_title: "錨栓設計分析", app_subtitle: "ACI 318-19 第17章規範檢核",
+                tab_analysis: "結構分析", tab_database: "資料庫",
+                sec_params: "設計參數", sec_mat: "材料與幾何", sec_space: "間距與邊距", sec_factors: "修正因數與條件", sec_loads: "極限載重",
+                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "垂牆厚 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "上方錨栓距梁頂邊 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "下方錨栓距梁底邊 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "錨栓距梁邊 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
+                lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "輕質混凝土因數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "配筋狀況", lbl_en: "偏心距 <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "偏心距 <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
+                lbl_t: "拉力設計載重 (<span class='math-symbol'>N<sub>ua</sub></span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>ua</sub></span>) [kgf]",
+                btn_run: "執行結構分析 (Ch. 17)", btn_save: "儲存至雲端", btn_pdf: "下載報告",
+                opt_cast: "預埋式錨栓 (10)", opt_post: "後置式錨栓 (7)",
+                opt_lam1: "常重混凝土 (1.0)", opt_le1: "預設/所有情況 (8da)", opt_le2: "全套筒/擴頭 (hef)", opt_le3: "扭力控制 (2da)",
+                opt_reinf1: "無輔助鋼筋 / < D13", opt_reinf2: "配筋 ≥ D13", opt_reinf3: "配筋 ≥ D13 + 箍筋",
+                modal_title: "存取入口", modal_desc: "登入以同步您的資料。", btn_login: "登入", btn_login_submit: "登入", btn_register: "註冊", btn_guest: "訪客登入",
+                history_title: "資料庫紀錄", btn_clear: "清除全部", btn_refresh: "重新整理", msg_auth_req: "需驗證才能查看紀錄。", msg_no_rec: "找不到紀錄。",
+                open: "開啟", pass: "通過", fail: "失敗",
+                res_t_title: "拉力分析", res_t1_sub: "單根錨栓", res_tg_sub: "錨栓群",
+                res_v_title: "剪力分析", res_v1_sub: "單根錨栓", res_vg_sub: "錨栓群",
+                res_nb: "基本強度", res_anc: "投影面積", res_anc_g: "群錨面積", res_edge: "邊距因數", res_cap: "強度", res_ratio: "比值",
+                res_vb: "基本剪力", res_avc: "投影面積", res_avc_g: "群錨面積", res_ecc: "偏心因數"
+            }
         };
 
         function t(key) { return translations[currentLang][key] || key; }
-        function toggleLanguage() { currentLang = currentLang === 'en' ? 'zh' : 'en'; document.getElementById('lang-label').innerText = currentLang === 'en' ? '中文' : 'EN'; }
+        function toggleLanguage() { 
+            currentLang = currentLang === 'en' ? 'zh' : 'en'; 
+            document.getElementById('lang-label').innerText = currentLang === 'en' ? '中文' : 'EN'; 
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+            });
+            if (currentData) updateUI();
+            if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
+        }
 
         // --- UI TOGGLES ---
         window.toggleTypeInputs = function() {
@@ -904,7 +951,13 @@
             performCalculation(); if (!currentData) return;
             try {
                 await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').add({
-                    inputs: currentData.inputs, summary: { ratio1: currentData.calcs.c1.ratio, ratio2: currentData.calcs.c2.ratio, ratio3: currentData.calcs.c3.ratio, ratio4: currentData.calcs.c4.ratio, allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok },
+                    inputs: currentData.inputs, 
+                    summary: { 
+                        tRatio: currentData.results.tension.ratio,
+                        sRatio: currentData.results.shear.ratio,
+                        iVal: currentData.results.interaction.val,
+                        allPass: (currentData.results.interaction.ok && currentData.results.tension.ratio <= 1.0 && currentData.results.shear.ratio <= 1.0)
+                    },
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Saved!'; setTimeout(() => btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`, 2000);
@@ -922,12 +975,24 @@
 
         window.restoreFromHistory = function (docId) {
             const data = historyCache[docId]; if (!data || !data.inputs) return;
-            const setVal = (id, v) => document.getElementById(id).value = v; const I = data.inputs;
-            setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef); setVal('s1', I.s1); setVal('s2', I.s2);
-            setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2); setVal('loadT', I.T); setVal('loadV', I.V);
-            setVal('kc_select', I.kc || 10); setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);
-            setVal('le_select', I.le_mode || 'default'); setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
+            const setVal = (id, v) => { if(document.getElementById(id)) document.getElementById(id).value = v; };
+            const setChk = (id, v) => { if(document.getElementById(id)) document.getElementById(id).checked = v; };
+            const I = data.inputs;
+            
+            setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef);
+            setVal('futa', I.futa); setVal('ase', I.ase); setVal('abrg', I.abrg);
+            setVal('s1', I.s1); setVal('s2', I.s2);
+            setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2); 
+            setVal('loadT', I.T); setVal('loadV', I.V);
+            setVal('anchor_type_detailed', I.type_detail || 'cast_headed');
+            setVal('eh', I.eh || 5.0);
+            setVal('tau', I.tau || 14); setVal('tau_uncr', I.tau_uncr || 45);
+            setVal('lambda_select', I.lambda || 1.0);
+            setVal('psi_c_V_select', I.reinf_factor_V || 1.0);
             setVal('e_prime_n', I.e_prime_n || 0); setVal('e_prime_v', I.e_prime_v || 0);
+            setChk('is_cracked', I.is_cracked); setChk('is_seismic', I.is_seismic);
+
+            toggleTypeInputs(); // Update UI visibility based on restored type
             switchTab('calculator'); performCalculation();
         };
 
@@ -941,206 +1006,17 @@
                 docs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 let html = '';
                 docs.forEach(d => {
-                    const status = d.summary.allPass ? `<span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded">${t('pass')}</span>` : `<span class="text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded">${t('fail')}</span>`;
+                    const pass = d.summary.allPass !== undefined ? d.summary.allPass : (d.summary.ratio1 < 1); // fallback for old data
+                    const status = pass ? `<span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded">${t('pass')}</span>` : `<span class="text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded">${t('fail')}</span>`;
                     const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
                     html += `<div onclick="restoreFromHistory('${d.id}')" class="p-4 hover:bg-blue-50 flex justify-between items-center border-b cursor-pointer transition active:bg-blue-100">
                                 <div><div class="flex items-center gap-2 mb-1">${status}<span class="text-xs font-mono text-gray-500">${date}</span></div>
                                 <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V}</div>
-                                <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1"><span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span><span class="bg-gray-100 px-1 rounded border">da: ${d.inputs.da}</span></div></div>
+                                <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1"><span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span></div></div>
                                 <div class="text-eng-primary text-xs font-bold flex items-center">${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i></div></div>`;
                 });
                 list.innerHTML = html;
             });
-        };
-
-        // ==========================================
-        //  NEW PDF EXPORT (NATIVE PRINTING)
-        // ==========================================
-        window.printReport = function () {
-            if (!currentData) { alert("Please run the analysis first."); return; }
-
-            const d = currentData;
-            const f = currentData.factors;
-            const dateStr = new Date().toLocaleDateString();
-            const staging = document.getElementById('print-staging');
-            const txt = (key) => translations[currentLang][key] || key;
-
-            const showT = d.inputs.T > 0;
-            const showV = d.inputs.V > 0;
-
-            // Define rich equation strings for Table
-            const e_Nb = `<span class="math-symbol">N<sub>b</sub> = k<sub>c</sub>λ<sub>a</sub>√f'<sub>c</sub>h<sub>ef</sub><sup>1.5</sup></span>`;
-            const e_Anc = `<span class="math-symbol">A<sub>Nc</sub> = 2(1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
-            const e_psiN = `<span class="math-symbol">ψ<sub>ed,N</sub> = 0.7+0.3(c<sub>a,min</sub>/1.5h<sub>ef</sub>)</span>`;
-            const e_phiN = `<span class="math-symbol">ϕN<sub>cb</sub> = 0.75(A<sub>Nc</sub>/A<sub>Nco</sub>)ψ<sub>ed,N</sub>ψ<sub>c,N</sub>ψ<sub>cp,N</sub>N<sub>b</sub></span>`;
-
-            const e_Ancg = `<span class="math-symbol">A<sub>Nc(g)</sub> = (C<sub>a2</sub>+S<sub>2</sub>+1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
-            const e_pecN = `<span class="math-symbol">ψ<sub>ec,N</sub> = 1/(1+2e'<sub>N</sub>/3h<sub>ef</sub>)</span>`;
-            const e_phiNg = `<span class="math-symbol">ϕN<sub>cbg</sub> = 0.75(A<sub>Nc(g)</sub>/A<sub>Nco</sub>)ψ<sub>ec,N</sub>ψ<sub>ed,N</sub>ψ<sub>c,N</sub>...N<sub>b</sub></span>`;
-
-            const e_Vb = `<span class="math-symbol">V<sub>b</sub> = min(V<sub>b1</sub>, V<sub>b2</sub>)</span>`;
-            const e_Avc = `<span class="math-symbol">A<sub>Vc</sub> = 2(1.5C<sub>a1</sub>)h<sub>a</sub></span>`;
-            const e_psiV = `<span class="math-symbol">ψ<sub>ed,V</sub> = 0.7+0.3(C<sub>a2</sub>/1.5C<sub>a1</sub>)</span>`;
-            const e_phiV = `<span class="math-symbol">ϕV<sub>cb</sub> = 0.75(A<sub>Vc</sub>/A<sub>Vco</sub>)ψ<sub>ed,V</sub>ψ<sub>c,V</sub>ψ<sub>h,V</sub>V<sub>b</sub></span>`;
-
-            const e_Avcg = `<span class="math-symbol">A<sub>Vc(g)</sub> = [(3C<sub>a1</sub>)+S<sub>2</sub>]h<sub>a</sub></span>`;
-            const e_pecV = `<span class="math-symbol">ψ<sub>ec,V</sub> = 1/(1+2e'<sub>V</sub>/3C<sub>a1</sub>)</span>`;
-            const e_phiVg = `<span class="math-symbol">ϕV<sub>cbg</sub> = 0.75(A<sub>Vc(g)</sub>/A<sub>Vco</sub>)ψ<sub>ec,V</sub>ψ<sub>ed,V</sub>ψ<sub>c,V</sub>...V<sub>b</sub></span>`;
-
-
-            let html = `
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
-                        <div>
-                            <h1 style="color: #004a99; font-size: 20pt; margin: 0; font-weight:bold;">Anchor Analysis</h1>
-                            <p style="font-size: 10pt; color: #555; margin: 2px 0 0 0;">ACI/Structural Compliance Tool</p>
-                        </div>
-                        <div style="text-align: right; font-size: 9pt; color: #777;">
-                            ${dateStr}
-                        </div>
-                    </div>
-
-                    <h2>${txt('sec_mat')}</h2>
-                    <table>
-                        <tr><th>${txt('Parameter') || 'Parameter'}</th><th>${txt('Value') || 'Value'}</th><th>${txt('Unit') || 'Unit'}</th></tr>
-                        <tr><td>${txt('lbl_fc')}</td><td>${d.inputs.fc}</td><td>kgf/cm²</td></tr>
-                        <tr><td>${txt('lbl_ha')}</td><td>${d.inputs.ha}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_da')}</td><td>${d.inputs.da}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_hef')}</td><td>${d.inputs.hef}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_s1')}</td><td>${d.inputs.s1}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_s2')}</td><td>${d.inputs.s2}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ca1')}</td><td>${d.inputs.ca1}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ca1_1')}</td><td>${d.inputs.ca1_1}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ca2')}</td><td>${d.inputs.ca2}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_t')}</td><td>${d.inputs.T}</td><td>kgf</td></tr>
-                        <tr><td>${txt('lbl_v')}</td><td>${d.inputs.V}</td><td>kgf</td></tr>
-                    </table>
-
-                    <h2>${txt('sec_factors')}</h2>
-                    <table>
-                        <tr><th>Factor</th><th>Value</th><th>Note</th></tr>
-                        <tr><td>${txt('lbl_kc')}</td><td>${d.inputs.kc}</td><td></td></tr>
-                        <tr><td>${txt('lbl_lambda')}</td><td>${d.inputs.lambda}</td><td></td></tr>
-                        <tr><td>${txt('lbl_le')}</td><td>${d.inputs.le_mode}</td><td></td></tr>
-                        <tr><td>${txt('lbl_reinf')}</td><td>${d.inputs.psi_c_V}</td><td></td></tr>
-                        <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
-                    </table>
-
-                    <div class="page-break">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px;">
-                            <div>
-                                <h1 style="color: #666; font-size: 14pt; margin: 0; font-weight:bold;">Results</h1>
-                            </div>
-                            <div style="text-align: right; font-size: 9pt; color: #777;">
-                                ${dateStr}
-                            </div>
-                        </div>
-                    </div>`;
-
-            if (showT) {
-                html += `
-                    <h3>${txt('res_t_title')}</h3>
-                    <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Nb_pdf}</div>
-
-                    <h4>${txt('res_t1_sub')}</h4>
-                    <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                        <tr><td>${txt('res_nb')}</td><td>${e_Nb}</td><td>${Math.round(d.calcs.c1.nb)}</td><td>kgf</td><td>-</td></tr>
-                        <tr><td>${txt('res_anc')}</td><td>${e_Anc}</td><td>${Math.round(d.calcs.c1.anc)}</td><td>cm²</td><td>-</td></tr>
-                        <tr><td>${txt('res_edge')}</td><td>${e_psiN}</td><td>${f.psi_ed_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                        <tr style="background:#e6f3ff">
-                            <td><strong>${txt('res_cap')}</strong></td>
-                            <td><strong>${e_phiN}</strong></td>
-                            <td><strong>${Math.round(d.calcs.c1.cap)}</strong></td>
-                            <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c1.ok ? 'pass' : 'fail'}">${d.calcs.c1.ok ? 'OK' : 'FAIL'}</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
-                            <td><strong>${(d.calcs.c1.ratio || 0).toFixed(2)}</strong></td>
-                            <td><strong>-</strong></td>
-                            <td>-</td>
-                        </tr>
-                    </table>
-
-                    <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Ncbg_pdf}</div>
-                    <h4>${txt('res_tg_sub')}</h4>
-                    <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                        <tr><td>${txt('res_anc_g')}</td><td>${e_Ancg}</td><td>${Math.round(d.calcs.c3.anc)}</td><td>cm²</td><td>-</td></tr>
-                        <tr><td>${txt('res_ecc')}</td><td>${e_pecN}</td><td>${f.psi_ec_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                        <tr style="background:#f9f9e0">
-                            <td><strong>${txt('res_cap_g')}</strong></td>
-                            <td><strong>${e_phiNg}</strong></td>
-                            <td><strong>${Math.round(d.calcs.c3.cap)}</strong></td>
-                            <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c3.ok ? 'pass' : 'fail'}">${d.calcs.c3.ok ? 'OK' : 'FAIL'}</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
-                            <td><strong>${(d.calcs.c3.ratio || 0).toFixed(2)}</strong></td>
-                            <td><strong>-</strong></td>
-                            <td>-</td>
-                        </tr>
-                    </table>`;
-            }
-
-            if (showV) {
-                html += `
-                    <h3>${txt('res_v_title')}</h3>
-                    <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vb_pdf}</div>
-
-                    <h4>${txt('res_v1_sub')}</h4>
-                    <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                        <tr><td>${txt('res_vb')}</td><td>${e_Vb}</td><td>${Math.round(d.calcs.c2.vb)}</td><td>kgf</td><td>-</td></tr>
-                        <tr><td>${txt('res_avc')}</td><td>${e_Avc}</td><td>${Math.round(d.calcs.c2.avc)}</td><td>cm²</td><td>-</td></tr>
-                        <tr><td>${txt('res_edge')}</td><td>${e_psiV}</td><td>${f.psi_ed_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                        <tr style="background:#e6f3ff">
-                            <td><strong>${txt('res_cap')}</strong></td>
-                            <td><strong>${e_phiV}</strong></td>
-                            <td><strong>${Math.round(d.calcs.c2.cap)}</strong></td>
-                            <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c2.ok ? 'pass' : 'fail'}">${d.calcs.c2.ok ? 'OK' : 'FAIL'}</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
-                            <td><strong>${(d.calcs.c2.ratio || 0).toFixed(2)}</strong></td>
-                            <td><strong>-</strong></td>
-                            <td>-</td>
-                        </tr>
-                    </table>
-
-                    <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vcbg_pdf}</div>
-                    <h4>${txt('res_vg_sub')}</h4>
-                    <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                        <tr><td>${txt('res_avc_g')}</td><td>${e_Avcg}</td><td>${Math.round(d.calcs.c4.avc)}</td><td>cm²</td><td>-</td></tr>
-                        <tr><td>${txt('res_ecc')}</td><td>${e_pecV}</td><td>${f.psi_ec_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                        <tr style="background:#f9f9e0">
-                            <td><strong>${txt('res_cap_g')}</strong></td>
-                            <td><strong>${e_phiVg}</strong></td>
-                            <td><strong>${Math.round(d.calcs.c4.cap)}</strong></td>
-                            <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c4.ok ? 'pass' : 'fail'}">${d.calcs.c4.ok ? 'OK' : 'FAIL'}</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
-                            <td><strong>${(d.calcs.c4.ratio || 0).toFixed(2)}</strong></td>
-                            <td><strong>-</strong></td>
-                            <td>-</td>
-                        </tr>
-                    </table>`;
-            }
-
-            html += `<div class="report-footer">Report generated on ${dateStr}</div>`;
-
-            staging.innerHTML = html;
-            window.print();
         };
 
         window.switchTab = function (t) {
@@ -1160,4 +1036,3 @@
     </script>
 </body>
 </html>
-
