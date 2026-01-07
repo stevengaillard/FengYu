@@ -347,7 +347,7 @@
                             <div class="pt-2 border-t border-dashed space-y-2">
                                 <div>
                                     <label class="text-xs text-gray-500" data-i18n="lbl_hef">Embedment (<span class="math-symbol">h<sub>ef</sub></span>) [cm]</label>
-                                    <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
+                                    <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right" oninput="updateCac()">
                                 </div>
                                 <!-- Step 8: Critical Edge Distance -->
                                 <div>
@@ -394,7 +394,7 @@
 
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_kc">Anchor Type (<span class="math-symbol">k<sub>c</sub></span>)</label>
-                                <select id="kc_select" class="w-full border border-gray-300 rounded p-2 text-xs">
+                                <select id="kc_select" class="w-full border border-gray-300 rounded p-2 text-xs" onchange="updateCac()">
                                     <option value="10" data-i18n="opt_cast">Cast-in Anchors (10)</option>
                                     <option value="7" data-i18n="opt_post">Post-installed (7)</option>
                                     <!-- NEW 6. Screw Anchor -->
@@ -1082,6 +1082,23 @@
             const isSeis = document.getElementById('is_seismic').checked;
             const isDuctile = document.getElementById('steel_ductility').value === 'ductile';
             document.getElementById('div_stretch').classList.toggle('hidden', !(isSeis && isDuctile));
+        }
+        // NEW Feature: Auto-calculate Critical Edge Distance (Lookup Logic)
+        window.updateCac = function () {
+            const hef = parseFloat(document.getElementById('hef').value) || 0;
+            const type = document.getElementById('kc_select').value;
+            let factor = 0;
+
+            // ACI 318 Default assumptions for Critical Edge Distance
+            if (type === '7') factor = 4.0; // Expansion anchors default
+            else if (type === 'screw') factor = 2.5; // Screw/Undercut anchors default
+            else factor = 0; // Cast-in usually relies on cover/spacing, not cac splitting check
+
+            // Only auto-update if a factor applies
+            if (factor > 0) {
+                document.getElementById('cac').value = (hef * factor).toFixed(2);
+            }
+            performCalculation(); // Live update results
         }
 
         window.performCalculation = function () {
@@ -2185,7 +2202,7 @@
         toggleShearLug();
         toggleReinf();
         toggleSeismicDetailing();
-        
+        updateCac();
     </script>
 </body>
 </html>
