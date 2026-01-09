@@ -1,227 +1,391 @@
 # Anchor Analysis - ACI/Structural Compliance Tool
+
 ## Overview
 
-**Anchor Analysis** is a web-based structural engineering application designed to analyze and verify concrete anchor connections according to ACI 318 standards designed by FengYu Group. The tool performs comprehensive calculations for both single anchors and anchor groups under tension and shear loading conditions.
+**Anchor Analysis** is a comprehensive web-based structural engineering application designed to analyze and verify concrete anchor connections according to ACI 318 standards. Developed by FengYu Group, this tool performs detailed calculations for both single anchors and anchor groups under combined tension and shear loading conditions.
 
-## Features
+## Core Features
 
-### Core Functionality
-- **Single Anchor Analysis**: Concrete breakout strength calculations for tension and shear
-- **Group Anchor Analysis**: Group effect calculations with eccentricity factors
-- **Real-time Calculations**: Instant structural verification with pass/fail indicators
-- **Multi-language Support**: English and Traditional Chinese (繁體中文)
-- **Cloud Synchronization**: Firebase-powered data storage and retrieval
-- **PDF Report Generation**: Professional calculation reports with detailed breakdowns
+### Calculation Engine
+- **Single Anchor Analysis**: Complete capacity verification for individual anchors
+- **Group Anchor Analysis**: Multi-anchor configurations with eccentricity effects
+- **Steel Strength Checks**: Tension and shear capacity of anchor steel
+- **Concrete Breakout**: Tension and shear failure modes
+- **Pullout & Pryout**: Anchorage withdrawal checks
+- **Adhesive Bond**: Chemical anchor bonding strength (optional)
+- **Side-Face Blowout**: Near-edge failure verification
+- **Shear Lug Analysis**: Bearing plate reinforcement capacity
+- **Interaction Check**: Combined loading per ACI trilinear criteria
 
-### Database Management
-- Save calculation history to cloud
-- Load and restore previous calculations
-- View all stored records with status indicators
-- Bulk delete functionality
+### User Interface
+- **Dual Language Support**: English and Traditional Chinese (繁體中文)
+- **Real-time Calculations**: Instant verification with pass/fail indicators
+- **Interactive Visualization**: 2D layout drawings and 3D interactive models
+- **Cloud Synchronization**: Firebase-powered data storage
+- **PDF Report Generation**: Professional calculation reports via native browser printing
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+
+### Advanced Features
+- **Custom Anchor Layouts**: Grid generator or manual coordinate input
+- **Seismic Design Mode**: 0.75 reduction factors per ACI 318-19
+- **Geometry Warnings**: Real-time validation of minimum spacing and edge distances
+- **Anchor Reinforcement**: Optional supplementary reinforcement calculations
+- **Material Limits**: Automatic concrete strength capping (700/560 kgf/cm²)
+
+---
+
+## Design Code Compliance
+
+### ACI 318-19 Sections Implemented
+
+| Section | Description | Failure Mode |
+|---------|-------------|--------------|
+| 17.6.1 | Steel Strength in Tension | Anchor yielding/fracture |
+| 17.6.2 | Concrete Breakout in Tension | Concrete cone failure |
+| 17.6.3 | Pullout Strength | Anchor withdrawal |
+| 17.6.4 | Side-Face Blowout | Shallow embedment near edge |
+| 17.6.5 | Adhesive Bond Strength | Chemical anchor bond failure |
+| 17.7.1 | Steel Strength in Shear | Anchor shear yielding |
+| 17.7.2 | Concrete Breakout in Shear | Concrete wedge failure |
+| 17.7.3 | Concrete Pryout | Compression strut failure |
+| 17.8 | Interaction of Tensile and Shear Forces | Combined loading |
+| 17.11 | Shear Lug (Kicker Plates) | Bearing and breakout |
+
+---
 
 ## Calculation Methods
 
-### 1. Concrete Tension Breakout (Single Anchor)
+### 1. Steel Strength (Tension)
 
-#### Basic Strength:
+**Nominal Strength:**
+$$N_{sa} = A_{se} \cdot f_{uta}$$
 
-$$N_b = k_c \cdot \lambda_a \cdot \sqrt{f'_c} \cdot h_{ef}^{1.5}$$
-
-#### Projected Area:
-
-$$A_{Nc} = 2 \times (1.5 \times h_{ef}) \times (C_{a1} + S_1 + 1.5 \times h_{ef})$$
-
-#### Reference Area:
-
-$$A_{Nco} = 9 \times h_{ef}^2$$
-
-#### Edge Distance Factor:
-
-$$\psi_{ed,N} = 0.7 + 0.3 \times \frac{c_{a,min}}{1.5 \times h_{ef}} \leq 1.0$$
+**Design Capacity:**
+$$\phi N_{sa} = \phi_{st} \cdot N_{sa}$$
 
 where:
+- $A_{se}$ = Effective cross-sectional area (cm²)
+- $f_{uta}$ = Minimum tensile strength (≤ 1.9f<sub>ya</sub> and ≤ 8750 kgf/cm²)
+- $\phi_{st}$ = 0.75 (ductile), 0.65 (brittle)
 
-$$c_{a,min} = \min(C_{a1}, C_{a1,1}, C_{a2})$$
-
-#### Design Capacity:
-
-$$\phi N_{cb} = 0.75 \times \frac{A_{Nc}}{A_{Nco}} \times \psi_{ed,N} \times \psi_{c,N} \times \psi_{cp,N} \times N_b$$
-
-where:
-- ϕ = 0.75 (strength reduction factor)
-- ψ<sub>c,N</sub> = 1.0 (cracking factor for tension)
-- ψ<sub>cp,N</sub> = 1.0 (splitting factor)
+**Check:** $T \leq \phi N_{sa}$
 
 ---
 
-### 2. Concrete Shear Breakout (Single Anchor)
+### 2. Steel Strength (Shear)
 
-#### Basic Shear Strength:
+**Nominal Strength:**
+$$V_{sa} = 0.6 \cdot A_{se} \cdot f_{uta}$$
 
-$$V_{b1} = 1.86 \times \left(\frac{l_e}{d_a}\right)^{0.2} \times \sqrt{d_a} \times \lambda_a \times \sqrt{f'_c} \times C_{a1,1}^{1.5}$$
+**Grouted Anchor Reduction:** $V_{sa} \times 0.8$
 
-$$V_{b2} = 3.8 \times \lambda_a \times \sqrt{f'_c} \times C_{a1,1}^{1.5}$$
+**Design Capacity:**
+$$\phi V_{sa} = \phi_{sv} \cdot V_{sa}$$
+
+where $\phi_{sv}$ = 0.65 (ductile), 0.60 (brittle)
+
+**Check:** $V \leq \phi V_{sa}$
+
+---
+
+### 3. Concrete Tension Breakout (Single Anchor)
+
+**Basic Strength:**
+$$N_b = k_c \cdot \lambda_a \cdot \sqrt{f'_c} \cdot h_{ef}^{1.5}$$
+
+**Projected Area:**
+$$A_{Nc} = 2 \times (1.5h_{ef}) \times (C_{a1} + S_1 + 1.5h_{ef})$$
+
+**Reference Area:**
+$$A_{Nco} = 9h_{ef}^2$$
+
+**Modification Factors:**
+- **Edge Distance:** $\psi_{ed,N} = 0.7 + 0.3 \frac{c_{a,min}}{1.5h_{ef}} \leq 1.0$
+- **Cracking:** $\psi_{c,N} = 1.0$ (tension)
+- **Splitting:** $\psi_{cp,N} = \max\left(\frac{c_{a,min}}{c_{ac}}, \frac{1.5h_{ef}}{c_{ac}}\right)$ if $c_{a,min} < c_{ac}$
+
+**Design Capacity:**
+$$\phi N_{cb} = \phi_c \cdot \frac{A_{Nc}}{A_{Nco}} \cdot \psi_{ed,N} \cdot \psi_{c,N} \cdot \psi_{cp,N} \cdot N_b$$
+
+**Seismic Reduction:** Multiply by 0.75 if seismic design
+
+**Check:** $T \leq \phi N_{cb}$
+
+---
+
+### 4. Concrete Tension Breakout (Group)
+
+**Group Projected Area:**
+$$A_{Nc,group} = (C_{a2} + S_2 + 1.5h_{ef}) \times (C_{a1} + S_1 + 1.5h_{ef})$$
+
+**Eccentricity Factor:**
+$$\psi_{ec,N} = \frac{1}{1 + \frac{2e'_N}{3h_{ef}}}$$
+
+**Design Capacity:**
+$$\phi N_{cbg} = \phi_c \cdot \frac{A_{Nc,group}}{A_{Nco}} \cdot \psi_{ec,N} \cdot \psi_{ed,N} \cdot \psi_{c,N} \cdot \psi_{cp,N} \cdot N_b$$
+
+**Check:** $T \leq \phi N_{cbg}$
+
+---
+
+### 5. Concrete Shear Breakout (Single Anchor)
+
+**Basic Shear Strength:**
+$$V_{b1} = 1.86 \left(\frac{l_e}{d_a}\right)^{0.2} \sqrt{d_a} \cdot \lambda_a \cdot \sqrt{f'_c} \cdot C_{a1,1}^{1.5}$$
+
+$$V_{b2} = 3.8 \cdot \lambda_a \cdot \sqrt{f'_c} \cdot C_{a1,1}^{1.5}$$
 
 $$V_b = \min(V_{b1}, V_{b2})$$
 
-#### Projected Area:
+**Projected Area:**
+$$A_{Vc} = 2 \times (1.5C_{a1,1}) \times h_a$$
 
-$$A_{Vc} = 2 \times (1.5 \times C_{a1,1}) \times h_a$$
+**Reference Area:**
+$$A_{Vco} = 4.5C_{a1,1}^2$$
 
-#### Reference Area:
+**Modification Factors:**
+- **Edge Distance:** $\psi_{ed,V} = 0.7 + 0.3\frac{C_{a2}}{1.5C_{a1,1}} \leq 1.0$
+- **Height:** $\psi_{h,V} = \sqrt{\frac{1.5C_{a1,1}}{h_a}} \geq 1.0$
+- **Cracking/Reinforcement:** $\psi_{c,V}$ = 1.0, 1.2, or 1.4
 
-$$A_{Vco} = 4.5 \times C_{a1,1}^2$$
+**Design Capacity:**
+$$\phi V_{cb} = \phi_c \cdot \frac{A_{Vc}}{A_{Vco}} \cdot \psi_{ed,V} \cdot \psi_{c,V} \cdot \psi_{h,V} \cdot V_b$$
 
-#### Height Factor:
+**Parallel Loading:** Multiply capacity by 2.0 with $\psi_{ed,V} = 1.0$
 
-$$\psi_{h,V} = \sqrt{\frac{1.5 \times C_{a1,1}}{h_a}} \geq 1.0$$
-
-#### Edge Distance Factor:
-
-$$\psi_{ed,V} = 0.7 + 0.3 \times \frac{C_{a2}}{1.5 \times C_{a1,1}} \leq 1.0$$
-
-#### Design Capacity:
-
-$$\phi V_{cb} = 0.75 \times \frac{A_{Vc}}{A_{Vco}} \times \psi_{ed,V} \times \psi_{c,V} \times \psi_{h,V} \times V_b$$
+**Check:** $V \leq \phi V_{cb}$
 
 ---
 
-### 3. Concrete Tension Breakout (Group)
+### 6. Pullout Strength
 
-#### Projected Area (Group):
+**For Headed Anchors:**
+$$N_p = 8 \cdot A_{brg} \cdot f'_c$$
 
-$$A_{Nc(group)} = (C_{a2} + S_2 + 1.5 \times h_{ef}) \times (C_{a1} + S_1 + 1.5 \times h_{ef})$$
+**For Hooked Anchors:**
+$$N_p = 0.9 \cdot f'_c \cdot e_h \cdot d_a$$
 
-#### Eccentricity Factor:
+**For Post-Installed (Certified):**
+$$N_p = N_{p,certified}$$
 
-$$\psi_{ec,N} = \frac{1}{1 + \frac{2 \times e'_N}{3 \times h_{ef}}}$$
+**Nominal Strength:**
+$$N_{pn} = \psi_{c,P} \cdot N_p$$
 
-Note: If e'<sub>N</sub> = 0, then ψ<sub>ec,N</sub> = 1.0
+where $\psi_{c,P}$ = 1.4 (uncracked), 1.0 (cracked)
 
-#### Design Capacity:
+**Design Capacity:**
+$$\phi N_{pn} = \phi_p \cdot N_{pn}$$
 
-$$\phi N_{cbg} = 0.75 \times \frac{A_{Nc(group)}}{A_{Nco}} \times \psi_{ec,N} \times \psi_{ed,N} \times \psi_{c,N} \times \psi_{cp,N} \times N_b$$
+**Seismic Reduction:** Multiply by 0.75
 
-#### Load Check:
-
-$$2T \leq \phi N_{cbg}$$
-
----
-
-### 4. Concrete Shear Breakout (Group)
-
-#### Projected Area (Group):
-
-$$A_{Vc(group)} = [(2 \times 1.5 \times C_{a1,1}) + S_2] \times h_a$$
-
-#### Eccentricity Factor:
-
-$$\psi_{ec,V} = \frac{1}{1 + \frac{2 \times e'_V}{3 \times C_{a1,1}}}$$
-
-Note: If e'<sub>V</sub> = 0, then ψ<sub>ec,V</sub> = 1.0
-
-#### Design Capacity:
-
-$$\phi V_{cbg} = 0.75 \times \frac{A_{Vc(group)}}{A_{Vco}} \times \psi_{ec,V} \times \psi_{ed,V} \times \psi_{c,V} \times \psi_{h,V} \times V_b$$
-
-#### Load Check:
-
-$$V \leq \phi V_{cbg}$$
+**Check:** $T \leq \phi N_{pn}$
 
 ---
 
-## Result Interpretation
+### 7. Concrete Pryout
 
-### Pass/Fail Criteria
-- **PASS**: Demand/Capacity ratio < 1.0
-- **FAIL**: Demand/Capacity ratio ≥ 1.0
+**Nominal Strength:**
+$$V_{cp} = k_{cp} \cdot N_{cp}$$
 
-### Demand/Capacity Ratios
+where:
+- $k_{cp}$ = 2.0 (for $h_{ef} \geq 6.35$ cm), 1.0 otherwise
+- $N_{cp}$ = Lesser of concrete breakout or adhesive bond strength
 
-For Single Anchor Tension:
+**Design Capacity:**
+$$\phi V_{cp} = \phi_p \cdot V_{cp}$$
 
-$$\text{Ratio}_1 = \frac{T}{\phi N_{cb}}$$
+**Check:** $V \leq \phi V_{cp}$
 
-For Single Anchor Shear:
+---
 
-$$\text{Ratio}_2 = \frac{V}{\phi V_{cb}}$$
+### 8. Adhesive Bond Strength (Optional)
 
-For Group Anchor Tension:
+**Basic Bond Strength:**
+$$N_{ba} = \lambda_a \cdot \tau \cdot \pi \cdot d_a \cdot h_{ef}$$
 
-$$\text{Ratio}_3 = \frac{2T}{\phi N_{cbg}}$$
+**Critical Spacing:**
+$$c_{Na} = 10d_a\sqrt{\frac{\tau}{77}}$$
 
-For Group Anchor Shear:
+**Projected Area:**
+$$A_{Na} = (c_{Na} + \min(c_{Na}, C_{a1})) \times (c_{Na} + \min(c_{Na}, C_{a2}))$$
 
-$$\text{Ratio}_4 = \frac{V}{\phi V_{cbg}}$$
+**Reference Area:**
+$$A_{Nao} = (2c_{Na})^2$$
 
-### Output for Each Check
-1. **Intermediate Values**: N<sub>b</sub>, V<sub>b</sub>, A<sub>Nc</sub>, A<sub>Vc</sub>, modification factors
-2. **Design Capacity**: ϕN<sub>cb</sub>, ϕV<sub>cb</sub>, ϕN<sub>cbg</sub>, ϕV<sub>cbg</sub>
-3. **Applied Load**: T, V, 2T
-4. **Demand/Capacity Ratio**: Load / Capacity
+**Modification Factors:**
+- **Edge Distance:** $\psi_{ed,Na} = 0.7 + 0.3\frac{c_{a,min}}{c_{Na}} \leq 1.0$
+- **Splitting:** $\psi_{cp,Na} = \frac{c_{a,min}}{c_{ac}}$ if $c_{a,min} < c_{ac}$
+
+**Nominal Strength:**
+$$N_a = \frac{A_{Na}}{A_{Nao}} \cdot \psi_{ed,Na} \cdot \psi_{cp,Na} \cdot N_{ba}$$
+
+**Design Capacity:**
+$$\phi N_a = \phi_{bond} \cdot N_a$$
+
+**Seismic Reduction:** 0.8 (cracked) or 0.4 (uncracked)
+
+**Sustained Load Check:**
+$$T_{sust} \leq 0.4 \phi N_a$$
+
+**Check:** $T \leq \phi N_a$
+
+---
+
+### 9. Side-Face Blowout
+
+**Applicable When:** Headed anchors with $h_{ef} > 2.5C_{a1}$
+
+**Nominal Strength:**
+$$N_{sb} = 42.4 \cdot C_{a1} \cdot \sqrt{A_{brg}} \cdot \lambda_a \cdot \sqrt{f'_c}$$
+
+**Spacing Modification:**
+If $S_2 < 6C_{a1}$:
+$$N_{sb} = N_{sb} \left(1 + \frac{S_2}{6C_{a1}}\right)$$
+
+**Design Capacity:**
+$$\phi N_{sb} = \phi_c \cdot N_{sb}$$
+
+**Check:** $T \leq \phi N_{sb}$
+
+---
+
+### 10. Shear Lug Analysis (Section 17.11)
+
+**Bearing Strength:**
+$$V_{brg} = 0.65 \times 1.7 \times f'_c \times A_{ef,sl}$$
+
+where $A_{ef,sl}$ = Effective bearing area
+
+**Concrete Breakout:**
+$$A_{Vc,sl} = (3c_{sl} + W_{sl}) \times h_a$$
+
+$$A_{Vco,sl} = 4.5c_{sl}^2$$
+
+$$V_{b,sl} = 3.8 \lambda_a \sqrt{f'_c} \cdot c_{sl}^{1.5}$$
+
+$$\phi V_{cb,sl} = \phi_c \cdot \frac{A_{Vc,sl}}{A_{Vco,sl}} \cdot V_{b,sl}$$
+
+**Design Capacity:**
+$$\phi V_{sl} = \min(\phi V_{brg}, \phi V_{cb,sl})$$
+
+**Check:** $V \leq \phi V_{sl}$
+
+---
+
+### 11. Interaction Check (ACI 318-19 Section 17.8)
+
+**Trilinear Interaction:**
+
+1. If $\frac{T}{\phi N_n} \leq 0.2$: No shear reduction required
+2. If $\frac{V}{\phi V_n} \leq 0.2$: No tension reduction required
+3. Otherwise:
+
+$$\frac{T}{\phi N_n} + \frac{V}{\phi V_n} \leq 1.2$$
+
+where $\phi N_n$ and $\phi V_n$ are the governing (minimum) capacities from all failure modes.
+
+---
+
+## Strength Reduction Factors (φ)
+
+### Steel Elements
+| Condition | Tension (φ) | Shear (φ) |
+|-----------|-------------|-----------|
+| Ductile Steel | 0.75 | 0.65 |
+| Brittle Steel | 0.65 | 0.60 |
+
+### Concrete Elements
+| Anchor Type | Condition | Category | φ Value |
+|-------------|-----------|----------|---------|
+| Cast-in | A (Reinforced) | - | 0.75 |
+| Cast-in | B (Unreinforced) | - | 0.70 |
+| Post-installed | A | 1 (High Reliability) | 0.75 |
+| Post-installed | A | 2 (Medium) | 0.65 |
+| Post-installed | A | 3 (Low) | 0.55 |
+| Post-installed | B | 1 | 0.65 |
+| Post-installed | B | 2 | 0.55 |
+| Post-installed | B | 3 | 0.45 |
+
+### Seismic Design
+- **Concrete/Steel:** 0.75 × base capacity
+- **Pullout/Pryout:** 0.75 × base capacity
+- **Adhesive Bond:** 0.8 (cracked) or 0.4 (uncracked) × base capacity
+
+### Supplementary Reinforcement
+- **Anchor Reinforcement:** φ = 0.75 (replaces concrete breakout when provided)
+
+---
+
+## Material Limits
+
+### Concrete Strength Caps
+- **Cast-in Anchors:** $f'_c \leq 700$ kgf/cm² (ACI 318-19 limit)
+- **Post-installed/Screw Anchors:** $f'_c \leq 560$ kgf/cm²
+
+### Minimum Geometry Requirements
+- **Anchor Spacing:** $S \geq 6d_a$
+- **Edge Distance:** $C_a \geq 6d_a$
+- **Embedment:** $h_{ef} \geq$ manufacturer recommendations
+
+### Seismic Detailing (Ductile Anchors)
+- **Stretch Length:** $L_{str} \geq 8d_a$ (ACI 318-19 17.10.5.3)
 
 ---
 
 ## Technology Stack
 
-- **Frontend**: HTML5, Tailwind CSS, JavaScript
-- **Backend**: Firebase Authentication & Firestore
-- **Libraries**:
-  - jsPDF & jsPDF-AutoTable (PDF generation)
-  - Firebase SDK 9.22.0
-  - Font Awesome 6.4.0
+- **Frontend:** HTML5, Tailwind CSS 3.x, JavaScript ES6+
+- **3D Graphics:** Three.js r128 with OrbitControls
+- **Backend:** Firebase 9.22.0 (Authentication + Firestore)
+- **Icons:** Font Awesome 6.4.0
+- **PDF Export:** Native browser print API with custom CSS
+
+---
 
 ## Units Convention
 
-| Parameter | Unit |
-|-----------|------|
-| Force | kgf (kilogram-force) |
-| Length | cm (centimeters) |
-| Area | cm² |
-| Stress | kgf/cm² |
+| Parameter | Unit | Example |
+|-----------|------|---------|
+| Force | kgf | T = 1000 kgf |
+| Length | cm | h<sub>ef</sub> = 8.5 cm |
+| Area | cm² | A<sub>se</sub> = 1.57 cm² |
+| Stress | kgf/cm² | f'<sub>c</sub> = 280 kgf/cm² |
 
 ---
 
-## Design Philosophy
+## Safety Notes
 
-- **User-Friendly**: Clean interface with clear visual hierarchy and intuitive navigation
-- **Professional**: Engineering-grade calculations strictly following ACI 318 standards
-- **Responsive**: Optimized for desktop, tablet, and mobile devices
-- **Bilingual**: Complete support for English and Traditional Chinese (繁體中文)
-- **Comprehensive**: Covers both single and group anchor failure modes
-- **Traceable**: Complete calculation documentation via detailed PDF reports
-- **Cloud-Enabled**: Save and access calculations from any device
+⚠️ **Critical Considerations:**
+
+1. **Professional Review Required**: All calculations must be verified by licensed professional engineers
+2. **Local Code Compliance**: User is responsible for ensuring compliance with applicable building codes
+3. **Conservative Assumptions**: Tool applies ACI 318-19 conservative provisions
+4. **Material Properties**: Verify actual material properties with manufacturer data
+5. **Installation Quality**: Calculations assume proper installation per manufacturer specifications
+6. **Dynamic Loading**: Static load calculations only; dynamic/fatigue analysis not included
 
 ---
 
-## Safety Notes and Limitations
+## Browser Compatibility
 
-⚠️ **Important Considerations:**
-
-1. **Strength Reduction Factor**: ϕ = 0.75 is applied to all concrete breakout capacities
-2. **Automatic Calculations**: Edge distance effects (ψ<sub>ed,N</sub>, ψ<sub>ed,V</sub>) are calculated automatically
-3. **Conservative Approach**: All calculations follow conservative assumptions per ACI 318
-4. **Professional Review**: Results should always be verified by licensed professional engineers
-5. **Code Compliance**: User is responsible for ensuring compliance with local building codes
+- Chrome/Edge (v90+)
+- Firefox (v88+)
+- Safari (v14+)
+- Mobile: iOS Safari, Chrome Mobile
 
 ---
 
 ## References
 
 - **ACI 318-19**: Building Code Requirements for Structural Concrete
+- **ACI 355.2-19**: Qualification of Post-Installed Mechanical Anchors in Concrete
+- **ACI 355.4-19**: Qualification of Post-Installed Adhesive Anchors in Concrete
 
 ---
 
-## Version Information
+## Support
 
-- **Browser Support**: Chrome, Firefox, Safari, Edge (latest versions)
-- **Mobile Support**: iOS Safari, Chrome Mobile
-
----
-
-## Contact & Support
-
-For technical support, feature requests, or bug reports, please use the feedback mechanism within the application or contact gacchuguts@gmail.com.
+**Email:** gacchuguts@gmail.com
 
 ---
 
