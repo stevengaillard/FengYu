@@ -130,7 +130,8 @@ $$\phi N_{cbg} = \phi_c \cdot \frac{A_{Nc,group}}{A_{Nco}} \cdot \psi_{ec,N} \cd
 
 ### 5. Concrete Shear Breakout (Single Anchor)
 
-**Basic Shear Strength:**
+### Basic Shear Strength:
+
 $$V_{b1} = 1.86 \left(\frac{l_e}{d_a}\right)^{0.2} \sqrt{d_a} \cdot \lambda_a \cdot \sqrt{f'_c} \cdot C_{a1,1}^{1.5}$$
 
 $$V_{b2} = 3.8 \cdot \lambda_a \cdot \sqrt{f'_c} \cdot C_{a1,1}^{1.5}$$
