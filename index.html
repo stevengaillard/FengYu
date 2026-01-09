@@ -20,6 +20,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+    <!-- Three.js for 3D Visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -276,14 +280,76 @@
                         <!-- 1. Geometry -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_mat">Material & Geometry</h4>
+                            <!-- Advanced Layout Editor -->
+                            <div class="bg-blue-50 p-3 rounded border border-blue-200">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="text-xs font-bold text-gray-700" data-i18n="lbl_layout">Anchor Layout</label>
+                                    <select id="layout_mode" class="w-40 text-xs border rounded px-2 py-1" onchange="toggleLayoutMode()">
+                                        <option value="grid" data-i18n="opt_grid">Grid (S1/S2)</option>
+                                        <option value="custom" data-i18n="opt_custom">Custom (X,Y)</option>
+                                    </select>
+                                </div>
+                                <div id="div_grid_inputs" class="space-y-2">
+                                    <!-- Keep original S1/S2 logic but move visibility -->
+                                    <p class="text-[10px] text-gray-400" data-i18n="msg_spacing_note">Uses Vertical/Horizontal Spacing below.</p>
+                                </div>
+                                <div id="div_custom_coords" class="hidden space-y-3">
+                                    <!-- Generator Tools -->
+                                    <div class="bg-blue-50 p-2 rounded border border-blue-200">
+                                        <label class="text-[10px] font-bold text-gray-700 uppercase mb-1 block" data-i18n="lbl_gen_title">1. Grid Generator</label>
+                                        <div class="grid grid-cols-3 gap-2 mb-2">
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_rows">Rows (Y)</label><input type="number" id="grid_rows" value="2" class="w-full text-xs border rounded p-1"></div>
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_cols">Cols (X)</label><input type="number" id="grid_cols" value="2" class="w-full text-xs border rounded p-1"></div>
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_action">Action</label><button onclick="generateGridAnchors()" class="w-full bg-blue-600 text-white text-[10px] py-1.5 rounded hover:bg-blue-700 font-bold" data-i18n="btn_add_grid">Add Grid</button></div>
+                                        </div>
+                                        <div class="grid grid-cols-4 gap-2">
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_sp_x">Space X</label><input type="number" id="grid_sx" value="15" class="w-full text-xs border rounded p-1"></div>
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_sp_y">Space Y</label><input type="number" id="grid_sy" value="22" class="w-full text-xs border rounded p-1"></div>
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_st_x">Start X</label><input type="number" id="grid_st_x" value="0" class="w-full text-xs border rounded p-1"></div>
+                                            <div><label class="text-[9px] text-gray-500" data-i18n="lbl_sp_y">Start Y</label><input type="number" id="grid_st_y" value="0" class="w-full text-xs border rounded p-1"></div>
+                                        </div>
+                                    </div>
 
+                                    <!-- Anchor List Table -->
+                                    <div>
+                                        <div class="flex justify-between items-end mb-1">
+                                            <label class="text-[10px] font-bold text-gray-700 uppercase" data-i18n="lbl_list_title">2. Anchor List</label>
+                                            <button onclick="clearAllAnchors()" class="text-[9px] text-red-500 hover:underline" data-i18n="btn_clear_all">Clear All</button>
+                                        </div>
+                                        <div class="border rounded max-h-40 overflow-y-auto bg-white">
+                                            <table class="w-full text-left border-collapse">
+                                                <thead class="bg-gray-100 sticky top-0">
+                                                    <tr>
+                                                        <th class="text-[9px] p-1 border-b pl-2" data-i18n="tbl_head_num">#</th>
+                                                        <th class="text-[9px] p-1 border-b" data-i18n="tbl_head_x">X (cm)</th>
+                                                        <th class="text-[9px] p-1 border-b" data-i18n="tbl_head_y">Y (cm)</th>
+                                                        <th class="text-[9px] p-1 border-b text-right pr-2" data-i18n="tbl_head_action">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="anchor_table_body" class="text-xs">
+                                                    <!-- Dynamic Rows -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- Manual Add Single -->
+                                        <div class="flex gap-2 mt-2 items-center">
+                                            <input type="number" id="new_x" placeholder="X" class="w-16 text-xs border rounded p-1">
+                                            <input type="number" id="new_y" placeholder="Y" class="w-16 text-xs border rounded p-1">
+                                            <button onclick="addSingleAnchor()" class="flex-1 bg-gray-200 text-gray-700 text-[10px] py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-plus mr-1"></i><span data-i18n="btn_add_pt">Add Point</span></button>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Hidden Textarea for Logic Connection -->
+                                    <textarea id="custom_coords" class="hidden"></textarea>
+                                </div>
+                            </div>
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_fc">Concrete Strength (<span class="math-symbol">f'c</span>) [kgf/cm²]</label>
                                 <input type="number" id="fc" value="280" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
 
                             <div>
-                                <label class="text-xs text-gray-500" data-i18n="lbl_ha">Wall Thickness (<span class="math-symbol">h<sub>a</sub></span>) [cm]</label>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_ha">Base Thickness (<span class="math-symbol">h<sub>a</sub></span>) [cm]</label>
                                 <input type="number" id="ha" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
 
@@ -293,14 +359,27 @@
                                     <input type="checkbox" id="is_shearlug" onchange="toggleShearLug()" class="rounded border-gray-300 text-eng-primary shadow-sm">
                                     <label for="is_shearlug" class="text-xs font-bold text-gray-700" data-i18n="lbl_is_sl">Shear Lug (Sec 17.11)</label>
                                 </div>
+                                <!-- Inside the Shear Lug section -->
                                 <div id="div_shearlug" class="hidden mt-1 space-y-2">
                                     <div class="grid grid-cols-2 gap-2">
-                                        <input type="number" id="sl_h" placeholder="Height" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
-                                        <input type="number" id="sl_w" placeholder="Width" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
+                                        <div>
+                                            <label class="text-[10px] text-gray-500 block" data-i18n="lbl_sl_h">Height (cm)</label>
+                                            <input type="number" id="sl_h" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-gray-500 block" data-i18n="lbl_sl_w">Width (cm)</label>
+                                            <input type="number" id="sl_w" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
+                                        </div>
                                     </div>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <input type="number" id="sl_t" placeholder="Thick" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
-                                        <input type="number" id="sl_c" placeholder="Edge Dist" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
+                                        <div>
+                                            <label class="text-[10px] text-gray-500 block" data-i18n="lbl_sl_t">Thickness (cm)</label>
+                                            <input type="number" id="sl_t" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
+                                        </div>
+                                        <div>
+                                            <label class="text-[10px] text-gray-500 block" data-i18n="lbl_sl_c">Edge Dist (cm)</label>
+                                            <input type="number" id="sl_c" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -353,13 +432,13 @@
                                 <div>
                                     <label class="text-xs text-gray-500" data-i18n="lbl_cac">Critical Edge Dist (<span class="math-symbol">c<sub>ac</sub></span>) [cm]</label>
                                     <input type="number" id="cac" value="21.25" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
-                                    <p class="text-[10px] text-gray-400 mt-0.5 text-right">Default: 2.5hef (Undercut) or 4hef (Exp)</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5 text-right" data-i18n="msg_cac_default">Default: 2.5hef (Undercut) or 4hef (Exp)</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- 2. Spacing -->
-                        <div class="space-y-4">
+                        <div id="spacing-inputs-section" class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_space">Spacing & Edge Dist</h4>
 
                             <div>
@@ -418,18 +497,18 @@
                             <!-- Condition A/B and Category -->
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_cond">Condition</label>
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_cond">Condition (Reinf)</label>
                                     <select id="condition_ab" class="w-full border border-gray-300 rounded p-2 text-xs">
                                         <option value="B" data-i18n="opt_cond_b">B (No Reinf)</option>
                                         <option value="A" data-i18n="opt_cond_a">A (Reinforced)</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_cat">Category</label>
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_cat">Category (Rel.)</label>
                                     <select id="anchor_category" class="w-full border border-gray-300 rounded p-2 text-xs">
-                                        <option value="1">1 (High Rel)</option>
-                                        <option value="2">2 (Med Rel)</option>
-                                        <option value="3">3 (Low Rel)</option>
+                                        <option value="1" data-i18n="opt_cat1">1 (High Rel)</option>
+                                        <option value="2" data-i18n="opt_cat2">2 (Med Rel)</option>
+                                        <option value="3" data-i18n="opt_cat3">3 (Low Rel)</option>
                                     </select>
                                 </div>
                             </div>
@@ -443,11 +522,11 @@
                                 <div id="div_reinf" class="hidden mt-1 space-y-2">
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label class="text-[10px] text-gray-500">Area (cm²)</label>
+                                            <label class="text-[10px] text-gray-500" data-i18n="lbl_reinf_area">Area (cm²)</label>
                                             <input type="number" id="reinf_area" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
                                         </div>
                                         <div>
-                                            <label class="text-[10px] text-gray-500">Yield (kgf/cm²)</label>
+                                            <label class="text-[10px] text-gray-500" data-i18n="lbl_reinf_yield">Yield (kgf/cm²)</label>
                                             <input type="number" id="reinf_fy" value="2800" class="calc-input w-full border border-gray-300 rounded p-1 text-right text-xs">
                                         </div>
                                     </div>
@@ -578,6 +657,17 @@
 
                 <!-- RESULTS CONTAINER (Interactive View) -->
                 <div id="results-container" class="hidden space-y-6">
+                    <div class="bg-white rounded shadow border border-gray-200 p-2 flex justify-center gap-4">
+                        <span class="text-xs font-bold text-gray-500 self-center" data-i18n="lbl_viz_mode">Visualization Mode:</span>
+                        <div class="inline-flex rounded-md shadow-sm" role="group">
+                            <button onclick="changeVizMode('2d')" id="btn-viz-2d" class="px-4 py-1.5 text-xs font-medium bg-eng-primary text-white border border-eng-primary rounded-l-lg transition-colors" data-i18n="btn_viz_2d">
+                                2D View (Default)
+                            </button>
+                            <button onclick="changeVizMode('3d')" id="btn-viz-3d" class="px-4 py-1.5 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-r-lg hover:bg-gray-50 transition-colors" data-i18n="btn_viz_3d">
+                                3D View
+                            </button>
+                        </div>
+                    </div>
                     <!-- Step 7: Geometry Warnings -->
                     <div id="geo-warn-box" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm">
                         <p class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i><span data-i18n="warn_title">Geometry Violation</span></p>
@@ -591,6 +681,21 @@
                         <button onclick="printReport()" class="flex-1 bg-gray-700 text-white py-2 rounded shadow hover:bg-gray-800 transition font-bold text-sm">
                             <i class="fa-solid fa-print mr-2"></i><span data-i18n="btn_pdf">Download Report</span>
                         </button>
+                    </div>
+
+                    <!-- 3D Interactive Model -->
+                    <div id="card-3d" class="bg-white rounded shadow border border-gray-200 overflow-hidden">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-sm text-gray-700"><i class="fa-solid fa-cube mr-2"></i><span data-i18n="viz_3d">3D Interactive Model</span></h4>
+                                <button onclick="reset3DView()" class="text-[10px] bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-0.5 rounded border border-gray-300 transition" title="Reset Camera">
+                                    <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reset">Reset</span>
+                                </button>
+                            </div>
+                            <span class="text-[10px] text-gray-400" data-i18n="lbl_3d_hint">Drag to Rotate | Scroll to Zoom</span>
+                        </div>
+                        <div id="canvas-3d-container" class="w-full h-64 bg-slate-900 relative">
+                        </div>
                     </div>
 
                     <!-- Step 7: 2D Visualizer -->
@@ -635,11 +740,11 @@
                             <span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600 font-mono">Sec 17.6.1 / 17.7.1</span>
                         </div>
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <!-- Tension Row 1 -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_nsa">Steel Tension (Nsa)</span><span id="r-nsa" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_nsa">φNsa Capacity</span><span id="r-phi-nsa" class="text-lg font-bold text-eng-primary"></span></div>
-                                
+
                                 <!-- Tension Row 2 (Ratio & Check) -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-st-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check_t">Tension Check</span><span id="badge-st" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
@@ -667,10 +772,10 @@
                             </div>
                         </div>
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_nba">Basic Bond (Nba)</span><span id="r-nba" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_cna">Crit. Spacing (cNa)</span><span id="r-cna" class="font-mono text-gray-600"></span></div>
-                                
+
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_na">Bond Strength (Na)</span><span id="r-na" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_na">φNa Capacity</span><span id="r-phi-na" class="text-lg font-bold text-eng-primary"></span></div>
 
@@ -695,7 +800,7 @@
                             <span id="badge-seis-pull" class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-bold hidden">Seismic</span>
                         </div>
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
-                             <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <!-- Pullout Row -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_npn">Pullout (Npn)</span><span id="r-npn" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_npn">φNpn Capacity</span><span id="r-phi-npn" class="text-lg font-bold text-eng-primary"></span></div>
@@ -854,13 +959,14 @@
         let currentLang = 'en';
 
         // --- TRANSLATION DATA ---
+// --- TRANSLATION DATA ---
         const translations = {
             en: {
                 app_title: "Anchor Analysis", app_subtitle: "ACI/Structural Compliance Tool",
                 tab_analysis: "Analysis", tab_database: "Database",
                 sec_params: "Design Parameters", sec_mat: "Material & Geometry", sec_space: "Spacing & Edge Dist", sec_factors: "Factors & Coefficients", sec_loads: "Applied Loads",
                 sec_steel_props: "ANCHOR STEEL",
-                lbl_fc: "Concrete Strength (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "Wall Thickness (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "Diameter (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "Embedment (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_fc: "Concrete Strength (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "Base Thickness (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "Diameter (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "Embedment (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
                 lbl_s1: "Vertical Spacing (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "Horizontal Spacing (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "Top Edge (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "Bottom Edge (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "Side Edge (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
                 lbl_kc: "Anchor Type (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "Failure Factor (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "Load Length (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "Cracking/Reinf (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "Eccentric <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "Eccentric <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
                 lbl_ase: "Eff. Area (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "Ult (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "Yld (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "Grouted (0.8x Shear)",
@@ -897,26 +1003,78 @@
                 modal_title: "Access Portal", modal_desc: "Sign in to sync your data across devices.", btn_login: "Login", btn_login_submit: "Login", btn_register: "Register", btn_guest: "Continue as Guest",
                 history_title: "Database Records", btn_clear: "Clear All", btn_refresh: "Refresh", msg_auth_req: "Authentication required to view records.", msg_no_rec: "No records found.",
                 open: "Open", pass: "PASS", fail: "FAIL",
-                warn_title: "Geometry Violation", viz_title: "Layout Visualization"
+                warn_title: "Geometry Violation", viz_title: "Layout Visualization", viz_3d: "3D Interactive Model",
+
+                // --- NEW TRANSLATIONS ADDED BELOW ---
+                lbl_sl_h: "Height (cm)",
+                lbl_sl_w: "Width (cm)",
+                lbl_sl_t: "Thickness (cm)",
+                lbl_sl_c: "Edge Dist (cm)",
+                opt_cat1: "1 (High Rel)",
+                opt_cat2: "2 (Med Rel)",
+                opt_cat3: "3 (Low Rel)",
+                msg_cac_default: "Default: 2.5hef (Undercut) or 4hef (Exp)",
+                tbl_res_type: "Result Type",
+                tbl_factor: "Factor",
+                tbl_note: "Note",
+                tbl_param: "Parameter",
+                tbl_check: "Check Item",
+                tbl_eq: "Equations",
+                tbl_val: "Value",
+                tbl_unit: "Unit",
+                tbl_stat: "Status",
+                tbl_ratio_lbl: "Load / Capacity",
+                lbl_layout: "Anchor Layout",
+                val_yes: "Yes",
+                val_no: "No",
+                opt_grid: "Grid (S1/S2)",
+                opt_custom: "Custom (X,Y)",
+                msg_spacing_note: "Uses Vertical/Horizontal Spacing below.",
+                lbl_gen_title: "1. Grid Generator",
+                lbl_rows: "Rows (Y)",
+                lbl_cols: "Cols (X)",
+                lbl_action: "Action",
+                btn_add_grid: "Add Grid",
+                lbl_sp_x: "Space X",
+                lbl_sp_y: "Space Y",
+                lbl_st_x: "Start X",
+                lbl_st_y: "Start Y",
+                lbl_list_title: "2. Anchor List",
+                btn_clear_all: "Clear All",
+                tbl_head_num: "#",
+                tbl_head_x: "X (cm)",
+                tbl_head_y: "Y (cm)",
+                tbl_head_action:  "Action",
+                msg_no_def: "No anchors defined",
+                btn_add_pt: "Add Point",
+                lbl_reinf_area: "Area (cm²)",
+                lbl_reinf_yield: "Yield (kgf/cm²)",
+                lbl_viz_mode: "Visualization Mode:",
+                btn_viz_2d: "2D View (Default)",
+                btn_viz_3d: "3D View",
+                btn_reset: "Reset",
+                lbl_3d_hint: "Drag to Rotate | Scroll to Zoom",
+                warn_custom_empty: "Custom coordinates empty. Using default 2x2 grid.",
+                rpt_layout: "Layout Confirmation"
             },
             zh: {
                 app_title: "錨栓設計分析", app_subtitle: "ACI/結構規範檢核工具",
                 tab_analysis: "結構分析", tab_database: "資料庫",
                 sec_params: "設計參數", sec_mat: "材料與幾何", sec_space: "間距與邊距", sec_factors: "修正因數/參數", sec_loads: "設計載重",
                 sec_steel_props: "錨栓鋼材性質",
-                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "垂牆厚 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "母材構件 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
                 lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "上方錨栓距梁頂邊 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "下方錨栓距梁底邊 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "錨栓距梁邊 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
                 lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "偏心距 <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "偏心距 <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
                 lbl_ase: "有效斷面積 (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "極限強度 (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "降伏強度 (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "灌漿錨栓 (0.8x 剪力)",
                 lbl_pull_mode: "拉出模式", lbl_abrg: "承壓面積 (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", lbl_eh: "彎鉤長度 (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", lbl_np_cert: "認證拉出強度 (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", lbl_crack_p: "拉出開裂參數 (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
                 lbl_is_adh: "化學黏結錨栓", lbl_tau: "黏結強度 (<span class='math-symbol'>τ</span>) [kgf/cm²]",
-                lbl_cond: "混凝土條件 (配筋)", lbl_cat: "錨栓類別 (可靠度)", lbl_ductility: "延展性",
+                lbl_cond: "混凝土狀況", lbl_cat: "錨栓類別 (可靠度)", lbl_ductility: "延展性",
                 lbl_seismic: "耐震設計 (0.75 折減)",
                 lbl_t: "拉力設計載重 (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V</span>) [kgf]",
                 lbl_tsust: "長期拉力載重 (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]",
                 lbl_cac: "臨界邊距 (<span class='math-symbol'>c<sub>ac</sub></span>) [cm]",
                 lbl_v_dir: "剪力載重方向",
-                lbl_is_sl: "抗剪座 (Sec 17.11)", lbl_is_reinf: "有錨栓鋼筋?",
+                lbl_is_sl: "剪力榫 (Sec 17.11)", lbl_is_reinf: "有錨栓鋼筋?",
                 lbl_stretch: "延伸長度 (<span class='math-symbol'>L<sub>str</sub></span>) [cm]",
                 btn_run: "執行結構分析", btn_save: "儲存至雲端", btn_pdf: "下載報告",
                 opt_cast: "預埋式錨栓 (10)", opt_post: "後置式錨栓 (7)",
@@ -941,7 +1099,59 @@
                 modal_title: "存取入口", modal_desc: "登入以同步您的資料。", btn_login: "登入", btn_login_submit: "登入", btn_register: "註冊", btn_guest: "訪客登入",
                 history_title: "資料庫紀錄", btn_clear: "清除全部", btn_refresh: "重新整理", msg_auth_req: "需驗證才能查看紀錄。", msg_no_rec: "找不到紀錄。",
                 open: "開啟", pass: "通過", fail: "失敗",
-                warn_title: "幾何限制警告", viz_title: "配置可視化"
+                warn_title: "幾何限制警告", viz_title: "配置可視化", viz_3d: "3D 互動模型",
+
+                // --- NEW TRANSLATIONS ADDED BELOW ---
+                lbl_sl_h: "高度 (cm)",
+                lbl_sl_w: "寬度 (cm)",
+                lbl_sl_t: "厚度 (cm)",
+                lbl_sl_c: "邊距 (cm)",
+                opt_cat1: "1 (高可靠度)",
+                opt_cat2: "2 (中可靠度)",
+                opt_cat3: "3 (低可靠度)",
+                msg_cac_default: "預設值: 2.5hef (擴底式) 或 4hef (膨脹式)",
+                tbl_res_type: "結果類型",
+                tbl_factor: "係數/參數",
+                tbl_note: "備註",
+                tbl_param: "參數名稱",
+                tbl_check: "檢核項目",
+                tbl_eq: "公式",
+                tbl_val: "數值",
+                tbl_unit: "單位",
+                tbl_stat: "狀態",
+                tbl_ratio_lbl: "載重 / 強度",
+                lbl_layout: "錨栓配置",
+                val_yes: "是",
+                val_no: "否",
+                opt_grid: "網格 (S1/S2)",
+                opt_custom: "自訂 (X,Y)",
+                msg_spacing_note: "使用下方的垂直/水平間距。",
+                lbl_gen_title: "1. 網格生成器",
+                lbl_rows: "列數 (Y)",
+                lbl_cols: "行數 (X)",
+                lbl_action: "動作",
+                btn_add_grid: "新增網格",
+                lbl_sp_x: "間距 X",
+                lbl_sp_y: "間距 Y",
+                lbl_st_x: "起點 X",
+                lbl_st_y: "起點 Y",
+                lbl_list_title: "2. 錨栓清單",
+                btn_clear_all: "清除全部",
+                tbl_head_num: "#",
+                tbl_head_x: "X (cm)",
+                tbl_head_y: "Y (cm)",
+                tbl_head_action:  "動作",
+                msg_no_def: "尚未定義錨栓",
+                btn_add_pt: "新增點",
+                lbl_reinf_area: "面積 (cm²)",
+                lbl_reinf_yield: "降伏強度 (kgf/cm²)",
+                lbl_viz_mode: "檢視模式:",
+                btn_viz_2d: "2D 視圖 (預設)",
+                btn_viz_3d: "3D 視圖",
+                btn_reset: "重置",
+                lbl_3d_hint: "拖曳旋轉 | 滾輪縮放",
+                warn_custom_empty: "自訂座標為空。使用預設 2x2 網格。",
+                rpt_layout: "配置確認圖"
             }
         };
 
@@ -1101,6 +1311,270 @@
             performCalculation(); // Live update results
         }
 
+        let scene, camera, renderer, controls;
+        let currentVizMode = '2d';
+
+// --- NEW: Custom Anchor Manager ---
+        let anchorData = []; 
+
+        // Helper to parse hidden textarea back to array
+        function parseCoords() {
+            const raw = document.getElementById('custom_coords').value.trim();
+            if(!raw) return [];
+            return raw.split(';').map(s => {
+                const p = s.trim().split(',');
+                return { x: parseFloat(p[0])||0, y: parseFloat(p[1])||0 };
+            });
+        }
+
+        // Sync Array -> Hidden Textarea -> Calculation
+        function syncToTextarea() {
+            const str = anchorData.map(a => `${a.x},${a.y}`).join(' ; ');
+            document.getElementById('custom_coords').value = str;
+            performCalculation();
+        }
+
+        // Render the visual table
+        function renderAnchorTable() {
+            const tbody = document.getElementById('anchor_table_body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            if(anchorData.length === 0) {
+                // UPDATE: Added translation support for this message
+                const msg = translations[currentLang]['msg_no_def'] || "No anchors defined";
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 py-2 italic">${msg}</td></tr>`;
+                return;
+            }
+
+            anchorData.forEach((a, i) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b last:border-0 hover:bg-blue-50";
+                tr.innerHTML = `
+                    <td class="p-1 pl-2 text-gray-500">${i+1}</td>
+                    <td class="p-1 font-mono font-bold text-eng-primary">${a.x}</td>
+                    <td class="p-1 font-mono font-bold text-eng-primary">${a.y}</td>
+                    <td class="p-1 text-right pr-2">
+                        <button onclick="removeAnchor(${i})" class="text-red-400 hover:text-red-600 px-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Layout Actions ---
+        window.addSingleAnchor = function() {
+            const x = parseFloat(document.getElementById('new_x').value);
+            const y = parseFloat(document.getElementById('new_y').value);
+            if(isNaN(x) || isNaN(y)) return;
+            anchorData.push({x, y});
+            renderAnchorTable();
+            syncToTextarea();
+            document.getElementById('new_x').value = '';
+            document.getElementById('new_y').value = '';
+        };
+
+        window.removeAnchor = function(idx) {
+            anchorData.splice(idx, 1);
+            renderAnchorTable();
+            syncToTextarea();
+        };
+
+        window.clearAllAnchors = function() {
+            if(!confirm("Clear all custom anchors?")) return;
+            anchorData = [];
+            renderAnchorTable();
+            syncToTextarea();
+        };
+
+        // Updated Generator with Offsets
+        window.generateGridAnchors = function () {
+            const rows = parseInt(document.getElementById('grid_rows').value) || 1;
+            const cols = parseInt(document.getElementById('grid_cols').value) || 1;
+            const sx = parseFloat(document.getElementById('grid_sx').value) || 0;
+            const sy = parseFloat(document.getElementById('grid_sy').value) || 0;
+            const stx = parseFloat(document.getElementById('grid_st_x').value) || 0;
+            const sty = parseFloat(document.getElementById('grid_st_y').value) || 0;
+            
+            // Append new grid to existing list
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    anchorData.push({ 
+                        x: parseFloat((stx + j * sx).toFixed(2)), 
+                        y: parseFloat((sty + i * sy).toFixed(2)) 
+                    });
+                }
+            }
+            renderAnchorTable();
+            syncToTextarea();
+        };
+
+        // Layout Toggle
+        window.toggleLayoutMode = function () {
+            const mode = document.getElementById('layout_mode').value;
+            const isCustom = mode === 'custom';
+            
+            // Show/hide the Custom Table UI
+            document.getElementById('div_custom_coords').classList.toggle('hidden', !isCustom);
+            
+            // Grey out Spacing & Edge inputs instead of hiding the section
+            const spacingSection = document.getElementById('spacing-inputs-section');
+            const inputs = spacingSection.querySelectorAll('input');
+            
+            inputs.forEach(input => {
+                input.disabled = isCustom;
+                if (isCustom) {
+                    input.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
+                    input.classList.remove('border-gray-300');
+                } else {
+                    input.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
+                    input.classList.add('border-gray-300');
+                }
+            });
+
+            if (isCustom) {
+                if (anchorData.length === 0) anchorData = parseCoords();
+                renderAnchorTable();
+            }
+            performCalculation();
+        };
+
+        window.changeVizMode = function (mode) {
+            currentVizMode = mode;
+            const btn2d = document.getElementById('btn-viz-2d');
+            const btn3d = document.getElementById('btn-viz-3d');
+            btn2d.className = (mode === '2d') ? "px-4 py-1.5 text-xs font-medium bg-eng-primary text-white border border-eng-primary rounded-l-lg" : "px-4 py-1.5 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-l-lg";
+            btn3d.className = (mode === '3d') ? "px-4 py-1.5 text-xs font-medium bg-eng-primary text-white border border-eng-primary rounded-r-lg" : "px-4 py-1.5 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-r-lg";
+
+            // Initialize 3D when switching to 3D mode
+            if (mode === '3d' && !renderer) {
+                setTimeout(() => {
+                    init3D();
+                    if (currentData && currentData.anchors) {
+                        update3DScene(currentData.anchors, currentData.inputs);
+                    }
+                }, 100);
+            }
+
+            updateUI();
+        };
+
+        window.init3D = function () {
+            const container = document.getElementById('canvas-3d-container');
+            if (!container) return;
+
+            // Clear existing renderer if present
+            if (renderer) {
+                container.removeChild(renderer.domElement);
+                renderer.dispose();
+                renderer = null;
+            }
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+
+            const width = container.clientWidth || 800;
+            const height = container.clientHeight || 256;
+
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(60, 60, 60);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const spotLight = new THREE.SpotLight(0xffffff, 0.5);
+            spotLight.position.set(100, 100, 100);
+            scene.add(spotLight);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.update();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                if (currentVizMode === '3d') renderer.render(scene, camera);
+            }
+            animate();
+        };
+
+        window.update3DScene = function (anchors, I) {
+            if (!renderer) init3D();
+
+            // Remove old meshes
+            scene.children.filter(c => c.type === "Mesh").forEach(m => scene.remove(m));
+
+            // 1. Concrete Slab - Calculate based on actual anchor positions
+            let maxAnchorX = 0;
+            let maxAnchorY = 0;
+
+            if (anchors.length > 0) {
+                maxAnchorX = Math.max(...anchors.map(a => a.x));
+                maxAnchorY = Math.max(...anchors.map(a => a.y));
+            }
+
+            const slabW = maxAnchorX + I.ca2 * 2 + 10; // max anchor X + edge distances + margin
+            const slabH = maxAnchorY + I.ca1 * 2 + 10; // max anchor Y + edge distances + margin
+            const slabGeo = new THREE.BoxGeometry(slabW, I.ha, slabH);
+            const slabMat = new THREE.MeshPhongMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
+            const slab = new THREE.Mesh(slabGeo, slabMat);
+            slab.position.y = -I.ha / 2;
+            scene.add(slab);
+
+            // 2. Anchors
+            anchors.forEach(a => {
+                const rodGeo = new THREE.CylinderGeometry(I.da / 2, I.da / 2, I.hef + 2, 16);
+                const rodMat = new THREE.MeshPhongMaterial({ color: 0xe2e8f0 });
+                const rod = new THREE.Mesh(rodGeo, rodMat);
+                rod.position.set(a.x - slabW / 2 + I.ca2, -I.hef / 2, a.y - slabH / 2 + I.ca1);
+                scene.add(rod);
+            });
+            // Reset camera to see all anchors
+            const maxDim = Math.max(slabW, slabH, I.ha);
+            const distance = maxDim * 2;
+            camera.position.set(distance, distance, distance);
+            camera.lookAt(0, 0, 0);
+            controls.update();
+
+            renderer.render(scene, camera); // Force a refresh
+        };
+
+        window.reset3DView = function () {
+            if (!camera || !controls || !currentData) return;
+            
+            // Recalculate optimal distance based on current geometry
+            const I = currentData.inputs;
+            const anchors = currentData.anchors || [];
+            let maxAnchorX = 0, maxAnchorY = 0;
+
+            if (anchors.length > 0) {
+                maxAnchorX = Math.max(...anchors.map(a => a.x));
+                maxAnchorY = Math.max(...anchors.map(a => a.y));
+            }
+
+            const slabW = maxAnchorX + I.ca2 * 2 + 10; 
+            const slabH = maxAnchorY + I.ca1 * 2 + 10;
+            
+            // Determine distance to fit the slab
+            const maxDim = Math.max(slabW, slabH, I.ha);
+            const distance = maxDim * 2; // Multiplier to ensure it fits in frame
+
+            // Reset Camera and Controls
+            controls.reset(); // Stop auto-rotation or inertia
+            camera.position.set(distance, distance, distance);
+            camera.lookAt(0, 0, 0);
+            controls.target.set(0, 0, 0);
+            
+            controls.update();
+            renderer.render(scene, camera);
+        };
+        
         window.performCalculation = function () {
             const val = (id) => parseFloat(document.getElementById(id).value) || 0;
             const str = (id) => document.getElementById(id).value;
@@ -1128,10 +1602,91 @@
                 // NEW Features Inputs
                 is_shearlug: chk('is_shearlug'), sl_h: val('sl_h'), sl_w: val('sl_w'), sl_t: val('sl_t'), sl_c: val('sl_c'),
                 is_reinf: chk('is_reinf'), reinf_area: val('reinf_area'), reinf_fy: val('reinf_fy'),
-                stretch_len: val('stretch_len'), kc_raw: str('kc_select')
+                stretch_len: val('stretch_len'), kc_raw: str('kc_select'),
+                layout_mode: str('layout_mode'),
+                custom_coords: str('custom_coords')
             };
 
             const warnings = [];
+            // --- STEP 10: Dynamic Anchor Array ---
+            let anchors = [];
+            const lMode = I.layout_mode;
+            if (lMode === 'grid') {
+                anchors.push({ x: I.ca2, y: I.ca1 });
+                if (I.s2 > 0) anchors.push({ x: I.ca2 + I.s2, y: I.ca1 });
+                if (I.s1 > 0) anchors.push({ x: I.ca2, y: I.ca1 + I.s1 });
+                if (I.s1 > 0 && I.s2 > 0) anchors.push({ x: I.ca2 + I.s2, y: I.ca1 + I.s1 });
+            } else {
+                const raw = I.custom_coords.trim();
+
+                if (!raw) {
+                    // UPDATE: Translation for empty warning
+                    const wMsg = translations[currentLang]['warn_custom_empty'] || "Custom coordinates empty. Using default 2x2 grid.";
+                    warnings.push(wMsg);
+                    anchors = [
+                        { x: I.ca2, y: I.ca1 },
+                        { x: I.ca2 + I.s2, y: I.ca1 },
+                        { x: I.ca2, y: I.ca1 + I.s1 },
+                        { x: I.ca2 + I.s2, y: I.ca1 + I.s1 }
+                    ];
+                } else {
+                    anchors = raw.split(';').map(pair => {
+                        const parts = pair.trim().split(',');
+                        const x = parseFloat(parts[0]);
+                        const y = parseFloat(parts[1]);
+
+                        if (isNaN(x) || isNaN(y)) {
+                            warnings.push(`Invalid coordinate: "${pair.trim()}" (non-numeric)`);
+                            return null;
+                        }
+                        if (x < 0 || y < 0) {
+                            warnings.push(`Negative coordinate rejected: (${x.toFixed(1)}, ${y.toFixed(1)})`);
+                            return null;
+                        }
+                        return { x, y };
+                    }).filter(a => a !== null);
+
+                    if (anchors.length === 0) {
+                        warnings.push("All custom coordinates invalid. Using default 2x2 grid.");
+                        anchors = [
+                            { x: I.ca2, y: I.ca1 },
+                            { x: I.ca2 + I.s2, y: I.ca1 },
+                            { x: I.ca2, y: I.ca1 + I.s1 },
+                            { x: I.ca2 + I.s2, y: I.ca1 + I.s1 }
+                        ];
+                    }
+                }
+
+                // Auto-calculate S1, S2, Ca1, Ca2 from custom anchors
+                if (anchors.length >= 2) {
+                    const xs = anchors.map(a => a.x).sort((a, b) => a - b);
+                    const ys = anchors.map(a => a.y).sort((a, b) => a - b);
+
+                    I.ca2 = xs[0]; // Leftmost anchor = ca2
+                    I.ca1 = ys[0]; // Topmost anchor = ca1
+
+                    // Find smallest non-zero spacing in X direction
+                    let minSpacingX = Infinity;
+                    for (let i = 1; i < xs.length; i++) {
+                        const diff = xs[i] - xs[i - 1];
+                        if (diff > 0.1 && diff < minSpacingX) minSpacingX = diff;
+                    }
+                    I.s2 = minSpacingX === Infinity ? 0 : minSpacingX;
+
+                    // Find smallest non-zero spacing in Y direction
+                    let minSpacingY = Infinity;
+                    for (let i = 1; i < ys.length; i++) {
+                        const diff = ys[i] - ys[i - 1];
+                        if (diff > 0.1 && diff < minSpacingY) minSpacingY = diff;
+                    }
+                    I.s1 = minSpacingY === Infinity ? 0 : minSpacingY;
+                }
+            }
+
+            // Re-calculate eccentricities based on centroid of the custom group
+            const sumX = anchors.reduce((s, a) => s + a.x, 0);
+            const sumY = anchors.reduce((s, a) => s + a.y, 0);
+            const centroid = { x: sumX / anchors.length, y: sumY / anchors.length };
 
             // --- LOGIC UPDATE: Concrete Limits ---
             let fc_calc = I.fc;
@@ -1227,7 +1782,8 @@
             const isPost = I.kc < 10; // 7 is post or screw
             if (isPost && isUncracked) {
                 if (ca_min < I.cac) {
-                    psi_cp_N = ca_min / I.cac;
+                    // PDF Eq 17.6.2.6.1b: Max of (ca_min/cac) and (1.5hef/cac)
+                    psi_cp_N = Math.max(ca_min / I.cac, (1.5 * I.hef) / I.cac);
                 }
             }
 
@@ -1250,14 +1806,16 @@
             const Anc_1 = 2 * (1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
             
             // Logic Update: Anchor Reinforcement Replacement (Tension)
-            let phi_Ncb_final = 0;
+            const phi_Ncb_concrete = seis_conc * phi_c * (Anc_1 / Anco) * psi_ed_N * 1.0 * psi_cp_N * Nb;
+
+            let phi_Ncb_final = phi_Ncb_concrete;
             let N_reinf_cap = 0;
-            if (I.is_reinf) {
-                // Tension Reinforcement Strength
+
+            if (I.is_reinf && I.reinf_area > 0) {
                 N_reinf_cap = I.reinf_area * I.reinf_fy;
-                phi_Ncb_final = phi_reinf * N_reinf_cap; // Replace breakout
-            } else {
-                phi_Ncb_final = seis_conc * phi_c * (Anc_1 / Anco) * psi_ed_N * 1.0 * psi_cp_N * Nb; 
+                const phi_Nreinf = phi_reinf * N_reinf_cap;
+                // Take MINIMUM (governing failure mode)
+                phi_Ncb_final = Math.min(phi_Ncb_concrete, phi_Nreinf);
             }
             const ratio_1 = I.T > 0 ? (I.T / phi_Ncb_final) : 0;
 
@@ -1284,48 +1842,89 @@
 
 			// Logic Update: Corner Shear Analysis
 			let phi_Vcb_final = 0;
-			const shear_para_factor = (I.v_dir === 'para') ? 2.0 : 1.0;
+            // Determine critical edge distance based on shear direction
+            let critical_shear_edge = I.ca1_1; // Default: perpendicular (front edge)
+            const shear_para_factor = (I.v_dir === 'para') ? 2.0 : 1.0;
 
-			// Primary Calc based on Ca1 (Front edge I.ca1_1)
-			let shear_result = calcShearBreakout(I.ca1_1);
-			let Vcb_ca1 = shear_result.cap;
-			const Vb = shear_result.vb;
-			const Avc_2 = shear_result.avc;
-			const Avco = shear_result.avco;
-			const psi_h_V = shear_result.psih;
+            // Then use critical_shear_edge in calcShearBreakout
+            let shear_result = calcShearBreakout(critical_shear_edge);
 
-			let Vcb_corner = 999999999;
-			if (I.ca2 < 1.5 * I.ca1_1) {
-				Vcb_corner = calcShearBreakout(I.ca2).cap;
-			}
-			const phi_Vcb_governing = Math.min(Vcb_ca1, Vcb_corner);
+            // Logic Update: Corner Shear Analysis
+            let phi_Vcb_governing = 0;
+            const res_front = calcShearBreakout(I.ca1_1); // Standard Perp (Front Edge)
+            
+            // Populate display data with standard perp values by default
+            let Vb = res_front.vb;
+            let Avc_2 = res_front.avc;
+            let Avco = res_front.avco;
+            let psi_h_V = res_front.psih;
 
-			// Logic Update: Anchor Reinforcement Replacement (Shear)
-			let V_reinf_cap = 0;
-			if (I.is_reinf) {
-				V_reinf_cap = I.reinf_area * I.reinf_fy;
-				phi_Vcb_final = phi_reinf * V_reinf_cap;
-			} else {
-				phi_Vcb_final = shear_para_factor * phi_Vcb_governing;
-			}
+            if (I.v_dir === 'para') {
+                // Parallel Mode: Check 2 failure modes (PDF 17.7.2.1)
+                
+                // Mode A: Shear towards Side Edge (Perpendicular failure of side edge)
+                const res_side = calcShearBreakout(I.ca2);
+                const Vcb_side = res_side.cap;
+
+                // Mode B: Shear Parallel to Front Edge (2x factor, psi_ed = 1.0)
+                // Recalculate Front capacity with psi_ed_V forced to 1.0 and 2.0 multiplier
+                const cap_para_front = seis_conc * phi_c * (res_front.avc / res_front.avco) * 1.0 * I.psi_c_V * res_front.psih * (2.0 * res_front.vb);
+
+                // Governing is the minimum of Side-Perp and Front-Parallel
+                phi_Vcb_governing = Math.min(Vcb_side, cap_para_front);
+
+                // Update display data to show the governing mode's values
+                if (Vcb_side < cap_para_front) {
+                    Vb = res_side.vb; Avc_2 = res_side.avc; Avco = res_side.avco; psi_h_V = res_side.psih;
+                }
+            } else {
+                // Perpendicular Mode: Check Front and Corner effects
+                const res_corner = calcShearBreakout(I.ca2);
+                phi_Vcb_governing = Math.min(res_front.cap, res_corner.cap);
+                // (Display data remains as Front Edge default)
+            }
+
+            // Logic Update: Anchor Reinforcement Replacement (Shear)
+            const phi_Vcb_concrete = phi_Vcb_governing;
+
+            phi_Vcb_final = phi_Vcb_concrete;
+            let V_reinf_cap = 0;
+
+            if (I.is_reinf && I.reinf_area > 0) {
+                V_reinf_cap = I.reinf_area * I.reinf_fy;
+                const phi_Vreinf = phi_reinf * V_reinf_cap;
+                // Take MINIMUM (governing failure mode)
+                phi_Vcb_final = Math.min(phi_Vcb_concrete, phi_Vreinf);
+            }
 			const ratio_2 = I.V > 0 ? (I.V / phi_Vcb_final) : 0;
 
             // Group Calcs (Simplified, not applying corner logic here for brevity as instructed "min lines")
-            const Anc_3 = (I.ca2 + I.s2 + 1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
-            let phi_Ncbg = seis_conc * phi_c * (Anc_3 / Anco) * psi_ec_N * psi_ed_N * 1.0 * psi_cp_N * Nb; 
-            if (I.is_reinf) phi_Ncbg = phi_Ncb_final; // Assume reinforcement governs group too
-            const ratio_3 = I.T > 0 ? ((2 * I.T) / phi_Ncbg) : 0;
+            // Calculate actual group area based on anchor positions
+            const xs = anchors.map(a => a.x);
+            const ys = anchors.map(a => a.y);
+            const minX = Math.min(...xs);
+            const maxX = Math.max(...xs);
+            const minY = Math.min(...ys);
+            const maxY = Math.max(...ys);
 
-            const Avc_4 = ((2 * 1.5 * I.ca1_1) + I.s2) * I.ha;
-            // Basic Vb based on ca1
+            // Group area considers all anchors' projection
+            const groupWidth = (maxX - minX) + 2 * (1.5 * I.hef);
+            const groupHeight = (maxY - minY) + 2 * (1.5 * I.hef);
+            const Anc_3 = groupWidth * groupHeight;
+            let phi_Ncbg = seis_conc * phi_c * (Anc_3 / Anco) * psi_ec_N * psi_ed_N * 1.0 * psi_cp_N * Nb;
+            if (I.is_reinf) phi_Ncbg = phi_Ncb_final * anchors.length; // Reinforcement scales with # of anchors
+            const ratio_3 = I.T > 0 ? (I.T / phi_Ncbg) : 0;  // Total load = per-anchor load × count
+
+            // Group shear area based on actual layout
+            const Avc_4 = ((maxX - minX) + 2 * (1.5 * I.ca1_1)) * I.ha;
             const Vb_basic = Math.min(
                 1.86 * Math.pow(le_val / I.da, 0.2) * Math.sqrt(I.da) * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5),
                 3.8 * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5)
             );
             const Avco_basic = 4.5 * Math.pow(I.ca1_1, 2);
-            let phi_Vcbg = shear_para_factor * seis_conc * phi_c * (Avc_4 / Avco_basic) * psi_ec_V * psi_ed_V * I.psi_c_V * 1.0 * Vb_basic; 
-             if (I.is_reinf) phi_Vcbg = phi_Vcb_final;
-            const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0;
+            let phi_Vcbg = shear_para_factor * seis_conc * phi_c * (Avc_4 / Avco_basic) * psi_ec_V * psi_ed_V * I.psi_c_V * 1.0 * Vb_basic;
+            if (I.is_reinf) phi_Vcbg = phi_Vcb_final * anchors.length;
+            const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0; // Total load scales with anchors
 
             // --- STEP 2: Pullout & Pryout Logic ---
             let Np = 0;
@@ -1411,7 +2010,7 @@
                 sl_res.ratio = I.V > 0 ? (I.V / sl_res.cap) : 0;
             }
 
-            // --- STEP 4: Interaction Check ---
+            // --- STEP 4: Interaction Check (ACI Trilinear) ---
             let ratios_N = [ratio_st, ratio_1, ratio_3, ratio_pn];
             if (I.is_adhesive) ratios_N.push(bond_res.ratio);
             if (sb_applicable) ratios_N.push(ratio_sb); 
@@ -1422,19 +2021,20 @@
             const max_V = Math.max(...ratios_V);
 
             let int_check = "OK";
-            let int_val = 0;
+            let int_val = max_N + max_V;
             
-            if (max_N <= 0.2 && max_V <= 0.2) {
-                int_val = 0; 
-                int_check = "N/A (Both ≤ 0.2)";
+            // Trilinear Interaction Logic
+            if (max_N <= 0.2 && max_V <= 1.0) {
+                int_check = "OK (N≤0.2)";
+            } else if (max_V <= 0.2 && max_N <= 1.0) {
+                int_check = "OK (V≤0.2)";
             } else {
-                int_val = max_N + max_V;
                 if (int_val > 1.2) int_check = "FAIL";
                 else int_check = "OK";
             }
 
             currentData = {
-                inputs: I, factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V, psi_cp_N }, calcs: { 
+                inputs: I, anchors: anchors, factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V, psi_cp_N }, calcs: { 
                     s1: { nsa: Nsa, cap: phi_Nsa, load: I.T, ratio: ratio_st, ok: ratio_st < 1.0 },
                     s2: { vsa: Vsa, cap: phi_Vsa, load: I.V, ratio: ratio_sv, ok: ratio_sv < 1.0 },
                     pn: { np: Np, npn: Npn, cap: phi_Npn, load: I.T, ratio: ratio_pn, ok: ratio_pn < 1.0 }, 
@@ -1444,12 +2044,17 @@
                     sl: sl_res, // Shear Lug
                     c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb_final, load: I.T, ratio: ratio_1, ok: ratio_1 < 1.0, is_reinf: I.is_reinf },
                     c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb_final, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0, is_reinf: I.is_reinf },
-                    c3: { anc: Anc_3, cap: phi_Ncbg, load: 2 * I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
+                    c3: { anc: Anc_3, cap: phi_Ncbg, load: I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
                     c4: { avc: Avc_4, cap: phi_Vcbg, load: I.V, ratio: ratio_4, psih: psi_h_V, ok: ratio_4 < 1.0 },
                     interaction: { max_n: max_N, max_v: max_V, val: int_val, status: int_check },
                     geo_warnings: warnings 
                 }, timestamp: new Date()
             };
+
+            if (renderer && currentVizMode === '3d') {
+                update3DScene(anchors, I);
+            }
+
             updateUI();
         };
 
@@ -1476,9 +2081,13 @@
             document.getElementById('card-tension').classList.toggle('hidden', !showTension);
             document.getElementById('card-shear').classList.toggle('hidden', !showShear);
             document.getElementById('card-steel').classList.toggle('hidden', !(showTension || showShear));
-            document.getElementById('card-pullout').classList.toggle('hidden', !(showTension || showShear)); 
+            document.getElementById('card-pullout').classList.toggle('hidden', !(showTension || showShear));
             document.getElementById('card-bond').classList.toggle('hidden', !(showTension && I.is_adhesive));
             document.getElementById('card-interaction').classList.toggle('hidden', !(showTension || showShear));
+
+            // Toggle visibility based on selected mode
+            document.getElementById('card-viz').style.display = (currentVizMode === '2d') ? 'block' : 'none';
+            document.getElementById('card-3d').style.display = (currentVizMode === '3d') ? 'block' : 'none';
 
             // Seismic Badge Display Logic
             const seisDisplay = I.is_seismic ? 'inline' : 'none';
@@ -1587,7 +2196,11 @@
             // --- Step 7: Draw Visualization ---
             drawVisualization();
 
-            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+            // Force 3D refresh when in 3D mode
+            if (currentVizMode === '3d' && currentData.anchors && renderer) {
+                update3DScene(currentData.anchors, currentData.inputs);
+                renderer.render(scene, camera);
+            }
         }
 
         // NEW Step 7: Visualization Function
@@ -1612,9 +2225,20 @@
             // Edge Top (ca1) is Y axis. Edge Left (ca2) is X axis.
             
             // Determine logical bounding box
-            const totalWidth = I.ca2 + (I.s2 > 0 ? I.s2 : 0) + Math.max(I.ca2, 20); // Add some concrete to right
-            const totalHeight = I.ca1 + (I.s1 > 0 ? I.s1 : 0) + Math.max(I.ca1, 20); // Add some concrete below
-            
+            // Determine logical bounding box based on actual anchor positions
+            const anchors = currentData.anchors || [];
+            let maxAnchorX = 0;
+            let maxAnchorY = 0;
+
+            if (anchors.length > 0) {
+                maxAnchorX = Math.max(...anchors.map(a => a.x));
+                maxAnchorY = Math.max(...anchors.map(a => a.y));
+            }
+
+            // Calculate concrete dimensions to cover all anchors plus edge distances
+            const totalWidth = maxAnchorX + I.ca2 + 20; // max anchor X + right edge + margin
+            const totalHeight = maxAnchorY + I.ca1 + 20; // max anchor Y + bottom edge + margin
+
             const padding = 40;
             const scaleX = (w - 2 * padding) / totalWidth;
             const scaleY = (h - 2 * padding) / totalHeight;
@@ -1641,17 +2265,6 @@
             ctx.lineTo(ox, oy + totalHeight * scale);
             ctx.stroke();
             ctx.setLineDash([]);
-
-            // Draw Anchors
-            const anchors = [];
-            // Top-Left (Always present)
-            anchors.push({ x: I.ca2, y: I.ca1 });
-            // Top-Right (if s2 > 0)
-            if (I.s2 > 0) anchors.push({ x: I.ca2 + I.s2, y: I.ca1 });
-            // Bottom-Left (if s1 > 0)
-            if (I.s1 > 0) anchors.push({ x: I.ca2, y: I.ca1 + I.s1 });
-            // Bottom-Right (if s1>0 and s2>0)
-            if (I.s1 > 0 && I.s2 > 0) anchors.push({ x: I.ca2 + I.s2, y: I.ca1 + I.s1 });
 
             // Check violations for coloring
             const bad_s1 = (I.s1 > 0 && I.s1 < min_s);
@@ -1699,22 +2312,22 @@
 
             // Draw Ca1
             const ax = ox + I.ca2 * scale; 
-            drawDim(ax, oy, ax, oy + I.ca1 * scale, `Ca1=${I.ca1}`, bad_ca1);
+            drawDim(ax, oy, ax, oy + I.ca1 * scale, `Ca1=${I.ca1} cm`, bad_ca1);
 
             // Draw Ca2
             const ay = oy + I.ca1 * scale;
-            drawDim(ox, ay, ox + I.ca2 * scale, ay, `Ca2=${I.ca2}`, bad_ca2);
+            drawDim(ox, ay, ox + I.ca2 * scale, ay, `Ca2=${I.ca2} cm`, bad_ca2);
 
             // Draw S1 (if exists)
             if (I.s1 > 0) {
                 const sx = ox + I.ca2 * scale + 20; // Offset slightly
-                drawDim(sx, ay, sx, ay + I.s1 * scale, `s1=${I.s1}`, bad_s1);
+                drawDim(sx, ay, sx, ay + I.s1 * scale, `s1=${I.s1} cm`, bad_s1);
             }
 
             // Draw S2 (if exists)
             if (I.s2 > 0) {
                 const sy = oy + I.ca1 * scale + 20;
-                drawDim(ax, sy, ax + I.s2 * scale, sy, `s2=${I.s2}`, bad_s2);
+                drawDim(ax, sy, ax + I.s2 * scale, sy, `s2=${I.s2} cm`, bad_s2);
             }
         }
 
@@ -1744,6 +2357,23 @@
                 const snapshot = await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').get();
                 const batch = db.batch(); snapshot.docs.forEach((doc) => batch.delete(doc.ref)); await batch.commit(); loadHistory();
             } catch (e) { console.error(e); alert("Error deleting history."); }
+        };
+
+        window.deleteHistoryItem = async function (docId, event) {
+            // Prevent the parent div's click event (restore) from firing
+            if (event) event.stopPropagation();
+
+            // Use a simple confirm; though custom UI is better, this fits your current logic
+            if (!confirm("Delete this record?")) return;
+
+            try {
+                await db.collection('artifacts').doc('anchor_app')
+                    .collection('users').doc(currentUser.uid)
+                    .collection('history').doc(docId).delete();
+                // History list will auto-refresh if using onSnapshot
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+            }
         };
 
         window.restoreFromHistory = function (docId) {
@@ -1809,9 +2439,27 @@
                 toggleReinf();
                 setVal('reinf_area', I.reinf_area); setVal('reinf_fy', I.reinf_fy);
             }
-
+            
             if (I.stretch_len) setVal('stretch_len', I.stretch_len);
+            // --- RESTORE LAYOUT & ANCHORS ---
+            if (I.layout_mode) {
+                setVal('layout_mode', I.layout_mode);
+                // Call toggleLayoutMode to show/hide the correct UI elements (Custom Coords Box vs Spacing Inputs)
+                toggleLayoutMode();
+            }
 
+            if (I.custom_coords) {
+                setVal('custom_coords', I.custom_coords);
+                // Parse the string back into the array so the visual table can populate
+                anchorData = parseCoords(); 
+                // Render the table rows
+                renderAnchorTable();
+            } else {
+                // If legacy data or grid mode was saved, ensure list is empty visually
+                anchorData = [];
+                renderAnchorTable();
+            }
+            
             switchTab('calculator'); performCalculation();
         };
 
@@ -1831,7 +2479,12 @@
                                 <div><div class="flex items-center gap-2 mb-1">${status}<span class="text-xs font-mono text-gray-500">${date}</span></div>
                                 <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V}</div>
                                 <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1"><span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span><span class="bg-gray-100 px-1 rounded border">da: ${d.inputs.da}</span></div></div>
-                                <div class="text-eng-primary text-xs font-bold flex items-center">${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i></div></div>`;
+                                <div class="flex items-center gap-4">
+                                    <div class="text-eng-primary text-xs font-bold flex items-center">${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i></div>
+                                    <button onclick="deleteHistoryItem('${d.id}', event)" class="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div></div>`;
                 });
                 list.innerHTML = html;
             });
@@ -1852,99 +2505,151 @@
             const showT = d.inputs.T > 0;
             const showV = d.inputs.V > 0;
 
-            // Define rich equation strings for Table
-            const e_Nb = `<span class="math-symbol">N<sub>b</sub> = k<sub>c</sub>λ<sub>a</sub>√f'<sub>c</sub>h<sub>ef</sub><sup>1.5</sup></span>`;
+            // --- 1. DEFINING FORMATTED EQUATIONS ---
+            // Concrete Breakout (Tension)
+            const e_Nb = `<span class="math-symbol">N<sub>b</sub> = k<sub>c</sub> λ<sub>a</sub> √f'<sub>c</sub> h<sub>ef</sub><sup>1.5</sup></span>`;
             const e_Anc = `<span class="math-symbol">A<sub>Nc</sub> = 2(1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
-            const e_psiN = `<span class="math-symbol">ψ<sub>ed,N</sub> = 0.7+0.3(c<sub>a,min</sub>/1.5h<sub>ef</sub>)</span>`;
-            // Updated formula string for Splitting (Step 8)
-            const e_phiN = `<span class="math-symbol">ϕN<sub>cb</sub> = 0.75(A<sub>Nc</sub>/A<sub>Nco</sub>)ψ<sub>ed,N</sub>ψ<sub>c,N</sub>ψ<sub>cp,N</sub>N<sub>b</sub></span>`;
+            const e_psiN = `<span class="math-symbol">ψ<sub>ed,N</sub> = 0.7 + 0.3(c<sub>a,min</sub>/1.5h<sub>ef</sub>)</span>`;
+            const e_phiN = `<span class="math-symbol">ϕN<sub>cb</sub> = ϕ (A<sub>Nc</sub>/A<sub>Nco</sub>) ψ<sub>ed,N</sub> ψ<sub>c,N</sub> ψ<sub>cp,N</sub> N<sub>b</sub></span>`;
 
+            // Group Tension
             const e_Ancg = `<span class="math-symbol">A<sub>Nc(g)</sub> = (C<sub>a2</sub>+S<sub>2</sub>+1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
-            const e_pecN = `<span class="math-symbol">ψ<sub>ec,N</sub> = 1/(1+2e'<sub>N</sub>/3h<sub>ef</sub>)</span>`;
-            const e_phiNg = `<span class="math-symbol">ϕN<sub>cbg</sub> = 0.75(A<sub>Nc(g)</sub>/A<sub>Nco</sub>)ψ<sub>ec,N</sub>ψ<sub>ed,N</sub>ψ<sub>c,N</sub>...N<sub>b</sub></span>`;
+            const e_pecN = `<span class="math-symbol">ψ<sub>ec,N</sub> = 1 / (1 + 2e'<sub>N</sub>/3h<sub>ef</sub>)</span>`;
+            const e_phiNg = `<span class="math-symbol">ϕN<sub>cbg</sub> = ϕ (A<sub>Nc(g)</sub>/A<sub>Nco</sub>) ψ<sub>ec,N</sub> ψ<sub>ed,N</sub> ψ<sub>c,N</sub> ψ<sub>cp,N</sub> N<sub>b</sub></span>`;
 
+            // Concrete Breakout (Shear)
             const e_Vb = `<span class="math-symbol">V<sub>b</sub> = min(V<sub>b1</sub>, V<sub>b2</sub>)</span>`;
             const e_Avc = `<span class="math-symbol">A<sub>Vc</sub> = 2(1.5C<sub>a1</sub>)h<sub>a</sub></span>`;
-            const e_psiV = `<span class="math-symbol">ψ<sub>ed,V</sub> = 0.7+0.3(C<sub>a2</sub>/1.5C<sub>a1</sub>)</span>`;
-            const e_phiV = `<span class="math-symbol">ϕV<sub>cb</sub> = 0.75(A<sub>Vc</sub>/A<sub>Vco</sub>)ψ<sub>ed,V</sub>ψ<sub>c,V</sub>ψ<sub>h,V</sub>V<sub>b</sub></span>`;
+            const e_psiV = `<span class="math-symbol">ψ<sub>ed,V</sub> = 0.7 + 0.3(C<sub>a2</sub>/1.5C<sub>a1</sub>)</span>`;
+            const e_phiV = `<span class="math-symbol">ϕV<sub>cb</sub> = ϕ (A<sub>Vc</sub>/A<sub>Vco</sub>) ψ<sub>ed,V</sub> ψ<sub>c,V</sub> ψ<sub>h,V</sub> V<sub>b</sub></span>`;
 
+            // Group Shear
             const e_Avcg = `<span class="math-symbol">A<sub>Vc(g)</sub> = [(3C<sub>a1</sub>)+S<sub>2</sub>]h<sub>a</sub></span>`;
-            const e_pecV = `<span class="math-symbol">ψ<sub>ec,V</sub> = 1/(1+2e'<sub>V</sub>/3C<sub>a1</sub>)</span>`;
-            const e_phiVg = `<span class="math-symbol">ϕV<sub>cbg</sub> = 0.75(A<sub>Vc(g)</sub>/A<sub>Vco</sub>)ψ<sub>ec,V</sub>ψ<sub>ed,V</sub>ψ<sub>c,V</sub>...V<sub>b</sub></span>`;
+            const e_pecV = `<span class="math-symbol">ψ<sub>ec,V</sub> = 1 / (1 + 2e'<sub>V</sub>/3C<sub>a1</sub>)</span>`;
+            const e_phiVg = `<span class="math-symbol">ϕV<sub>cbg</sub> = ϕ (A<sub>Vc(g)</sub>/A<sub>Vco</sub>) ψ<sub>ec,V</sub> ψ<sub>ed,V</sub> ψ<sub>c,V</sub> V<sub>b</sub></span>`;
+
+            // Steel Strength
+            const e_Nsa = `<span class="math-symbol">N<sub>sa</sub> = A<sub>se</sub> f<sub>uta</sub></span>`;
+            const e_phiNsa = `<span class="math-symbol">ϕN<sub>sa</sub> = ϕ A<sub>se</sub> f<sub>uta</sub></span>`;
+            const e_Vsa = `<span class="math-symbol">V<sub>sa</sub> = 0.6 A<sub>se</sub> f<sub>uta</sub></span>`;
+            const e_phiVsa = `<span class="math-symbol">ϕV<sub>sa</sub> = ϕ 0.6 A<sub>se</sub> f<sub>uta</sub></span>`;
+
+            // Pullout & Pryout
+            const e_Npn = `<span class="math-symbol">N<sub>pn</sub> = ψ<sub>c,P</sub> N<sub>p</sub></span>`;
+            const e_phiNpn = `<span class="math-symbol">ϕN<sub>pn</sub> = ϕ ψ<sub>c,P</sub> N<sub>p</sub></span>`;
+            const e_Vcp = `<span class="math-symbol">V<sub>cp</sub> = k<sub>cp</sub> N<sub>cp</sub></span>`;
+            const e_phiVcp = `<span class="math-symbol">ϕV<sub>cp</sub> = ϕ k<sub>cp</sub> N<sub>cp</sub></span>`;
+
+            // Adhesive Bond
+            const e_Nba = `<span class="math-symbol">N<sub>ba</sub> = λ<sub>a</sub> τ<sub>cr</sub> π d<sub>a</sub> h<sub>ef</sub></span>`;
+            const e_cNa = `<span class="math-symbol">c<sub>Na</sub> = 10 d<sub>a</sub> √(τ<sub>uncr</sub>/77)</span>`;
+            const e_Na = `<span class="math-symbol">N<sub>a</sub> = (A<sub>Na</sub>/A<sub>Nao</sub>) ψ<sub>ed,Na</sub> ψ<sub>cp,Na</sub> N<sub>ba</sub></span>`;
+            const e_phiNa = `<span class="math-symbol">ϕN<sub>a</sub> = ϕ N<sub>a</sub></span>`;
+
+            // Side-Face Blowout
+            const e_Nsb = `<span class="math-symbol">N<sub>sb</sub> = 42.4 c<sub>a1</sub> √A<sub>brg</sub> λ<sub>a</sub> √f'<sub>c</sub></span>`;
+            const e_phiNsb = `<span class="math-symbol">ϕN<sub>sb</sub> = ϕ N<sub>sb</sub></span>`;
+
+            // Shear Lug
+            const e_Vbrg = `<span class="math-symbol">V<sub>brg</sub> = 1.7 f'<sub>c</sub> A<sub>ef,sl</sub></span>`;
+            const e_Vcbsl = `<span class="math-symbol">V<sub>cb,sl</sub> = (A<sub>Vc,sl</sub>/A<sub>Vco,sl</sub>) ψ<sub>ed,V</sub>... V<sub>b,sl</sub></span>`;
 
 
+            // --- 2. GENERATING REPORT HTML ---
             let html = `
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
-                        <div>
-                            <h1 style="color: #004a99; font-size: 20pt; margin: 0; font-weight:bold;">Anchor Analysis</h1>
-                            <p style="font-size: 10pt; color: #555; margin: 2px 0 0 0;">ACI/Structural Compliance Tool</p>
-                        </div>
-                        <div style="text-align: right; font-size: 9pt; color: #777;">
-                            ${dateStr}
-                        </div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
+                    <div>
+                        <h1 style="color: #004a99; font-size: 20pt; margin: 0; font-weight:bold;">${txt('app_title')}</h1>
+                        <p style="font-size: 10pt; color: #555; margin: 2px 0 0 0;">${txt('app_subtitle')}</p>
                     </div>
+                    <div style="text-align: right; font-size: 9pt; color: #777;">
+                        ${dateStr}
+                    </div>
+                </div>
 
-                    ${(d.geo_warnings && d.geo_warnings.length > 0) ? `
-                        <div style="background-color:#fee2e2; color:#b91c1c; padding:10px; margin-bottom:20px; border-left:5px solid #ef4444;">
-                            <strong>WARNING: Geometry Violations</strong>
-                            <ul>${d.geo_warnings.map(w => `<li>${w}</li>`).join('')}</ul>
-                        </div>
-                    ` : ''}
+                ${(d.geo_warnings && d.geo_warnings.length > 0) ? `
+                    <div style="background-color:#fee2e2; color:#b91c1c; padding:10px; margin-bottom:20px; border-left:5px solid #ef4444;">
+                        <strong>${txt('warn_title')}</strong>
+                        <ul>${d.geo_warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+                    </div>
+                ` : ''}
 
-                    <h2>${txt('sec_mat')}</h2>
-                    <table>
-                        <tr><th>${txt('Parameter') || 'Parameter'}</th><th>${txt('Value') || 'Value'}</th><th>${txt('Unit') || 'Unit'}</th></tr>
-                        <tr><td>${txt('lbl_fc')}</td><td>${d.inputs.fc}</td><td>kgf/cm²</td></tr>
-                        <tr><td>${txt('lbl_ha')}</td><td>${d.inputs.ha}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_da')}</td><td>${d.inputs.da}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_hef')}</td><td>${d.inputs.hef}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_cac')}</td><td>${d.inputs.cac}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ase')}</td><td>${d.inputs.ase}</td><td>cm²</td></tr>
-                        <tr><td>${txt('lbl_futa')}</td><td>${d.inputs.futa}</td><td>kgf/cm²</td></tr>
-                        <tr><td>${txt('lbl_s1')}</td><td>${d.inputs.s1}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_s2')}</td><td>${d.inputs.s2}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ca1')}</td><td>${d.inputs.ca1}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ca1_1')}</td><td>${d.inputs.ca1_1}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ca2')}</td><td>${d.inputs.ca2}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_t')}</td><td>${d.inputs.T}</td><td>kgf</td></tr>
-                        <tr><td>${txt('lbl_v')}</td><td>${d.inputs.V}</td><td>kgf</td></tr>
-                        ${d.inputs.is_adhesive ? `<tr><td>${txt('lbl_tsust')}</td><td>${d.inputs.loadT_sust}</td><td>kgf</td></tr>` : ''}
-                    </table>
 
-                    <h2>${txt('sec_factors')}</h2>
-                    <table>
-                        <tr><th>Factor</th><th>Value</th><th>Note</th></tr>
-                        <tr><td>${txt('lbl_kc')}</td><td>${d.inputs.kc}</td><td></td></tr>
-                        <tr><td>${txt('lbl_lambda')}</td><td>${d.inputs.lambda}</td><td></td></tr>
-                        <tr><td>${txt('lbl_le')}</td><td>${d.inputs.le_mode}</td><td></td></tr>
-                        <tr><td>${txt('lbl_reinf')}</td><td>${d.inputs.psi_c_V}</td><td></td></tr>
-                        <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
-                        <tr><td>${txt('lbl_pull_mode')}</td><td>${d.inputs.pull_mode}</td><td></td></tr>
-                        <tr><td>${txt('lbl_is_adh')}</td><td>${d.inputs.is_adhesive ? 'Yes' : 'No'}</td><td></td></tr>
-                        <tr><td>${txt('lbl_cond')}</td><td>${d.inputs.cond_ab}</td><td></td></tr>
-                        <tr><td>${txt('lbl_cat')}</td><td>${d.inputs.category}</td><td></td></tr>
-                        <tr><td>${txt('lbl_seismic')}</td><td>${d.inputs.is_seismic ? 'Yes' : 'No'}</td><td></td></tr>
-                        <tr><td>${txt('lbl_v_dir')}</td><td>${d.inputs.v_dir === 'para' ? 'Parallel' : 'Perpendicular'}</td><td></td></tr>
-                    </table>
+                <h3>${txt('rpt_layout')} (${currentVizMode.toUpperCase()})</h3>
+                <div style="text-align:center; padding: 15px; border: 1px solid #eee; margin-bottom: 20px;">
+                    <img src="${currentVizMode === '2d' ? document.getElementById('viz-canvas').toDataURL() : renderer.domElement.toDataURL()}" style="max-width: 100%; border: 1px solid #ccc; height: 200px; object-fit: contain;">
+                </div>
 
-                    <div class="page-break">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 20px;">
-                            <div>
-                                <h1 style="color: #666; font-size: 14pt; margin: 0; font-weight:bold;">Results</h1>
-                            </div>
-                            <div style="text-align: right; font-size: 9pt; color: #777;">
-                                ${dateStr}
-                            </div>
-                        </div>
-                    </div>`;
-            
-            // Interaction Check Section (New Step 4)
+                <h2>${txt('sec_mat')}</h2>
+                <table>
+                    <tr><th>${txt('tbl_param')}</th><th>${txt('tbl_val')}</th><th>${txt('tbl_unit')}</th></tr>
+                    <tr><td>${txt('lbl_fc')}</td><td>${d.inputs.fc}</td><td>kgf/cm²</td></tr>
+                    <tr><td>${txt('lbl_ha')}</td><td>${d.inputs.ha}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_da')}</td><td>${d.inputs.da}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_hef')}</td><td>${d.inputs.hef}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_cac')}</td><td>${d.inputs.cac}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_ase')}</td><td>${d.inputs.ase}</td><td>cm²</td></tr>
+                    <tr><td>${txt('lbl_futa')}</td><td>${d.inputs.futa}</td><td>kgf/cm²</td></tr>
+                    <tr><td>${txt('lbl_s1')}</td><td>${d.inputs.s1}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_s2')}</td><td>${d.inputs.s2}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_ca1')}</td><td>${d.inputs.ca1}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_ca1_1')}</td><td>${d.inputs.ca1_1}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_ca2')}</td><td>${d.inputs.ca2}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_t')}</td><td>${d.inputs.T}</td><td>kgf</td></tr>
+                    <tr><td>${txt('lbl_v')}</td><td>${d.inputs.V}</td><td>kgf</td></tr>
+                    ${d.inputs.is_adhesive ? `<tr><td>${txt('lbl_tsust')}</td><td>${d.inputs.loadT_sust}</td><td>kgf</td></tr>` : ''}
+                </table>
+                
+                <div class="page-break"></div>
+                
+                <h2>${txt('sec_factors')}</h2>
+                <table>
+                    <tr><th>${txt('tbl_factor')}</th><th>${txt('tbl_val')}</th><th>${txt('tbl_note')}</th></tr>
+                    <tr>
+                        <td>${txt('lbl_kc')}</td>
+                        <td>${d.inputs.kc_raw === '10' ? txt('opt_cast') : (d.inputs.kc_raw === 'screw' ? txt('opt_screw') : txt('opt_post'))}</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>${txt('lbl_lambda')}</td><td>${d.inputs.lambda}</td><td></td></tr>
+                    <tr>
+                        <td>${txt('lbl_le')}</td>
+                        <td>${d.inputs.le_mode === 'sleeve' ? txt('opt_le2') : (d.inputs.le_mode === 'torque' ? txt('opt_le3') : txt('opt_le1'))}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>${txt('lbl_reinf')}</td>
+                        <td>${d.inputs.psi_c_V === 1.2 ? txt('opt_reinf2') : (d.inputs.psi_c_V === 1.4 ? txt('opt_reinf3') : txt('opt_reinf1'))}</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
+                    <tr>
+                        <td>${txt('lbl_pull_mode')}</td>
+                        <td>${d.inputs.pull_mode === 'hooked' ? txt('opt_hooked') : (d.inputs.pull_mode === 'post' ? txt('opt_post_cert') : txt('opt_headed'))}</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>${txt('lbl_is_adh')}</td><td>${d.inputs.is_adhesive ? txt('val_yes') : txt('val_no')}</td><td></td></tr>
+                    <tr>
+                        <td>${txt('lbl_cond')}</td>
+                        <td>${d.inputs.cond_ab === 'A' ? txt('opt_cond_a') : txt('opt_cond_b')}</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>${txt('lbl_cat')}</td><td>${d.inputs.category}</td><td></td></tr>
+                    <tr><td>${txt('lbl_seismic')}</td><td>${d.inputs.is_seismic ? txt('val_yes') : txt('val_no')}</td><td></td></tr>
+                    <tr>
+                        <td>${txt('lbl_v_dir')}</td>
+                        <td>${d.inputs.v_dir === 'para' ? txt('opt_v_para') : txt('opt_v_perp')}</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                <div class="page-break"></div>`;
+
             if(showT || showV) {
                 html += `
                     <h3>${txt('res_int_title')}</h3>
                     <table>
-                        <tr><th>Result Type</th><th>Value</th><th>Status</th></tr>
+                        <tr><th>${txt('tbl_res_type')}</th><th>${txt('tbl_val')}</th><th>${txt('tbl_stat')}</th></tr>
                         <tr><td><strong>${txt('res_max_n')}</strong></td><td>${d.calcs.interaction.max_n.toFixed(2)}</td><td>-</td></tr>
                         <tr><td><strong>${txt('res_max_v')}</strong></td><td>${d.calcs.interaction.max_v.toFixed(2)}</td><td>-</td></tr>
                         <tr style="background:${d.calcs.interaction.status === 'OK' || d.calcs.interaction.status.includes('N/A') ? '#e6fffa' : '#fee2e2'}">
@@ -1956,81 +2661,95 @@
                 `;
             }
 
-            // Steel Section in PDF
+            // --- STEEL STRENGTH SECTION ---
             if(showT || showV) {
                  html += `
                     <h3>${txt('res_s_title')}</h3>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
                         
-                        <!-- Tension -->
-                        <tr><td>${txt('res_nsa')}</td><td>Ase * futa</td><td>${Math.round(d.calcs.s1.nsa)}</td><td>kgf</td><td>-</td></tr>
-                        <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_nsa')}</strong></td><td>φNsa (φ=${(d.calcs.s1.cap / d.calcs.s1.nsa).toFixed(2)})</td><td><strong>${Math.round(d.calcs.s1.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s1.ok ? 'pass' : 'fail'}">${d.calcs.s1.ok ? 'OK' : 'FAIL'}</span></td></tr>
-                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.calcs.s1.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
+                        <tr><td>${txt('res_nsa')}</td><td>${e_Nsa}</td><td>${Math.round(d.calcs.s1.nsa)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_nsa')}</strong></td><td>${e_phiNsa}</td><td><strong>${Math.round(d.calcs.s1.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s1.ok ? 'pass' : 'fail'}">${d.calcs.s1.ok ? txt('pass') : txt('fail')}</span></td></tr>
+                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.s1.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
 
-                        <!-- Shear -->
-                        <tr><td>${txt('res_vsa')}</td><td>0.6 * Ase * futa</td><td>${Math.round(d.calcs.s2.vsa)}</td><td>kgf</td><td>-</td></tr>
-                        <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_vsa')}</strong></td><td>φVsa (φ=${(d.calcs.s2.cap / d.calcs.s2.vsa).toFixed(2)})</td><td><strong>${Math.round(d.calcs.s2.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s2.ok ? 'pass' : 'fail'}">${d.calcs.s2.ok ? 'OK' : 'FAIL'}</span></td></tr>
-                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.calcs.s2.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
+                        <tr><td>${txt('res_vsa')}</td><td>${e_Vsa}</td><td>${Math.round(d.calcs.s2.vsa)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_vsa')}</strong></td><td>${e_phiVsa}</td><td><strong>${Math.round(d.calcs.s2.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s2.ok ? 'pass' : 'fail'}">${d.calcs.s2.ok ? txt('pass') : txt('fail')}</span></td></tr>
+                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.s2.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
                     </table>
                  `;
             }
 
-            // Pullout & Pryout Section in PDF
+            // --- PULLOUT & PRYOUT SECTION ---
             if(showT || showV) {
                  html += `
                     <h3>${txt('res_p_title')}</h3>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
                         
-                        <!-- Pullout -->
-                        <tr><td>${txt('res_npn')}</td><td>Np * psi_c_P</td><td>${Math.round(d.calcs.pn.npn)}</td><td>kgf</td><td>-</td></tr>
-                        <tr style="background:#fffbe6"><td><strong>${txt('res_phi_npn')}</strong></td><td>φNpn (φ=${(d.calcs.pn.cap / d.calcs.pn.npn).toFixed(2)})</td><td><strong>${Math.round(d.calcs.pn.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.pn.ok ? 'pass' : 'fail'}">${d.calcs.pn.ok ? 'OK' : 'FAIL'}</span></td></tr>
-                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.calcs.pn.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
+                        <tr><td>${txt('res_npn')}</td><td>${e_Npn}</td><td>${Math.round(d.calcs.pn.npn)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#fffbe6"><td><strong>${txt('res_phi_npn')}</strong></td><td>${e_phiNpn}</td><td><strong>${Math.round(d.calcs.pn.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.pn.ok ? 'pass' : 'fail'}">${d.calcs.pn.ok ? txt('pass') : txt('fail')}</span></td></tr>
+                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.pn.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
 
-                        <!-- Pryout -->
-                        <tr><td>${txt('res_vcp')}</td><td>kcp * Ncp</td><td>${Math.round(d.calcs.cp.vcp)}</td><td>kgf</td><td>-</td></tr>
-                        <tr style="background:#fffbe6"><td><strong>${txt('res_phi_vcp')}</strong></td><td>φVcp</td><td><strong>${Math.round(d.calcs.cp.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.cp.ok ? 'pass' : 'fail'}">${d.calcs.cp.ok ? 'OK' : 'FAIL'}</span></td></tr>
-                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>Load / Capacity</strong></td><td><strong>${(d.calcs.cp.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
+                        <tr><td>${txt('res_vcp')}</td><td>${e_Vcp}</td><td>${Math.round(d.calcs.cp.vcp)}</td><td>kgf</td><td>-</td></tr>
+                        <tr style="background:#fffbe6"><td><strong>${txt('res_phi_vcp')}</strong></td><td>${e_phiVcp}</td><td><strong>${Math.round(d.calcs.cp.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.cp.ok ? 'pass' : 'fail'}">${d.calcs.cp.ok ? txt('pass') : txt('fail')}</span></td></tr>
+                        <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.cp.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
                     </table>
                  `;
             }
 
-            // Step 3 PDF Update
+            // --- BOND SECTION ---
             if (showT && d.inputs.is_adhesive) {
                 html += `
                     <h3>${txt('res_b_title')}</h3>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
-                        <tr><td>${txt('res_nba')}</td><td>lambda * tau * pi * da * hef</td><td>${Math.round(d.calcs.bond.nba)}</td><td>kgf</td><td>-</td></tr>
-                        <tr><td>${txt('res_cna')}</td><td>10da * sqrt(tau/77)</td><td>${Math.round(d.calcs.bond.cna)}</td><td>cm</td><td>-</td></tr>
-                        <tr><td>${txt('res_na')}</td><td>(ANa/ANao) * psi * Nba</td><td>${Math.round(d.calcs.bond.na)}</td><td>kgf</td><td>-</td></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
+                        <tr><td>${txt('res_nba')}</td><td>${e_Nba}</td><td>${Math.round(d.calcs.bond.nba)}</td><td>kgf</td><td>-</td></tr>
+                        <tr><td>${txt('res_cna')}</td><td>${e_cNa}</td><td>${Math.round(d.calcs.bond.cna)}</td><td>cm</td><td>-</td></tr>
+                        <tr><td>${txt('res_na')}</td><td>${e_Na}</td><td>${Math.round(d.calcs.bond.na)}</td><td>kgf</td><td>-</td></tr>
                         <tr style="background:#e6f3ff">
                             <td><strong>${txt('res_phi_na')}</strong></td>
-                            <td>φNa</td>
+                            <td>${e_phiNa}</td>
                             <td><strong>${Math.round(d.calcs.bond.cap)}</strong></td>
                             <td>kgf</td>
-                            <td><span class="${d.calcs.bond.ok ? 'pass' : 'fail'}">${d.calcs.bond.ok ? 'OK' : 'FAIL'}</span></td>
+                            <td><span class="${d.calcs.bond.ok ? 'pass' : 'fail'}">${d.calcs.bond.ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                         <tr>
                             <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${txt('tbl_ratio_lbl')}</strong></td>
                             <td><strong>${(d.calcs.bond.ratio || 0).toFixed(2)}</strong></td>
                             <td><strong>-</strong></td>
                             <td>-</td>
                         </tr>
-                        <!-- Sustained Load PDF Row -->
                         <tr>
                             <td>${txt('res_sust_load')}</td>
                             <td>Load ≤ 0.4φNa</td>
                             <td>${d.inputs.loadT_sust} / ${Math.round(d.calcs.bond.sust_cap)}</td>
                             <td>kgf</td>
-                            <td><span class="${d.calcs.bond.sust_ok ? 'pass' : 'fail'}">${d.calcs.bond.sust_ok ? 'OK' : 'FAIL'}</span></td>
+                            <td><span class="${d.calcs.bond.sust_ok ? 'pass' : 'fail'}">${d.calcs.bond.sust_ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                     </table>
                 `;
             }
 
+            // --- CONCRETE BREAKOUT (TENSION) ---
             if (showT) {
                 html += `
                     <h3>${txt('res_t_title')}</h3>
@@ -2038,22 +2757,27 @@
 
                     <h4>${txt('res_t1_sub')}</h4>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
                         <tr><td>${txt('res_nb')}</td><td>${e_Nb}</td><td>${Math.round(d.calcs.c1.nb)}</td><td>kgf</td><td>-</td></tr>
                         <tr><td>${txt('res_anc')}</td><td>${e_Anc}</td><td>${Math.round(d.calcs.c1.anc)}</td><td>cm²</td><td>-</td></tr>
                         <tr><td>${txt('res_edge')}</td><td>${e_psiN}</td><td>${f.psi_ed_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
-                        <!-- Step 8: Splitting -->
                         <tr><td>${txt('res_psi_cp')}</td><td>${f.psi_cp_N < 1 ? 'ca,min/cac' : '1.0'}</td><td>${f.psi_cp_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
                         <tr style="background:#e6f3ff">
                             <td><strong>${txt('res_cap')}</strong></td>
                             <td><strong>${e_phiN}</strong></td>
                             <td><strong>${Math.round(d.calcs.c1.cap)}</strong></td>
                             <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c1.ok ? 'pass' : 'fail'}">${d.calcs.c1.ok ? 'OK' : 'FAIL'}</span></td>
+                            <td><span class="${d.calcs.c1.ok ? 'pass' : 'fail'}">${d.calcs.c1.ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                         <tr>
                             <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${txt('tbl_ratio_lbl')}</strong></td>
                             <td><strong>${(d.calcs.c1.ratio || 0).toFixed(2)}</strong></td>
                             <td><strong>-</strong></td>
                             <td>-</td>
@@ -2063,7 +2787,13 @@
                     <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Ncbg_pdf}</div>
                     <h4>${txt('res_tg_sub')}</h4>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
                         <tr><td>${txt('res_anc_g')}</td><td>${e_Ancg}</td><td>${Math.round(d.calcs.c3.anc)}</td><td>cm²</td><td>-</td></tr>
                         <tr><td>${txt('res_ecc')}</td><td>${e_pecN}</td><td>${f.psi_ec_N.toFixed(2)}</td><td>-</td><td>-</td></tr>
                         <tr style="background:#f9f9e0">
@@ -2071,11 +2801,11 @@
                             <td><strong>${e_phiNg}</strong></td>
                             <td><strong>${Math.round(d.calcs.c3.cap)}</strong></td>
                             <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c3.ok ? 'pass' : 'fail'}">${d.calcs.c3.ok ? 'OK' : 'FAIL'}</span></td>
+                            <td><span class="${d.calcs.c3.ok ? 'pass' : 'fail'}">${d.calcs.c3.ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                         <tr>
                             <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${txt('tbl_ratio_lbl')}</strong></td>
                             <td><strong>${(d.calcs.c3.ratio || 0).toFixed(2)}</strong></td>
                             <td><strong>-</strong></td>
                             <td>-</td>
@@ -2084,17 +2814,24 @@
                     
                     ${d.calcs.sb.applicable ? `
                         <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #f59e0b"></div>
-                        <h4>${txt('res_sb_title')} (Step 5)</h4>
+                        <h4>${txt('res_sb_title')}</h4> <!-- REMOVED HARDCODED (Step 5) -->
                         <table>
-                            <tr><th>Check Item</th><th>Value</th><th>Status</th></tr>
-                            <tr><td>${txt('res_nsb')}</td><td>${Math.round(d.calcs.sb.nsb)} kgf</td><td>-</td></tr>
+                            <tr>
+                                <th>${txt('tbl_check')}</th>
+                                <th>${txt('tbl_eq')}</th>
+                                <th>${txt('tbl_val')}</th>
+                                <th>${txt('tbl_stat')}</th>
+                            </tr>
+                            <tr><td>${txt('res_nsb')}</td><td>${e_Nsb}</td><td>${Math.round(d.calcs.sb.nsb)} kgf</td><td>-</td></tr>
                             <tr style="background:#fff7ed">
                                 <td><strong>${txt('res_phi_nsb')}</strong></td>
+                                <td>${e_phiNsb}</td>
                                 <td><strong>${Math.round(d.calcs.sb.cap)} kgf</strong></td>
-                                <td><span class="${d.calcs.sb.ok ? 'pass' : 'fail'}">${d.calcs.sb.ok ? 'OK' : 'FAIL'}</span></td>
+                                <td><span class="${d.calcs.sb.ok ? 'pass' : 'fail'}">${d.calcs.sb.ok ? txt('pass') : txt('fail')}</span></td>
                             </tr>
                             <tr>
                                 <td><strong>${txt('res_ratio')}</strong></td>
+                                <td><strong>${txt('tbl_ratio_lbl')}</strong></td>
                                 <td><strong>${(d.calcs.sb.ratio || 0).toFixed(2)}</strong></td>
                                 <td>-</td>
                             </tr>
@@ -2103,6 +2840,7 @@
                     `;
             }
 
+            // --- CONCRETE BREAKOUT (SHEAR) ---
             if (showV) {
                 html += `
                     <h3>${txt('res_v_title')}</h3>
@@ -2110,7 +2848,13 @@
 
                     <h4>${txt('res_v1_sub')}</h4>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
                         <tr><td>${txt('res_vb')}</td><td>${e_Vb}</td><td>${Math.round(d.calcs.c2.vb)}</td><td>kgf</td><td>-</td></tr>
                         <tr><td>${txt('res_avc')}</td><td>${e_Avc}</td><td>${Math.round(d.calcs.c2.avc)}</td><td>cm²</td><td>-</td></tr>
                         <tr><td>${txt('res_edge')}</td><td>${e_psiV}</td><td>${f.psi_ed_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
@@ -2119,11 +2863,11 @@
                             <td><strong>${e_phiV}</strong></td>
                             <td><strong>${Math.round(d.calcs.c2.cap)}</strong></td>
                             <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c2.ok ? 'pass' : 'fail'}">${d.calcs.c2.ok ? 'OK' : 'FAIL'}</span></td>
+                            <td><span class="${d.calcs.c2.ok ? 'pass' : 'fail'}">${d.calcs.c2.ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                         <tr>
                             <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${txt('tbl_ratio_lbl')}</strong></td>
                             <td><strong>${(d.calcs.c2.ratio || 0).toFixed(2)}</strong></td>
                             <td><strong>-</strong></td>
                             <td>-</td>
@@ -2132,15 +2876,21 @@
                     
                     ${d.calcs.sl.applicable ? `
                         <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99"></div>
-                        <h4>Shear Lug (Sec 17.11)</h4>
+                        <h4>${txt('lbl_is_sl')}</h4>
                         <table>
-                             <tr><th>Check Item</th><th>Value</th><th>Status</th></tr>
-                             <tr><td>Bearing (Vbrg)</td><td>${Math.round(d.calcs.sl.vbrg)} kgf</td><td>-</td></tr>
-                             <tr><td>Breakout (Vcb,sl)</td><td>${Math.round(d.calcs.sl.vcbsl)} kgf</td><td>-</td></tr>
+                             <tr>
+                                <th>${txt('tbl_check')}</th>
+                                <th>${txt('tbl_eq')}</th>
+                                <th>${txt('tbl_val')}</th>
+                                <th>${txt('tbl_stat')}</th>
+                             </tr>
+                             <tr><td>Bearing (Vbrg)</td><td>${e_Vbrg}</td><td>${Math.round(d.calcs.sl.vbrg)} kgf</td><td>-</td></tr>
+                             <tr><td>Breakout (Vcb,sl)</td><td>${e_Vcbsl}</td><td>${Math.round(d.calcs.sl.vcbsl)} kgf</td><td>-</td></tr>
                              <tr style="background:#e6f3ff">
                                 <td><strong>Capacity</strong></td>
+                                <td>min(ϕVbrg, ϕVcb,sl)</td>
                                 <td><strong>${Math.round(d.calcs.sl.cap)} kgf</strong></td>
-                                <td><span class="${d.calcs.sl.ratio < 1.0 ? 'pass' : 'fail'}">${d.calcs.sl.ratio < 1.0 ? 'OK' : 'FAIL'}</span></td>
+                                <td><span class="${d.calcs.sl.ratio < 1.0 ? 'pass' : 'fail'}">${d.calcs.sl.ratio < 1.0 ? txt('pass') : txt('fail')}</span></td>
                              </tr>
                         </table>
                     ` : ''}
@@ -2148,7 +2898,13 @@
                     <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vcbg_pdf}</div>
                     <h4>${txt('res_vg_sub')}</h4>
                     <table>
-                        <tr><th>Check Item</th><th>Equations</th><th>Value</th><th>Unit</th><th>Status</th></tr>
+                        <tr>
+                            <th>${txt('tbl_check')}</th>
+                            <th>${txt('tbl_eq')}</th>
+                            <th>${txt('tbl_val')}</th>
+                            <th>${txt('tbl_unit')}</th>
+                            <th>${txt('tbl_stat')}</th>
+                        </tr>
                         <tr><td>${txt('res_avc_g')}</td><td>${e_Avcg}</td><td>${Math.round(d.calcs.c4.avc)}</td><td>cm²</td><td>-</td></tr>
                         <tr><td>${txt('res_ecc')}</td><td>${e_pecV}</td><td>${f.psi_ec_V.toFixed(2)}</td><td>-</td><td>-</td></tr>
                         <tr style="background:#f9f9e0">
@@ -2156,11 +2912,11 @@
                             <td><strong>${e_phiVg}</strong></td>
                             <td><strong>${Math.round(d.calcs.c4.cap)}</strong></td>
                             <td><strong>kgf</strong></td>
-                            <td><span class="${d.calcs.c4.ok ? 'pass' : 'fail'}">${d.calcs.c4.ok ? 'OK' : 'FAIL'}</span></td>
-
-						<tr>
+                            <td><span class="${d.calcs.c4.ok ? 'pass' : 'fail'}">${d.calcs.c4.ok ? txt('pass') : txt('fail')}</span></td>
+                        </tr>
+                        <tr>
                             <td><strong>${txt('res_ratio')}</strong></td>
-                            <td><strong>Load / Capacity</strong></td>
+                            <td><strong>${txt('tbl_ratio_lbl')}</strong></td>
                             <td><strong>${(d.calcs.c4.ratio || 0).toFixed(2)}</strong></td>
                             <td><strong>-</strong></td>
                             <td>-</td>
@@ -2203,6 +2959,7 @@
         toggleReinf();
         toggleSeismicDetailing();
         updateCac();
+        init3D();
     </script>
 </body>
 </html>
