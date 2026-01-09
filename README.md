@@ -2,6 +2,8 @@
 
 **[English](#) | [繁體中文](./README.zh-TW.md)**
 
+**[Detailed](./All%20Types.md) | [詳細的](./All%20Types.zh-TW.md)**
+
 ## Overview
 
 **Anchor Analysis** is a comprehensive web-based structural engineering application designed to analyze and verify concrete anchor connections according to ACI 318 standards. Developed by FengYu Group, this tool performs detailed calculations for both single anchors and anchor groups under combined tension and shear loading conditions.

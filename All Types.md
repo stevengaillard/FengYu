@@ -1,5 +1,9 @@
 # Concrete Anchor Analysis (Chapter 17 Compliance)
 
+**[English](#) | [繁體中文](./All%20Types.zh-TW.md)**
+
+**[Simplified](./README.md) | [簡化版](./README.zh-TW.md)**
+
 This documentation outlines the structural analysis logic for anchors in concrete structures, complying with Chapter 17 of the provided code. It covers classification, input parameters, detailed design equations, and output validation.
 
 ---
