@@ -688,14 +688,19 @@
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
                             <div class="flex items-center gap-2">
                                 <h4 class="font-bold text-sm text-gray-700"><i class="fa-solid fa-cube mr-2"></i><span data-i18n="viz_3d">3D Interactive Model</span></h4>
+                                
                                 <button onclick="reset3DView()" class="text-[10px] bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-0.5 rounded border border-gray-300 transition" title="Reset Camera">
                                     <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reset">Reset</span>
+                                </button>
+
+                                <button onclick="toggle3DDimensions()" id="btn-3d-dims" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-0.5 rounded border border-blue-200 transition">
+                                    <i class="fa-solid fa-ruler-combined"></i> <span data-i18n="btn_dims">Dimensions</span>
                                 </button>
                             </div>
                             <span class="text-[10px] text-gray-400" data-i18n="lbl_3d_hint">Drag to Rotate | Scroll to Zoom</span>
                         </div>
-                        <div id="canvas-3d-container" class="w-full h-64 bg-slate-900 relative">
-                        </div>
+                        <!-- This container was missing -->
+                        <div id="canvas-3d-container" class="w-full h-64 bg-white relative"></div>
                     </div>
 
                     <!-- Step 7: 2D Visualizer -->
@@ -1055,7 +1060,8 @@
                 btn_reset: "Reset",
                 lbl_3d_hint: "Drag to Rotate | Scroll to Zoom",
                 warn_custom_empty: "Custom coordinates empty. Using default 2x2 grid.",
-                rpt_layout: "Layout Confirmation"
+                rpt_layout: "Layout Confirmation",
+                btn_dims: "Dimensions"
             },
             zh: {
                 app_title: "錨栓設計分析", app_subtitle: "ACI/結構規範檢核工具",
@@ -1151,7 +1157,8 @@
                 btn_reset: "重置",
                 lbl_3d_hint: "拖曳旋轉 | 滾輪縮放",
                 warn_custom_empty: "自訂座標為空。使用預設 2x2 網格。",
-                rpt_layout: "配置確認圖"
+                rpt_layout: "配置確認圖",
+                btn_dims: "標註尺寸"
             }
         };
 
@@ -1313,8 +1320,20 @@
 
         let scene, camera, renderer, controls;
         let currentVizMode = '2d';
+        let showDims = true;
+        
+        window.toggle3DDimensions = function() {
+            showDims = !showDims;
+            const btn = document.getElementById('btn-3d-dims');
+            if(showDims) {
+                btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-0.5 rounded border border-blue-200 transition";
+            } else {
+                btn.className = "text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-400 px-2 py-0.5 rounded border border-gray-200 transition";
+            }
+            if (currentData) update3DScene(currentData.anchors, currentData.inputs);
+        };
 
-// --- NEW: Custom Anchor Manager ---
+        // --- NEW: Custom Anchor Manager ---
         let anchorData = []; 
 
         // Helper to parse hidden textarea back to array
@@ -1459,11 +1478,12 @@
             updateUI();
         };
 
+        // --- Initialize 3D Environment ---
         window.init3D = function () {
             const container = document.getElementById('canvas-3d-container');
             if (!container) return;
 
-            // Clear existing renderer if present
+            // Cleanup if exists
             if (renderer) {
                 container.removeChild(renderer.domElement);
                 renderer.dispose();
@@ -1471,7 +1491,7 @@
             }
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0f172a);
+            scene.background = new THREE.Color(0xffffff); // slate-900
 
             const width = container.clientWidth || 800;
             const height = container.clientHeight || 256;
@@ -1499,80 +1519,460 @@
             function animate() {
                 requestAnimationFrame(animate);
                 controls.update();
-                if (currentVizMode === '3d') renderer.render(scene, camera);
+                if (currentVizMode === '3d' && renderer) renderer.render(scene, camera);
             }
             animate();
         };
 
+        // --- 3D Text Helper (Billboard Sprites) ---
+        function makeTextSprite(message, color, scale = 0.1) {
+            var fontface = "Arial";
+            var fontsize = 80; // High res font for texture
+            var canvas = document.createElement('canvas');
+            canvas.width = 512; 
+            canvas.height = 256; // 2:1 Aspect Ratio
+            var context = canvas.getContext('2d');
+            
+            // Draw background pill (Solid White for contrast)
+            /*
+            context.fillStyle = "rgba(255, 255, 255, 0.95)";
+            context.beginPath();
+            context.ellipse(256, 128, 230, 100, 0, 0, 2 * Math.PI);
+            context.fill();
+            
+            // Border
+            context.lineWidth = 12;
+            context.strokeStyle = color || "#004a99";
+            context.stroke();
+            */
+
+            // Text
+            context.font = "Bold " + fontsize + "px " + fontface;
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.fillStyle = color || "#004a99";
+            context.fillText(message, 256, 128);
+
+            var texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            
+            // sizeAttenuation: false ensures text stays same size on screen regardless of zoom
+            var spriteMaterial = new THREE.SpriteMaterial({ 
+                map: texture, 
+                sizeAttenuation: false, 
+                depthTest: false, 
+                depthWrite: false 
+            });
+            var sprite = new THREE.Sprite(spriteMaterial);
+            
+            // Scale is relative to viewport height. 
+            // 0.1 means 10% of screen height.
+            // Width is 2x height because canvas is 2:1.
+            sprite.scale.set(scale * 2, scale, 1); 
+            sprite.renderOrder = 999; 
+            return sprite;
+        }
+
         window.update3DScene = function (anchors, I) {
-            if (!renderer) init3D();
+            // Attempt to initialize if renderer doesn't exist
+            if (!renderer && typeof init3D === 'function') init3D();
 
-            // Remove old meshes
-            scene.children.filter(c => c.type === "Mesh").forEach(m => scene.remove(m));
+            // CRITICAL FIX: Stop execution if scene is still undefined (init3D failed)
+            // This prevents "Cannot read properties of undefined (reading 'children')"
+            if (!scene) return;
 
-            // 1. Concrete Slab - Calculate based on actual anchor positions
-            let maxAnchorX = 0;
-            let maxAnchorY = 0;
+            // Clear existing scene objects
+            scene.children.filter(c => c.type === "Mesh" || c.type === "Sprite" || c.type === "Line" || c.type === "LineSegments").forEach(m => scene.remove(m));
 
+            // 1. Calculate Bounds
+            let maxAnchorX = 0, maxAnchorY = 0;
             if (anchors.length > 0) {
                 maxAnchorX = Math.max(...anchors.map(a => a.x));
                 maxAnchorY = Math.max(...anchors.map(a => a.y));
             }
 
-            const slabW = maxAnchorX + I.ca2 * 2 + 10; // max anchor X + edge distances + margin
-            const slabH = maxAnchorY + I.ca1 * 2 + 10; // max anchor Y + edge distances + margin
+            const margin = 10;
+            const slabW = maxAnchorX + I.ca2 + margin; 
+            const slabH = maxAnchorY + I.ca1_1 + margin; 
+            
+            // Validation Thresholds for Red coloring
+            const min_s = 6 * I.da;
+            const min_c = 6 * I.da;
+
+            // 2. Concrete Slab
             const slabGeo = new THREE.BoxGeometry(slabW, I.ha, slabH);
             const slabMat = new THREE.MeshPhongMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
             const slab = new THREE.Mesh(slabGeo, slabMat);
-            slab.position.y = -I.ha / 2;
+            slab.position.set(0, -I.ha/2, 0); 
             scene.add(slab);
 
-            // 2. Anchors
-            anchors.forEach(a => {
+            // Wireframe Edges
+            const edges = new THREE.EdgesGeometry(slabGeo);
+            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x94a3b8 }));
+            line.position.copy(slab.position);
+            scene.add(line);
+
+            // --- Coordinate Mapping ---
+            const mapX = (x) => -slabW/2 + x;
+            const mapZ = (y) => -slabH/2 + y;
+
+            // 3. Anchors & ID Labels
+            anchors.forEach((a, index) => {
                 const rodGeo = new THREE.CylinderGeometry(I.da / 2, I.da / 2, I.hef + 2, 16);
                 const rodMat = new THREE.MeshPhongMaterial({ color: 0xe2e8f0 });
                 const rod = new THREE.Mesh(rodGeo, rodMat);
-                rod.position.set(a.x - slabW / 2 + I.ca2, -I.hef / 2, a.y - slabH / 2 + I.ca1);
-                scene.add(rod);
-            });
-            // Reset camera to see all anchors
-            const maxDim = Math.max(slabW, slabH, I.ha);
-            const distance = maxDim * 2;
-            camera.position.set(distance, distance, distance);
-            camera.lookAt(0, 0, 0);
-            controls.update();
+                
+                const tx = mapX(a.x);
+                const tz = mapZ(a.y);
 
-            renderer.render(scene, camera); // Force a refresh
+                rod.position.set(tx, -I.hef / 2, tz);
+                scene.add(rod);
+
+                // Only show ID label if dimensions are on, or keep it always? 
+                // Let's keep ID labels always visible, but you can move this into the 'if(showDims)' block if you want them hidden too.
+                const label = makeTextSprite(`#${index + 1}`, "#0f172a", 0.08);
+                label.position.set(tx, 5, tz); 
+                scene.add(label);
+            });
+
+            // --- 4. 3D Architectural Dimensions Helper ---
+            function draw3DDim(p1, p2, text, offset, isVert, isBad) {
+                const mainColor = isBad ? 0xef4444 : 0x475569;
+                const extColor = isBad ? 0xffaaaa : 0xa0aec0; 
+                const fontColor = isBad ? "#b91c1c" : "#0f172a";
+
+                let startV, endV;
+
+                // Determine positions based on orientation
+                if (isVert) {
+                    // Vertical Dims on RIGHT side
+                    const lineX = slabW/2 + offset;
+                    startV = new THREE.Vector3(lineX, 0, mapZ(p1));
+                    endV = new THREE.Vector3(lineX, 0, mapZ(p2));
+                    
+                    const objZ1 = mapZ(p1);
+                    const objZ2 = mapZ(p2);
+                    const objX = slabW/2; 
+                    
+                    drawExtension(new THREE.Vector3(objX, 0, objZ1), new THREE.Vector3(lineX, 0, objZ1), extColor);
+                    drawExtension(new THREE.Vector3(objX, 0, objZ2), new THREE.Vector3(lineX, 0, objZ2), extColor);
+
+                } else {
+                    // Horizontal Dims on BOTTOM side
+                    const lineZ = slabH/2 + offset;
+                    startV = new THREE.Vector3(mapX(p1), 0, lineZ);
+                    endV = new THREE.Vector3(mapX(p2), 0, lineZ);
+
+                    const objX1 = mapX(p1);
+                    const objX2 = mapX(p2);
+                    const objZ = slabH/2; 
+
+                    drawExtension(new THREE.Vector3(objX1, 0, objZ), new THREE.Vector3(objX1, 0, lineZ), extColor);
+                    drawExtension(new THREE.Vector3(objX2, 0, objZ), new THREE.Vector3(objX2, 0, lineZ), extColor);
+                }
+
+                // Draw Main Line
+                const geo = new THREE.BufferGeometry().setFromPoints([startV, endV]);
+                const mat = new THREE.LineBasicMaterial({ color: mainColor });
+                scene.add(new THREE.Line(geo, mat));
+
+                // Draw Ticks
+                drawTick(startV, mainColor);
+                drawTick(endV, mainColor);
+
+                // Draw Text Label - Scale 0.09 (Readable text)
+                const mid = new THREE.Vector3().addVectors(startV, endV).multiplyScalar(0.5);
+                const label = makeTextSprite(text + " cm", fontColor, 0.09);
+                label.position.copy(mid);
+                label.position.y = 2; 
+                scene.add(label);
+            }
+
+            // Sub-helper: Extension Line
+            function drawExtension(from, to, color) {
+                const points = [from, to];
+                const geo = new THREE.BufferGeometry().setFromPoints(points);
+                const mat = new THREE.LineDashedMaterial({ 
+                    color: color, 
+                    dashSize: 1, 
+                    gapSize: 1,
+                    opacity: 0.6,
+                    transparent: true
+                });
+                const line = new THREE.Line(geo, mat);
+                line.computeLineDistances();
+                scene.add(line);
+            }
+
+            // Sub-helper: Tick Mark
+            function drawTick(pos, color) {
+                const size = 1.5;
+                const p1 = new THREE.Vector3(pos.x - size, 0, pos.z + size);
+                const p2 = new THREE.Vector3(pos.x + size, 0, pos.z - size);
+                const geo = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+                const mat = new THREE.LineBasicMaterial({ color: color });
+                scene.add(new THREE.Line(geo, mat));
+            }
+
+            // --- 5. Draw the Dimensions (WRAPPED IN CONDITION) ---
+            // Use typeof check to avoid ReferenceError if showDims wasn't declared globally
+            if (typeof showDims !== 'undefined' && showDims) { // <--- START CONDITIONAL
+                const uniqueX = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
+                const uniqueY = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
+
+                // A. Vertical Dimensions (Right Side)
+                const bad_ca1 = I.ca1 < min_c;
+                draw3DDim(0, uniqueY[0], `Ca1=${I.ca1}`, 15, true, bad_ca1); 
+
+                for(let i=0; i<uniqueY.length-1; i++) {
+                    const val = uniqueY[i+1] - uniqueY[i];
+                    if (val > 0.1) {
+                        const isBad = val < min_s;
+                        draw3DDim(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 30 + (i*15), true, isBad);
+                    }
+                }
+
+                // B. Horizontal Dimensions (Bottom Side)
+                const bad_ca2 = I.ca2 < min_c;
+                draw3DDim(0, uniqueX[0], `Ca2=${I.ca2}`, 15, false, bad_ca2);
+
+                for(let i=0; i<uniqueX.length-1; i++) {
+                    const val = uniqueX[i+1] - uniqueX[i];
+                    if (val > 0.1) {
+                        const isBad = val < min_s;
+                        draw3DDim(uniqueX[i], uniqueX[i+1], `s2=${val.toFixed(1)}`, 30 + (i*15), false, isBad);
+                    }
+                }
+            } // <--- END CONDITIONAL
+
+            renderer.render(scene, camera);
         };
 
         window.reset3DView = function () {
             if (!camera || !controls || !currentData) return;
-            
-            // Recalculate optimal distance based on current geometry
+            const I = currentData.inputs;
+            // Approximation of scale
+            const size = Math.max(I.s1*2, I.s2*2, 50);
+            camera.position.set(size, size, size);
+            camera.lookAt(0, 0, 0);
+            controls.reset();
+        };
+
+        // --- 2D Visualization (Right/Bottom Dims, AutoCad Style, Dotted Extensions, "cm") ---
+        window.drawVisualization = function () {
+            const canvas = document.getElementById('viz-canvas');
+            if (!canvas || !currentData) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
             const I = currentData.inputs;
             const anchors = currentData.anchors || [];
-            let maxAnchorX = 0, maxAnchorY = 0;
 
+            // Validation Thresholds
+            const min_s = 6 * I.da;
+            const min_c = 6 * I.da;
+
+            // Clear background
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#f8fafc'; 
+            ctx.fillRect(0, 0, w, h);
+
+            // 1. Determine Logic Bounds
+            let maxX = 0, maxY = 0;
             if (anchors.length > 0) {
-                maxAnchorX = Math.max(...anchors.map(a => a.x));
-                maxAnchorY = Math.max(...anchors.map(a => a.y));
+                maxX = Math.max(...anchors.map(a => a.x));
+                maxY = Math.max(...anchors.map(a => a.y));
+            }
+            
+            const internalMargin = 20; // Extra concrete past the last anchor
+            
+            // Real world concrete dimensions (Logic)
+            const realW = maxX + I.ca2 + internalMargin; 
+            const realH = maxY + I.ca1_1 + internalMargin; 
+
+            // Canvas Layout Config
+            const topMargin = 30;
+            const leftMargin = 30;
+            const rightSpace = 100; // Reserved for vertical dims text
+            const bottomSpace = 90; // INCREASED: Reserved for horizontal dims text
+
+            // Calculate Scale to fit within (w - margins)
+            const availableW = w - leftMargin - rightSpace;
+            const availableH = h - topMargin - bottomSpace;
+            
+            const scaleX = availableW / realW;
+            const scaleY = availableH / realH;
+            const scale = Math.min(scaleX, scaleY);
+
+            // Origin (Top-Left of Concrete)
+            const ox = leftMargin;
+            const oy = topMargin;
+
+            // Concrete Visual Dimensions
+            const visW = realW * scale;
+            const visH = realH * scale;
+
+            // --- Helper: Draw Architectural Dimension Line ---
+            function drawDimLine(p1, p2, text, offset, isVert, isBad) {
+                const mainColor = isBad ? '#ef4444' : '#475569'; // Solid Red or Slate
+                const extColor = isBad ? 'rgba(239, 68, 68, 0.4)' : 'rgba(71, 85, 105, 0.3)'; // Transparent Dotted
+                const fontColor = isBad ? '#b91c1c' : '#0f172a';
+                
+                let dimX1, dimY1, dimX2, dimY2, textX, textY;
+
+                // Calculate Coordinates
+                if (isVert) {
+                    // Vertical Dimension (Right Side)
+                    const lineX = ox + visW + offset;
+                    dimX1 = lineX; dimY1 = oy + p1 * scale;
+                    dimX2 = lineX; dimY2 = oy + p2 * scale;
+                    
+                    textX = dimX1 + 8;
+                    textY = (dimY1 + dimY2) / 2;
+                } else {
+                    // Horizontal Dimension (Bottom Side)
+                    const lineY = oy + visH + offset;
+                    dimX1 = ox + p1 * scale; dimY1 = lineY;
+                    dimX2 = ox + p2 * scale; dimY2 = lineY;
+
+                    textX = (dimX1 + dimX2) / 2;
+                    textY = dimY1 + 14;
+                }
+
+                // 1. Draw Extension Lines (Dotted & Transparent)
+                ctx.beginPath();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = extColor;
+                ctx.setLineDash([2, 3]); // Dotted style
+
+                if (isVert) {
+                    ctx.moveTo(ox + internalMargin, dimY1); ctx.lineTo(dimX1, dimY1); 
+                    ctx.moveTo(ox + internalMargin, dimY2); ctx.lineTo(dimX2, dimY2); 
+                } else {
+                    ctx.moveTo(dimX1, oy + internalMargin); ctx.lineTo(dimX1, dimY1); 
+                    ctx.moveTo(dimX2, oy + internalMargin); ctx.lineTo(dimX2, dimY2); 
+                }
+                ctx.stroke();
+                ctx.setLineDash([]); // Reset to solid
+
+                // 2. Draw Main Dimension Line (Solid)
+                ctx.beginPath();
+                ctx.strokeStyle = mainColor;
+                ctx.lineWidth = 1;
+                ctx.moveTo(dimX1, dimY1); ctx.lineTo(dimX2, dimY2);
+                
+                // Small extensions past the tick marks
+                if (isVert) {
+                    ctx.moveTo(dimX1, dimY1 - 5); ctx.lineTo(dimX1, dimY2 + 5);
+                } else {
+                    ctx.moveTo(dimX1 - 5, dimY1); ctx.lineTo(dimX2 + 5, dimY1);
+                }
+                ctx.stroke();
+
+                // 3. Draw Architectural Ticks (/)
+                const tickSize = 4;
+                ctx.lineWidth = 2; 
+                ctx.beginPath();
+                ctx.moveTo(dimX1 - tickSize, dimY1 + tickSize); ctx.lineTo(dimX1 + tickSize, dimY1 - tickSize);
+                ctx.moveTo(dimX2 - tickSize, dimY2 + tickSize); ctx.lineTo(dimX2 + tickSize, dimY2 - tickSize);
+                ctx.stroke();
+
+                // 4. Draw Text
+                const fullText = text + " cm";
+                ctx.font = isBad ? "bold 11px Arial" : "11px Arial";
+                const metrics = ctx.measureText(fullText);
+                const tw = metrics.width;
+                const th = 12; 
+                
+                // Text Background
+                ctx.save();
+                ctx.fillStyle = "rgba(255,255,255,0.9)"; // White box
+                if(isVert) {
+                    ctx.fillRect(textX - 2, textY - th/2, tw + 4, th);
+                    ctx.textAlign = "left"; 
+                    ctx.textBaseline = "middle";
+                } else {
+                    ctx.fillRect(textX - tw/2, textY - th - 2, tw + 4, th);
+                    ctx.textAlign = "center"; 
+                    ctx.textBaseline = "bottom";
+                }
+                
+                ctx.fillStyle = fontColor;
+                ctx.fillText(fullText, textX, textY);
+                ctx.restore();
             }
 
-            const slabW = maxAnchorX + I.ca2 * 2 + 10; 
-            const slabH = maxAnchorY + I.ca1 * 2 + 10;
-            
-            // Determine distance to fit the slab
-            const maxDim = Math.max(slabW, slabH, I.ha);
-            const distance = maxDim * 2; // Multiplier to ensure it fits in frame
+            // 2. Draw Concrete Slab
+            ctx.fillStyle = '#e2e8f0';
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.fillRect(ox, oy, visW, visH);
+            ctx.strokeRect(ox, oy, visW, visH);
 
-            // Reset Camera and Controls
-            controls.reset(); // Stop auto-rotation or inertia
-            camera.position.set(distance, distance, distance);
-            camera.lookAt(0, 0, 0);
-            controls.target.set(0, 0, 0);
-            
-            controls.update();
-            renderer.render(scene, camera);
+            // Infinite Lines (Visual Cue)
+            ctx.beginPath();
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.moveTo(ox + visW, oy); ctx.lineTo(w, oy);
+            ctx.moveTo(ox, oy + visH); ctx.lineTo(ox, h); 
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 3. Draw Anchors
+            anchors.forEach((a, i) => {
+                const cx = ox + a.x * scale;
+                const cy = oy + a.y * scale;
+                const r = Math.max(I.da * scale / 2, 4); 
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+                ctx.fillStyle = '#94a3b8';
+                ctx.fill();
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Anchor ID
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillText("#" + (i + 1), cx + r + 2, cy + 2);
+            });
+
+            // 4. Draw Dimensions (Right & Bottom)
+            const uniqueX = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
+            const uniqueY = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
+
+            // --- Vertical Dimensions (Right Side) ---
+            // Layer 1: Ca1 (Top Edge to First Anchor)
+            const bad_ca1 = I.ca1 < min_c;
+            drawDimLine(0, uniqueY[0], `Ca1=${I.ca1}`, 20, true, bad_ca1);
+
+            // Layer 2+: S1 Spacings
+            for(let i=0; i<uniqueY.length-1; i++) {
+                const val = uniqueY[i+1] - uniqueY[i];
+                if (val > 0.1) {
+                    const isBad = val < min_s;
+                    // Stagger offsets
+                    drawDimLine(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 45 + (i*20), true, isBad);
+                }
+            }
+
+            // --- Horizontal Dimensions (Bottom Side) ---
+            // Layer 1: Ca2 (Left Edge to First Anchor)
+            const bad_ca2 = I.ca2 < min_c;
+            drawDimLine(0, uniqueX[0], `Ca2=${I.ca2}`, 20, false, bad_ca2);
+
+            // Layer 2+: S2 Spacings
+            for(let i=0; i<uniqueX.length-1; i++) {
+                const val = uniqueX[i+1] - uniqueX[i];
+                if (val > 0.1) {
+                    const isBad = val < min_s;
+                    drawDimLine(uniqueX[i], uniqueX[i+1], `s2=${val.toFixed(1)}`, 45 + (i*20), false, isBad);
+                }
+            }
         };
         
         window.performCalculation = function () {
