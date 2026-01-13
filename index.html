@@ -606,14 +606,14 @@
                                 </select>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2">
+                            <div class="grid grid-cols-3 gap-2">
                                 <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_en">Eccentric <span class="math-symbol">e'<sub>N</sub></span> [cm]</label>
-                                    <input type="number" id="e_prime_n" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_en_x">Eccentric <span class="math-symbol">e'<sub>x</sub></span> [cm]</label>
+                                    <input type="number" id="e_prime_n_x" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
                                 </div>
                                 <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_ev">Eccentric <span class="math-symbol">e'<sub>V</sub></span> [cm]</label>
-                                    <input type="number" id="e_prime_v" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                                    <label class="text-xs text-gray-500" data-i18n="lbl_en_y">Eccentric <span class="math-symbol">e'<sub>y</sub></span> [cm]</label>
+                                    <input type="number" id="e_prime_n_y" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
                                 </div>
                             </div>
 
@@ -625,12 +625,20 @@
                         <h4 class="text-xs font-bold text-eng-danger uppercase border-b pb-1 mb-2 text-red-600" data-i18n="sec_loads">Applied Loads</h4>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-red-50 p-3 rounded border border-red-100">
-                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_t">Tension (<span class="math-symbol">T</span>) [kgf]</label>
+                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_t">Tension (<span class="math-symbol">T<sub>u</sub></span>) [kgf]</label>
                                 <input type="number" id="loadT" value="1000" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
                             </div>
                             <div class="bg-red-50 p-3 rounded border border-red-100">
-                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_v">Shear (<span class="math-symbol">V</span>) [kgf]</label>
+                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_v">Shear (<span class="math-symbol">V<sub>u</sub></span>) [kgf]</label>
                                 <input type="number" id="loadV" value="600" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                            </div>
+                            <div class="bg-red-50 p-3 rounded border border-red-100">
+                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_mux">Moment X (<span class="math-symbol">M<sub>ux</sub></span>)  [kgf-cm]</label>
+                                <input type="number" id="loadMux" value="0" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                            </div>
+                            <div class="bg-red-50 p-3 rounded border border-red-100">
+                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_muy">Moment Y (<span class="math-symbol">M<sub>uy</sub></span>) [kgf-cm]</label>
+                                <input type="number" id="loadMuy" value="0" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
                             </div>
                             <!-- Step 6: Sustained Tension -->
                             <div class="bg-blue-50 p-3 rounded border border-blue-100 col-span-2">
@@ -685,32 +693,67 @@
 
                     <!-- 3D Interactive Model -->
                     <div id="card-3d" class="bg-white rounded shadow border border-gray-200 overflow-hidden">
-                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center h-12">
+                            
+                            <h4 class="font-bold text-sm text-gray-700 flex items-center">
+                                <i class="fa-solid fa-cube mr-2 text-eng-primary"></i>
+                                <span data-i18n="viz_3d">3D Interactive Model</span>
+                            </h4>
+
                             <div class="flex items-center gap-2">
-                                <h4 class="font-bold text-sm text-gray-700"><i class="fa-solid fa-cube mr-2"></i><span data-i18n="viz_3d">3D Interactive Model</span></h4>
+                                <span class="text-[10px] text-gray-400 mr-2 hidden sm:inline" data-i18n="lbl_3d_hint">Drag to Rotate | Scroll to Zoom</span>
                                 
-                                <button onclick="reset3DView()" class="text-[10px] bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-0.5 rounded border border-gray-300 transition" title="Reset Camera">
-                                    <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btn_reset">Reset</span>
+                                <button onclick="toggle3DDimensions()" id="btn-3d-dims" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center">
+                                    <i class="fa-solid fa-ruler-combined mr-1"></i> <span data-i18n="btn_dims">Dimensions</span>
                                 </button>
 
-                                <button onclick="toggle3DDimensions()" id="btn-3d-dims" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-0.5 rounded border border-blue-200 transition">
-                                    <i class="fa-solid fa-ruler-combined"></i> <span data-i18n="btn_dims">Dimensions</span>
+                                <button onclick="toggle3DLoads()" id="btn-3d-loads" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center">
+                                    <i class="fa-solid fa-arrow-up-long mr-1"></i> <span data-i18n="btn_loads">Loads</span>
+                                </button>
+
+                                <div class="h-4 w-px bg-gray-300 mx-1"></div>
+
+                                <button onclick="reset3DView()" class="text-[10px] bg-white hover:bg-gray-100 text-gray-600 border border-gray-300 px-3 py-1 rounded transition font-medium flex items-center shadow-sm" title="Reset Camera">
+                                    <i class="fa-solid fa-arrows-rotate mr-1"></i> <span data-i18n="btn_reset">Reset</span>
                                 </button>
                             </div>
-                            <span class="text-[10px] text-gray-400" data-i18n="lbl_3d_hint">Drag to Rotate | Scroll to Zoom</span>
                         </div>
-                        <!-- This container was missing -->
+                        
                         <div id="canvas-3d-container" class="w-full h-64 bg-white relative"></div>
                     </div>
 
                     <!-- Step 7: 2D Visualizer -->
                     <div id="card-viz" class="bg-white rounded shadow border border-gray-200 overflow-hidden">
-                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
-                            <h4 class="font-bold text-sm text-gray-700"><i class="fa-solid fa-compass-drafting mr-2"></i><span data-i18n="viz_title">Layout Visualization</span></h4>
+                        <div class="p-3 bg-gray-50 border-b flex justify-between items-center h-12">
+                            
+                            <h4 class="font-bold text-sm text-gray-700 flex items-center">
+                                <i class="fa-solid fa-compass-drafting mr-2 text-eng-primary"></i>
+                                <span data-i18n="viz_title">Layout Visualization</span>
+                            </h4>
+
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleLoads()" id="btn-toggle-loads" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center">
+                                    <i class="fa-solid fa-arrow-up-long mr-1"></i> <span data-i18n="btn_loads">Loads</span>
+                                </button>
+
+                                <div class="h-4 w-px bg-gray-300 mx-1"></div>
+
+                                <button onclick="reset2DView()" class="text-[10px] bg-white hover:bg-gray-100 text-gray-600 border border-gray-300 px-3 py-1 rounded transition font-medium flex items-center shadow-sm" title="Reset View">
+                                    <i class="fa-solid fa-arrows-rotate mr-1"></i> <span data-i18n="btn_reset">Reset</span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="p-4 flex justify-center bg-slate-100">
-                            <canvas id="viz-canvas" width="400" height="300" class="bg-white rounded shadow-sm border border-slate-300"></canvas>
+
+                        <div class="relative w-full h-64 bg-slate-50 flex justify-center items-center overflow-hidden">
+                            <canvas id="viz-canvas" width="800" height="400" class="w-full h-full object-contain cursor-grab active:cursor-grabbing"></canvas>
                         </div>
+                    </div>
+
+                    <div id="indiv-force-list" class="bg-white rounded shadow border border-gray-200 overflow-hidden hidden">
+                        <div class="p-3 bg-gray-50 border-b">
+                            <h4 class="font-bold text-sm text-gray-700"><i class="fa-solid fa-list-ol mr-2"></i><span data-i18n="lbl_indiv_forces">Individual Anchor Forces</span></h4>
+                        </div>
+                        <div id="indiv-force-content" class="p-4 space-y-2 text-sm"></div>
                     </div>
 
                     <!-- Interaction Check Card (Step 4) -->
@@ -963,8 +1006,60 @@
         let historyCache = {};
         let currentLang = 'en';
 
+        // --- VISUALIZER STATE (ADD THIS BLOCK) ---
+        let vizState = { scale: 1.0, panX: 0, panY: 0, isDragging: false, lastX: 0, lastY: 0 };
+
+        function initVizControls() {
+            const canvas = document.getElementById('viz-canvas');
+            if (!canvas) return;
+
+            // Mouse Down - Start Pan
+            canvas.addEventListener('mousedown', (e) => {
+                vizState.isDragging = true;
+                vizState.lastX = e.clientX;
+                vizState.lastY = e.clientY;
+                canvas.style.cursor = 'grabbing';
+            });
+
+            // Mouse Up - Stop Pan (Window level to catch dragging outside canvas)
+            window.addEventListener('mouseup', () => {
+                vizState.isDragging = false;
+                if (document.getElementById('viz-canvas')) {
+                    document.getElementById('viz-canvas').style.cursor = 'grab';
+                }
+            });
+
+            // Mouse Move - Pan
+            canvas.addEventListener('mousemove', (e) => {
+                if (!vizState.isDragging) return;
+                const dx = e.clientX - vizState.lastX;
+                const dy = e.clientY - vizState.lastY;
+                vizState.panX += dx;
+                vizState.panY += dy;
+                vizState.lastX = e.clientX;
+                vizState.lastY = e.clientY;
+                requestAnimationFrame(() => drawVisualization());
+            });
+
+            // Scroll Wheel - Zoom
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault(); // Stop page scrolling
+                const zoomIntensity = 0.1;
+                const delta = e.deltaY > 0 ? -zoomIntensity : zoomIntensity;
+                const newScale = vizState.scale + delta;
+                // Limit zoom range (0.1x to 10x)
+                vizState.scale = Math.min(Math.max(0.1, newScale), 10.0);
+                requestAnimationFrame(() => drawVisualization());
+            }, { passive: false });
+        }
+
+        // Reset function for the "Reset" button
+        window.reset2DView = function() {
+            vizState = { scale: 1.0, panX: 0, panY: 0, isDragging: false, lastX: 0, lastY: 0 };
+            drawVisualization();
+        };
+
         // --- TRANSLATION DATA ---
-// --- TRANSLATION DATA ---
         const translations = {
             en: {
                 app_title: "Anchor Analysis", app_subtitle: "ACI/Structural Compliance Tool",
@@ -973,14 +1068,21 @@
                 sec_steel_props: "ANCHOR STEEL",
                 lbl_fc: "Concrete Strength (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "Base Thickness (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "Diameter (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "Embedment (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
                 lbl_s1: "Vertical Spacing (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "Horizontal Spacing (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "Top Edge (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "Bottom Edge (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "Side Edge (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
-                lbl_kc: "Anchor Type (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "Failure Factor (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "Load Length (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "Cracking/Reinf (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "Eccentric <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "Eccentric <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
+                lbl_kc: "Anchor Type (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "Failure Factor (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "Load Length (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "Cracking/Reinf (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", 
+                lbl_en_x: "Eccentric <span class='math-symbol'>e'<sub>x</sub></span> [cm]", 
+                lbl_en_y: "Eccentric <span class='math-symbol'>e'<sub>y</sub></span> [cm]",
                 lbl_ase: "Eff. Area (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "Ult (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "Yld (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "Grouted (0.8x Shear)",
                 lbl_pull_mode: "Pullout Mode", lbl_abrg: "Bearing Area (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", lbl_eh: "Hook Length (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", lbl_np_cert: "Certified Pullout (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", lbl_crack_p: "Pullout Cracking (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
                 lbl_is_adh: "Adhesive Anchor", lbl_tau: "Bond Stress (<span class='math-symbol'>τ</span>) [kgf/cm²]",
                 lbl_cond: "Condition (Reinf)", lbl_cat: "Category (Rel.)", lbl_ductility: "Ductility",
                 lbl_seismic: "Seismic Design (0.75 Reduction)",
-                lbl_t: "Tension (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "Shear (<span class='math-symbol'>V</span>) [kgf]",
+                lbl_t: "Tension (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "Shear (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
                 lbl_tsust: "Sustained Tension (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]",
+                lbl_indiv_forces: "Individual Anchor Forces",
+                lbl_tension: "Tension",
+                tbl_dir: "Direction",
+                lbl_compression: "Compression",
+                lbl_shear: "Shear",
                 lbl_cac: "Critical Edge Dist (<span class='math-symbol'>c<sub>ac</sub></span>) [cm]",
                 lbl_v_dir: "Shear Load Direction",
                 lbl_is_sl: "Shear Lug (Sec 17.11)", lbl_is_reinf: "Anchor Reinf. Present?",
@@ -1011,6 +1113,16 @@
                 warn_title: "Geometry Violation", viz_title: "Layout Visualization", viz_3d: "3D Interactive Model",
 
                 // --- NEW TRANSLATIONS ADDED BELOW ---
+                btn_saving: "Saving...", // <--- ADD THIS
+                btn_saved: "Saved!",     // <--- ADD THIS
+                btn_error: "Error",      // <--- ADD THIS
+                btn_loads: "Loads",
+                btn_reset: "Reset",
+                warn_spacing: "Spacing > 3hef. Cones separate.",
+                warn_cluster: "Strength calculated using only the largest cluster:",
+                warn_group_cap: "Group ANc/ANco ratio capped.",
+                val_excluded: "EXCLUDED",
+                val_fail: "FAIL",
                 lbl_sl_h: "Height (cm)",
                 lbl_sl_w: "Width (cm)",
                 lbl_sl_t: "Thickness (cm)",
@@ -1061,23 +1173,35 @@
                 lbl_3d_hint: "Drag to Rotate | Scroll to Zoom",
                 warn_custom_empty: "Custom coordinates empty. Using default 2x2 grid.",
                 rpt_layout: "Layout Confirmation",
-                btn_dims: "Dimensions"
+                btn_dims: "Dimensions",
+                btn_id_mode: "ID Mode",
+                lbl_t: "Tension (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "Shear (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
+                lbl_mux: "Moment X (<span class='math-symbol'>M<sub>ux</sub></span>) [kgf-cm]", 
+                lbl_muy: "Moment Y (<span class='math-symbol'>M<sub>uy</sub></span>) [kgf-cm]", 
+                lbl_tsust: "Sustained Tension (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]"
             },
             zh: {
                 app_title: "錨栓設計分析", app_subtitle: "ACI/結構規範檢核工具",
                 tab_analysis: "結構分析", tab_database: "資料庫",
                 sec_params: "設計參數", sec_mat: "材料與幾何", sec_space: "間距與邊距", sec_factors: "修正因數/參數", sec_loads: "設計載重",
                 sec_steel_props: "錨栓鋼材性質",
-                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "母材構件 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "母材構件深度 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
                 lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "上方錨栓距梁頂邊 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "下方錨栓距梁底邊 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "錨栓距梁邊 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
-                lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", lbl_en: "偏心距 <span class='math-symbol'>e'<sub>N</sub></span> [cm]", lbl_ev: "偏心距 <span class='math-symbol'>e'<sub>V</sub></span> [cm]",
+                lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", 
+                lbl_en_x: "偏心距 <span class='math-symbol'>e'<sub>Nx</sub></span> [cm]", 
+                lbl_en_y: "偏心距 <span class='math-symbol'>e'<sub>Ny</sub></span> [cm]",
                 lbl_ase: "有效斷面積 (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "極限強度 (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "降伏強度 (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "灌漿錨栓 (0.8x 剪力)",
                 lbl_pull_mode: "拉出模式", lbl_abrg: "承壓面積 (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", lbl_eh: "彎鉤長度 (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", lbl_np_cert: "認證拉出強度 (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", lbl_crack_p: "拉出開裂參數 (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
                 lbl_is_adh: "化學黏結錨栓", lbl_tau: "黏結強度 (<span class='math-symbol'>τ</span>) [kgf/cm²]",
                 lbl_cond: "混凝土狀況", lbl_cat: "錨栓類別 (可靠度)", lbl_ductility: "延展性",
                 lbl_seismic: "耐震設計 (0.75 折減)",
-                lbl_t: "拉力設計載重 (<span class='math-symbol'>T</span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V</span>) [kgf]",
+                lbl_t: "拉力設計載重 (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
                 lbl_tsust: "長期拉力載重 (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]",
+                lbl_indiv_forces: "單根錨栓受力分析",
+                lbl_tension: "拉力",
+                tbl_dir: "方向",
+                lbl_compression: "壓力",
+                lbl_shear: "剪力",
                 lbl_cac: "臨界邊距 (<span class='math-symbol'>c<sub>ac</sub></span>) [cm]",
                 lbl_v_dir: "剪力載重方向",
                 lbl_is_sl: "剪力榫 (Sec 17.11)", lbl_is_reinf: "有錨栓鋼筋?",
@@ -1108,6 +1232,16 @@
                 warn_title: "幾何限制警告", viz_title: "配置可視化", viz_3d: "3D 互動模型",
 
                 // --- NEW TRANSLATIONS ADDED BELOW ---
+                btn_saving: "儲存中...", // <--- ADD THIS
+                btn_saved: "已儲存!",    // <--- ADD THIS
+                btn_error: "錯誤",       // <--- ADD THIS
+                btn_loads: "顯示載重",
+                btn_reset: "重置",
+                warn_spacing: "間距 > 3hef (錐體分離)",
+                warn_cluster: "僅計算最大群集強度:",
+                warn_group_cap: "群錨 ANc/ANco 比值上限已修正",
+                val_excluded: "已排除",
+                val_fail: "失敗",
                 lbl_sl_h: "高度 (cm)",
                 lbl_sl_w: "寬度 (cm)",
                 lbl_sl_t: "厚度 (cm)",
@@ -1158,7 +1292,12 @@
                 lbl_3d_hint: "拖曳旋轉 | 滾輪縮放",
                 warn_custom_empty: "自訂座標為空。使用預設 2x2 網格。",
                 rpt_layout: "配置確認圖",
-                btn_dims: "標註尺寸"
+                btn_dims: "標註尺寸",
+                btn_id_mode: "編號模式",
+                lbl_t: "拉力設計載重 (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
+                lbl_mux: "彎矩 X-axis (<span class='math-symbol'>M<sub>ux</sub></span>) [kgf-cm]", 
+                lbl_muy: "彎矩 Y-axis (<span class='math-symbol'>M<sub>uy</sub></span>) [kgf-cm]", 
+                lbl_tsust: "長期拉力載重 (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]"
             }
         };
 
@@ -1178,10 +1317,10 @@
                 const key = el.getAttribute('data-i18n');
                 if (translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
             });
-            if (currentData) updateUI();
+            if (currentData) performCalculation();
             if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
         }
-
+        
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             if (user) {
@@ -1321,18 +1460,74 @@
         let scene, camera, renderer, controls;
         let currentVizMode = '2d';
         let showDims = true;
-        
+        let displayMode2D = 'numbers'; // Possible values: 'numbers' or 'loads'
+        let displayMode3D = 'numbers'; // Modes: 'numbers' or 'loads'
+
+        // Revised Snippet
+        window.toggleLoads = function() {
+            displayMode2D = (displayMode2D === 'numbers') ? 'loads' : 'numbers';
+            
+            const btn = document.getElementById('btn-toggle-loads');
+            if (btn) {
+                // If the NEW state is 'loads', the button should offer to switch back to 'numbers' (ID Mode)
+                if (displayMode2D === 'loads') {
+                    // Update: Added px-3 py-1 to match new layout AND Translation
+                    btn.className = "text-[10px] bg-green-600 text-white px-3 py-1 rounded border border-green-700 transition font-medium flex items-center";
+                    btn.innerHTML = `<i class="fa-solid fa-list-ol mr-1"></i> <span>${t('btn_id_mode')}</span>`; 
+                } else {
+                    // Update: Added px-3 py-1 to match new layout
+                    btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
+                    btn.innerHTML = `<i class="fa-solid fa-arrow-up-long mr-1"></i> <span>${t('btn_loads')}</span>`;
+                }
+            }
+            drawVisualization();
+        };
+
         window.toggle3DDimensions = function() {
             showDims = !showDims;
             const btn = document.getElementById('btn-3d-dims');
             if(showDims) {
-                btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-0.5 rounded border border-blue-200 transition";
+                // Update: Added px-3 py-1
+                btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
             } else {
-                btn.className = "text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-400 px-2 py-0.5 rounded border border-gray-200 transition";
+                // Update: Added px-3 py-1
+                btn.className = "text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-400 px-3 py-1 rounded border border-gray-200 transition font-medium flex items-center";
             }
             if (currentData) update3DScene(currentData.anchors, currentData.inputs);
         };
 
+        window.toggle3DLoads = function() {
+            // Switch between modes
+            displayMode3D = (displayMode3D === 'numbers') ? 'loads' : 'numbers';
+            
+            const btn = document.getElementById('btn-3d-loads');
+            if (btn) {
+                // Update button text/style based on what is currently ACTIVE
+                if (displayMode3D === 'loads') {
+                    // Show "ID Mode" button (to switch back)
+                    btn.innerHTML = `<i class="fa-solid fa-arrow-up-long mr-1"></i> <span>${t('btn_loads')}</span>`;
+                    btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
+                } else {
+                    // Show "Loads" button (to switch to loads)
+                    // FIXED: Corrected logic to show ID Mode text when we are actually looking at loads? 
+                    // Actually, if displayMode is 'numbers', the button should say "Loads" (to switch to loads).
+                    // If displayMode is 'loads', the button should say "ID Mode" (to switch to IDs).
+                    
+                    // Let's align this exactly with the 2D logic:
+                    if (displayMode3D === 'loads') {
+                         // Active state is Loads, button allows switching to IDs
+                         btn.innerHTML = `<i class="fa-solid fa-list-ol mr-1"></i> <span>${t('btn_id_mode')}</span>`;
+                         btn.className = "text-[10px] bg-green-600 text-white px-3 py-1 rounded border border-green-700 transition font-medium flex items-center";
+                    } else {
+                         // Active state is IDs, button allows switching to Loads
+                         btn.innerHTML = `<i class="fa-solid fa-arrow-up-long mr-1"></i> <span>${t('btn_loads')}</span>`;
+                         btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
+                    }
+                }
+            }
+            // Refresh the scene
+            if (currentData) update3DScene(currentData.anchors, currentData.inputs);
+        };
         // --- NEW: Custom Anchor Manager ---
         let anchorData = []; 
 
@@ -1581,8 +1776,15 @@
             // This prevents "Cannot read properties of undefined (reading 'children')"
             if (!scene) return;
 
-            // Clear existing scene objects
-            scene.children.filter(c => c.type === "Mesh" || c.type === "Sprite" || c.type === "Line" || c.type === "LineSegments").forEach(m => scene.remove(m));
+            // Clear existing scene objects (Include Groups and ArrowHelpers for loads)
+            scene.children.filter(c => 
+                c.type === "Mesh" || 
+                c.type === "Sprite" || 
+                c.type === "Line" || 
+                c.type === "LineSegments" || 
+                c.type === "Group" || 
+                c.type === "ArrowHelper"
+            ).forEach(m => scene.remove(m));
 
             // 1. Calculate Bounds
             let maxAnchorX = 0, maxAnchorY = 0;
@@ -1598,7 +1800,8 @@
             // Validation Thresholds for Red coloring
             const min_s = 6 * I.da;
             const min_c = 6 * I.da;
-
+            const limit_3hef = 3 * I.hef;
+            
             // 2. Concrete Slab
             const slabGeo = new THREE.BoxGeometry(slabW, I.ha, slabH);
             const slabMat = new THREE.MeshPhongMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
@@ -1619,7 +1822,15 @@
             // 3. Anchors & ID Labels
             anchors.forEach((a, index) => {
                 const rodGeo = new THREE.CylinderGeometry(I.da / 2, I.da / 2, I.hef + 2, 16);
-                const rodMat = new THREE.MeshPhongMaterial({ color: 0xe2e8f0 });
+                
+                // Dynamic Color: Blue (Tension), Red (Compression), Grey (Neutral)
+                let hexColor = 0xe2e8f0;
+                if (!a.excluded) {
+                    if ((a.forceN || 0) > 0.1) hexColor = 0x3b82f6; // blue-500
+                    else if ((a.forceN || 0) < -0.1) hexColor = 0xef4444; // red-500
+                }
+
+                const rodMat = new THREE.MeshPhongMaterial({ color: hexColor });
                 const rod = new THREE.Mesh(rodGeo, rodMat);
                 
                 const tx = mapX(a.x);
@@ -1630,11 +1841,13 @@
 
                 // Only show ID label if dimensions are on, or keep it always? 
                 // Let's keep ID labels always visible, but you can move this into the 'if(showDims)' block if you want them hidden too.
-                const label = makeTextSprite(`#${index + 1}`, "#0f172a", 0.08);
-                label.position.set(tx, 5, tz); 
-                scene.add(label);
+                if (displayMode3D === 'numbers') {
+                    const label = makeTextSprite(`#${index + 1}`, "#0f172a", 0.08);
+                    label.position.set(tx, 5, tz); 
+                    scene.add(label);
+                }
             });
-
+            
             // --- 4. 3D Architectural Dimensions Helper ---
             function draw3DDim(p1, p2, text, offset, isVert, isBad) {
                 const mainColor = isBad ? 0xef4444 : 0x475569;
@@ -1744,7 +1957,106 @@
                     }
                 }
             } // <--- END CONDITIONAL
+            // --- 7. 3D LOADS VISUALIZATION ---
+            if (displayMode3D === 'loads') {
+                // Calculate Centroid of ACTIVE anchors only
+                const activeAnchors = anchors.filter(a => !a.excluded);
+                let cx = 0, cy = 0;
+                
+                // Fallback to geometric center if no active anchors
+                if (activeAnchors.length > 0) {
+                    cx = activeAnchors.reduce((s, a) => s + a.x, 0) / activeAnchors.length;
+                    cy = activeAnchors.reduce((s, a) => s + a.y, 0) / activeAnchors.length;
+                } else if (anchors.length > 0) {
+                    cx = anchors.reduce((s, a) => s + a.x, 0) / anchors.length;
+                    cy = anchors.reduce((s, a) => s + a.y, 0) / anchors.length;
+                }
+                
+                // Base Origin (Centroid)
+                const centerV = new THREE.Vector3(mapX(cx), 2, mapZ(cy));
+                
+                // Eccentric Origin for Forces (Shifted by input e'x, e'y)
+                // Note: e'y is shift in Z-axis in 3D world (Vertical on 2D plan)
+                const eccX = I.e_prime_n_x || 0;
+                const eccY = I.e_prime_n_y || 0;
+                const forceOrigin = new THREE.Vector3(mapX(cx + eccX), 2, mapZ(cy + eccY));
 
+                const textScale = 0.09; 
+
+                // 1. Straight Arrow Helper
+                const addArrow = (dir, color, len, labelText, originPoint) => {
+                    const arrowHelper = new THREE.ArrowHelper(dir, originPoint, len, color, 4, 2);
+                    scene.add(arrowHelper);
+                    if (labelText) {
+                        const lbl = makeTextSprite(labelText, color, textScale);
+                        // Position at the END of the arrow
+                        lbl.position.copy(originPoint).add(dir.clone().multiplyScalar(len + 5));
+                        scene.add(lbl);
+                    }
+                };
+
+                // 2. Curved Moment Arrow (Stays at Centroid)
+                const addCurvedMomentArrow = (axis, color, labelText) => {
+                    const radius = 15;
+                    const tube = 0.3; 
+                    const arc = Math.PI; 
+
+                    // Geometry
+                    const torusGeo = new THREE.TorusGeometry(radius, tube, 8, 32, arc);
+                    const mat = new THREE.MeshBasicMaterial({ color: color });
+                    const curveMesh = new THREE.Mesh(torusGeo, mat);
+
+                    // Arrowhead
+                    const coneGeo = new THREE.ConeGeometry(1.5, 4, 16);
+                    const head = new THREE.Mesh(coneGeo, mat);
+                    
+                    // Position head at end of arc
+                    head.position.set(radius * Math.cos(arc), radius * Math.sin(arc), 0);
+                    head.rotation.z = Math.PI; 
+
+                    const group = new THREE.Group();
+                    group.add(curveMesh);
+                    group.add(head);
+                    group.position.copy(centerV); // Moments stay at Centroid
+
+                    // Rotation Logic
+                    if (axis === 'x') {
+                        // Mux rotates around X axis
+                        group.rotation.y = -Math.PI / 2; 
+                    } 
+                    // axis 'z' (Muy) uses default orientation in XY plane relative to camera
+                    
+                    // Add Label to the GROUP so it rotates with the arrow
+                    if (labelText) {
+                        const lbl = makeTextSprite(labelText, color, textScale);
+                        lbl.position.set(radius + 8, 0, 0);
+                        group.add(lbl);
+                    }
+
+                    scene.add(group);
+                };
+
+                // A. Tension (Tu) - Upward (+Y) at Eccentric Location
+                if (I.T > 0) {
+                    addArrow(new THREE.Vector3(0, 1, 0), 0x2563eb, 25, `Tu=${I.T} kgf`, forceOrigin);
+                }
+
+                // B. Shear (Vu) at Eccentric Location
+                if (I.V > 0) {
+                    const shearDir = (I.v_dir === 'para') ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 0, -1);
+                    addArrow(shearDir, 0xdc2626, 20, `Vu=${I.V} kgf`, forceOrigin);
+                }
+
+                // C. Moment X (Mux) at Centroid
+                if (Math.abs(I.Mux) > 0) {
+                    addCurvedMomentArrow('x', 0x059669, `Mux=${I.Mux}`);
+                }
+
+                // D. Moment Y (Muy) at Centroid
+                if (Math.abs(I.Muy) > 0) {
+                    addCurvedMomentArrow('z', 0x7c3aed, `Muy=${I.Muy}`);
+                }
+            }
             renderer.render(scene, camera);
         };
 
@@ -1759,8 +2071,8 @@
         };
 
         // --- 2D Visualization (Right/Bottom Dims, AutoCad Style, Dotted Extensions, "cm") ---
-        window.drawVisualization = function () {
-            const canvas = document.getElementById('viz-canvas');
+        window.drawVisualization = function (targetCanvas = null, forceFit = false) {
+            const canvas = targetCanvas || document.getElementById('viz-canvas');
             if (!canvas || !currentData) return;
             const ctx = canvas.getContext('2d');
             const w = canvas.width;
@@ -1771,6 +2083,7 @@
             // Validation Thresholds
             const min_s = 6 * I.da;
             const min_c = 6 * I.da;
+            const limit_3hef = 3 * I.hef; 
 
             // Clear background
             ctx.clearRect(0, 0, w, h);
@@ -1791,22 +2104,29 @@
             const realH = maxY + I.ca1_1 + internalMargin; 
 
             // Canvas Layout Config
-            const topMargin = 30;
-            const leftMargin = 30;
-            const rightSpace = 100; // Reserved for vertical dims text
-            const bottomSpace = 90; // INCREASED: Reserved for horizontal dims text
+            const topMargin = 50;  // Increased margin for bigger text
+            const leftMargin = 50; // Increased margin for bigger text
+            const rightSpace = 120; // Reserved for vertical dims text
+            const bottomSpace = 110; 
 
-            // Calculate Scale to fit within (w - margins)
+            // Calculate Base Scale to fit within (w - margins)
             const availableW = w - leftMargin - rightSpace;
             const availableH = h - topMargin - bottomSpace;
             
             const scaleX = availableW / realW;
             const scaleY = availableH / realH;
-            const scale = Math.min(scaleX, scaleY);
+            let scale = Math.min(scaleX, scaleY);
 
             // Origin (Top-Left of Concrete)
-            const ox = leftMargin;
-            const oy = topMargin;
+            let ox = leftMargin;
+            let oy = topMargin;
+
+            // --- APPLY ZOOM/PAN (If not printing and not forced) ---
+            if (!targetCanvas && !forceFit && typeof vizState !== 'undefined') {
+                scale *= vizState.scale;
+                ox += vizState.panX;
+                oy += vizState.panY;
+            }
 
             // Concrete Visual Dimensions
             const visW = realW * scale;
@@ -1814,8 +2134,8 @@
 
             // --- Helper: Draw Architectural Dimension Line ---
             function drawDimLine(p1, p2, text, offset, isVert, isBad) {
-                const mainColor = isBad ? '#ef4444' : '#475569'; // Solid Red or Slate
-                const extColor = isBad ? 'rgba(239, 68, 68, 0.4)' : 'rgba(71, 85, 105, 0.3)'; // Transparent Dotted
+                const mainColor = isBad ? '#ef4444' : '#475569'; 
+                const extColor = isBad ? 'rgba(239, 68, 68, 0.4)' : 'rgba(71, 85, 105, 0.3)'; 
                 const fontColor = isBad ? '#b91c1c' : '#0f172a';
                 
                 let dimX1, dimY1, dimX2, dimY2, textX, textY;
@@ -1836,14 +2156,14 @@
                     dimX2 = ox + p2 * scale; dimY2 = lineY;
 
                     textX = (dimX1 + dimX2) / 2;
-                    textY = dimY1 + 14;
+                    textY = dimY1 + 16; // Increased offset for bigger text
                 }
 
                 // 1. Draw Extension Lines (Dotted & Transparent)
                 ctx.beginPath();
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = extColor;
-                ctx.setLineDash([2, 3]); // Dotted style
+                ctx.setLineDash([2, 3]); 
 
                 if (isVert) {
                     ctx.moveTo(ox + internalMargin, dimY1); ctx.lineTo(dimX1, dimY1); 
@@ -1879,14 +2199,15 @@
 
                 // 4. Draw Text
                 const fullText = text + " cm";
-                ctx.font = isBad ? "bold 11px Arial" : "11px Arial";
+                // UPDATED: Increased Font Size to 14px
+                ctx.font = isBad ? "bold 14px Arial" : "14px Arial";
                 const metrics = ctx.measureText(fullText);
                 const tw = metrics.width;
-                const th = 12; 
+                const th = 16; // Increased box height
                 
                 // Text Background
                 ctx.save();
-                ctx.fillStyle = "rgba(255,255,255,0.9)"; // White box
+                ctx.fillStyle = "rgba(255,255,255,0.9)"; 
                 if(isVert) {
                     ctx.fillRect(textX - 2, textY - th/2, tw + 4, th);
                     ctx.textAlign = "left"; 
@@ -1925,20 +2246,28 @@
                 const cy = oy + a.y * scale;
                 const r = Math.max(I.da * scale / 2, 4); 
 
+                let fillCol = '#94a3b8'; 
+                if (!a.excluded && typeof a.forceN === 'number') {
+                    if (a.forceN > 0.1) fillCol = '#2563eb';      
+                    else if (a.forceN < -0.1) fillCol = '#dc2626'; 
+                }
+
                 ctx.beginPath();
                 ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-                ctx.fillStyle = '#94a3b8';
+                ctx.fillStyle = fillCol;
                 ctx.fill();
                 ctx.strokeStyle = '#1e293b';
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // Anchor ID
-                ctx.fillStyle = '#0f172a';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-                ctx.fillText("#" + (i + 1), cx + r + 2, cy + 2);
+                // Only draw the ID label if we are in 'numbers' mode
+                if (displayMode2D === 'numbers') {
+                    ctx.fillStyle = '#0f172a';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText("#" + (i + 1), cx + r + 2, cy + 2);
+                }
             });
 
             // 4. Draw Dimensions (Right & Bottom)
@@ -1946,31 +2275,173 @@
             const uniqueY = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
 
             // --- Vertical Dimensions (Right Side) ---
-            // Layer 1: Ca1 (Top Edge to First Anchor)
             const bad_ca1 = I.ca1 < min_c;
             drawDimLine(0, uniqueY[0], `Ca1=${I.ca1}`, 20, true, bad_ca1);
 
-            // Layer 2+: S1 Spacings
             for(let i=0; i<uniqueY.length-1; i++) {
                 const val = uniqueY[i+1] - uniqueY[i];
                 if (val > 0.1) {
-                    const isBad = val < min_s;
-                    // Stagger offsets
+                    const isBad = val < min_s || val >= limit_3hef; 
                     drawDimLine(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 45 + (i*20), true, isBad);
                 }
             }
 
             // --- Horizontal Dimensions (Bottom Side) ---
-            // Layer 1: Ca2 (Left Edge to First Anchor)
             const bad_ca2 = I.ca2 < min_c;
             drawDimLine(0, uniqueX[0], `Ca2=${I.ca2}`, 20, false, bad_ca2);
 
-            // Layer 2+: S2 Spacings
             for(let i=0; i<uniqueX.length-1; i++) {
                 const val = uniqueX[i+1] - uniqueX[i];
                 if (val > 0.1) {
-                    const isBad = val < min_s;
+                    const isBad = val < min_s || val >= limit_3hef; 
                     drawDimLine(uniqueX[i], uniqueX[i+1], `s2=${val.toFixed(1)}`, 45 + (i*20), false, isBad);
+                }
+            }
+
+            // --- 5. Draw Loads (Tu, Vu, Mux, Muy) ---
+            if (displayMode2D === 'loads') {
+                
+                // Helper: Draw Straight Arrow
+                function drawForceArrow(x, y, len, angle, label, color) {
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = 3;
+                    
+                    // Shaft
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(len, 0);
+                    ctx.stroke();
+                    
+                    // Head
+                    ctx.beginPath();
+                    ctx.moveTo(len, 0);
+                    ctx.lineTo(len - 10, -5);
+                    ctx.lineTo(len - 10, 5);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Label
+                    if (label) {
+                        ctx.translate(len + 5, 0);
+                        ctx.rotate(-angle); // Keep text horizontal
+                        ctx.fillStyle = color;
+                        // UPDATED: Increased Font Size to 16px
+                        ctx.font = "bold 16px sans-serif";
+                        ctx.textAlign = "left";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(label, 5, 0);
+                    }
+                    ctx.restore();
+                }
+
+                // Helper: Draw Curved Moment Arrow (Half-Circle)
+                function drawMomentArrow(x, y, r, startAngle, endAngle, label, color, anticlockwise = false) {
+                    ctx.save();
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = 3;
+                    
+                    // 1. Draw the Arc
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, startAngle, endAngle, anticlockwise);
+                    ctx.stroke();
+
+                    // 2. Draw Arrow Head at the endAngle
+                    const headX = x + r * Math.cos(endAngle);
+                    const headY = y + r * Math.sin(endAngle);
+                    
+                    ctx.save();
+                    ctx.translate(headX, headY);
+                    
+                    // Calculate tangent angle based on drawing direction
+                    let tan = anticlockwise ? (endAngle - Math.PI/2) : (endAngle + Math.PI/2);
+                    
+                    ctx.rotate(tan);
+                    ctx.beginPath();
+                    // Sharper, more balanced arrowhead
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(-10, -5); 
+                    ctx.lineTo(-10, 5);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+
+                    // 3. Draw Label
+                    if (label) {
+                        // Position text slightly further out from the apex of the arc
+                        const midAngle = anticlockwise 
+                            ? (startAngle + (endAngle - startAngle) / 2) 
+                            : (startAngle + (endAngle - startAngle) / 2);
+                        
+                        // For half circles, the apex is the simplest anchor
+                        const textDist = r + 20;
+                        const lx = x + textDist * Math.cos((startAngle + endAngle) / 2);
+                        const ly = y + textDist * Math.sin((startAngle + endAngle) / 2);
+                        
+                        ctx.fillStyle = color;
+                        ctx.font = "bold 16px sans-serif";
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(label, lx, ly);
+                    }
+                    ctx.restore();
+                }
+
+                // Calculate Centroid (Visual) - ACTIVE ANCHORS ONLY
+                let cx = ox + visW / 2;
+                let cy = oy + visH / 2;
+                
+                const activeAnchors = anchors.filter(a => !a.excluded);
+                
+                if (activeAnchors.length > 0) {
+                     const avgX = activeAnchors.reduce((s, a) => s + a.x, 0) / activeAnchors.length;
+                     const avgY = activeAnchors.reduce((s, a) => s + a.y, 0) / activeAnchors.length;
+                     cx = ox + avgX * scale;
+                     cy = oy + avgY * scale;
+                } else if (anchors.length > 0) {
+                     // Fallback if all excluded
+                     const avgX = anchors.reduce((s, a) => s + a.x, 0) / anchors.length;
+                     const avgY = anchors.reduce((s, a) => s + a.y, 0) / anchors.length;
+                     cx = ox + avgX * scale;
+                     cy = oy + avgY * scale;
+                }
+
+                // Calculate Eccentric Shift for Forces (Inputs e'x, e'y)
+                const shiftX = (I.e_prime_n_x || 0) * scale;
+                const shiftY = (I.e_prime_n_y || 0) * scale;
+                const forceCx = cx + shiftX;
+                const forceCy = cy + shiftY;
+
+                // Draw Vu (Shear) - Red Straight Arrow at Eccentric Location
+                // UPDATED: Added Unit (kgf)
+                if (I.V > 0) {
+                    const ang = (I.v_dir === 'para') ? 0 : -Math.PI / 2;
+                    drawForceArrow(forceCx, forceCy, 60, ang, `Vu=${I.V} kgf`, '#dc2626'); 
+                }
+                // Draw Tu (Tension) - Blue Dot + Leader at Eccentric Location
+                // UPDATED: Added Unit (kgf)
+                if (I.T > 0) {
+                    ctx.beginPath();
+                    ctx.arc(forceCx, forceCy, 5, 0, 2*Math.PI);
+                    ctx.fillStyle = '#2563eb';
+                    ctx.fill();
+                    drawForceArrow(forceCx, forceCy, 50, -Math.PI/4, `Tu=${I.T} kgf`, '#2563eb');
+                }
+
+                // Draw Mux (Moment X) - Green Curve at Centroid
+                // UPDATED: Added Unit (kgf-cm)
+                if (Math.abs(I.Mux) > 0) {
+                    drawMomentArrow(cx + 50, cy, 25, Math.PI/2, -Math.PI/2, `Mux=${I.Mux} kgf-cm`, '#059669');
+                }
+
+                // Draw Muy (Moment Y) - Purple Curve at Centroid
+                // UPDATED: Added Unit (kgf-cm)
+                if (Math.abs(I.Muy) > 0) {
+                    drawMomentArrow(cx, cy + 50, 25, 0, Math.PI, `Muy=${I.Muy} kgf-cm`, '#7c3aed');
                 }
             }
         };
@@ -1983,8 +2454,14 @@
             const I = {
                 fc: val('fc'), ha: val('ha'), da: val('da'), hef: val('hef'), s1: val('s1'), s2: val('s2'),
                 ca1: val('ca1'), ca1_1: val('ca1_1'), ca2: val('ca2'), T: val('loadT'), V: val('loadV'),
+                Mux: val('loadMux'), Muy: val('loadMuy'), // ADD THIS LINE
+                // Locate inside window.performCalculation = function () { ... const I = {
                 kc: parseFloat(str('kc_select')), lambda: parseFloat(str('lambda_select')), le_mode: str('le_select'), psi_c_V: parseFloat(str('psi_c_V_select')),
-                e_prime_n: val('e_prime_n'), e_prime_v: val('e_prime_v'),
+                // UPDATED inputs for biaxial
+                e_prime_n_x: val('e_prime_n_x'), 
+                e_prime_n_y: val('e_prime_n_y'), 
+                // DELETE: e_prime_v: val('e_prime_v'),
+                
                 // Steel inputs
                 futa: val('futa'), fya: val('fya'), ase: val('ase'), is_grouted: chk('is_grouted'),
                 // Step 2 Inputs
@@ -2086,7 +2563,119 @@
             // Re-calculate eccentricities based on centroid of the custom group
             const sumX = anchors.reduce((s, a) => s + a.x, 0);
             const sumY = anchors.reduce((s, a) => s + a.y, 0);
-            const centroid = { x: sumX / anchors.length, y: sumY / anchors.length };
+            const n_anchors = anchors.length;
+
+            // --- NEW: Cluster Analysis (Identify Active Group) ---
+            const limit_dist = 3.0 * I.hef;
+            const adj = Array.from({ length: anchors.length }, () => []);
+            
+            for(let i=0; i<anchors.length; i++) {
+                for(let j=i+1; j<anchors.length; j++) {
+                    const dx = anchors[i].x - anchors[j].x;
+                    const dy = anchors[i].y - anchors[j].y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if(dist < limit_dist) {
+                        adj[i].push(j);
+                        adj[j].push(i);
+                    }
+                }
+            }
+
+            // Find connected components
+            const visited = new Set();
+            let components = [];
+            for(let i=0; i<anchors.length; i++) {
+                if(!visited.has(i)) {
+                    const comp = [];
+                    const stack = [i];
+                    visited.add(i);
+                    while(stack.length > 0) {
+                        const u = stack.pop();
+                        comp.push(u);
+                        for(const v of adj[u]) {
+                            if(!visited.has(v)) {
+                                visited.add(v);
+                                stack.push(v);
+                            }
+                        }
+                    }
+                    components.push(comp);
+                }
+            }
+
+            // Keep only the largest component
+            components.sort((a,b) => b.length - a.length);
+            const activeIndices = new Set(components[0] || []);
+            
+            // Mark anchors
+            anchors.forEach((a, i) => {
+                a.excluded = !activeIndices.has(i);
+                a.forceN = 0; // Reset
+            });
+
+            // --- REVISED: Geometric Properties (Active Only) ---
+            const activeAnchors = anchors.filter(a => !a.excluded);
+            const n_active = activeAnchors.length;
+            
+            let centroid = { x: 0, y: 0 };
+            if (n_active > 0) {
+                const sumX = activeAnchors.reduce((s, a) => s + a.x, 0);
+                const sumY = activeAnchors.reduce((s, a) => s + a.y, 0);
+                centroid = { x: sumX / n_active, y: sumY / n_active };
+            }
+
+            // Moments of Inertia (Active Only)
+            const Ixx = activeAnchors.reduce((s, a) => s + Math.pow(a.y - centroid.y, 2), 0);
+            const Iyy = activeAnchors.reduce((s, a) => s + Math.pow(a.x - centroid.x, 2), 0);
+            
+            // --- FIX: CALCULATE ECCENTRICITY BEFORE FORCE DISTRIBUTION ---
+            let calc_ex = 0;
+            let calc_ey = 0;
+            if (I.T > 0) {
+                calc_ex = Math.abs(I.Muy / I.T); 
+                calc_ey = Math.abs(I.Mux / I.T); 
+            }
+
+            // 1. Calculate Total Design Moments (Input Moment + Tension * Eccentricity)
+            // e'y creates Moment about X-axis. e'x creates Moment about Y-axis.
+            const Mux_total = I.Mux + (I.T * (I.e_prime_n_y || 0)); 
+            const Muy_total = I.Muy + (I.T * (I.e_prime_n_x || 0));
+
+            // 2. Back-calculate resultant system eccentricity for Psi factors (ACI Code factors)
+            let e_use_x = 0;
+            let e_use_y = 0;
+            if (I.T > 0) {
+                e_use_x = Math.abs(Muy_total / I.T);
+                e_use_y = Math.abs(Mux_total / I.T);
+            }
+
+            let max_anchor_tension = 0;
+
+            // Distribute Forces (Loop all, but only calculate for active)
+            // Distribute Forces (Loop all, but only calculate for active)
+            anchors.forEach(a => {
+                if (a.excluded) return; // Skip excluded
+
+                let force = 0;
+                
+                // Axial Component (T/n)
+                if (n_active > 0) force += I.T / n_active;
+
+                // Moment X Component (Mux * y / Ixx)
+                if (Ixx > 0.01 && Math.abs(Mux_total) > 0.01) {
+                    force += ((Mux_total) * (a.y - centroid.y)) / Ixx;
+                }
+
+                // Moment Y Component (Muy * x / Iyy)
+                if (Iyy > 0.01 && Math.abs(Muy_total) > 0.01) {
+                    force += ((Muy_total) * (a.x - centroid.x)) / Iyy;
+                }
+                
+                a.forceN = force; 
+                if (force > max_anchor_tension) max_anchor_tension = force;
+            });
+            // Safety: If compression dominates, max tension might be 0
+            if (max_anchor_tension < 0) max_anchor_tension = 0;
 
             // --- LOGIC UPDATE: Concrete Limits ---
             let fc_calc = I.fc;
@@ -2173,8 +2762,36 @@
             const ca_min = Math.min(I.ca1, I.ca1_1, I.ca2);
             let psi_ed_N = (ca_min < 1.5 * I.hef) ? (0.7 + 0.3 * (ca_min / (1.5 * I.hef))) : 1.0;
             let psi_ed_V = (I.ca2 < 1.5 * I.ca1_1) ? (0.7 + 0.3 * (I.ca2 / (1.5 * I.ca1_1))) : 1.0;
-            let psi_ec_N = 1.0; if (I.e_prime_n > 0) psi_ec_N = 1.0 / (1.0 + (2.0 * I.e_prime_n) / (3.0 * I.hef));
-            let psi_ec_V = 1.0; if (I.e_prime_v > 0) psi_ec_V = 1.0 / (1.0 + (2.0 * I.e_prime_v) / (3.0 * I.ca1_1));
+
+            // Calculate Psi for X and Y directions
+            const psi_ec_N_x = 1.0 / (1.0 + (2.0 * e_use_x) / (3.0 * I.hef));
+            const psi_ec_N_y = 1.0 / (1.0 + (2.0 * e_use_y) / (3.0 * I.hef));
+            
+            // Combine biaxially (Product of factors)
+            let psi_ec_N = psi_ec_N_x * psi_ec_N_y;
+
+            // Locate this section in window.performCalculation
+            // --- AUTO-LINK SHEAR ECCENTRICITY ---
+            // If the user didn't explicitly enter a separate Shear Eccentricity (e_prime_v),
+            // infer it from the Tension Eccentricities (e_prime_n_x/y) based on shear direction.
+            
+            // REPLACE the block starting with "let e_shear_effective = I.e_prime_v;" with:
+            
+            let e_shear_effective = 0;
+            
+            if (I.v_dir === 'para') {
+                // Shear is Parallel (X-direction load). Eccentricity is offset in Y.
+                e_shear_effective = Math.abs(I.e_prime_n_y);
+            } else {
+                // Shear is Perpendicular (Y-direction load). Eccentricity is offset in X.
+                e_shear_effective = Math.abs(I.e_prime_n_x);
+            }
+
+            let psi_ec_V = 1.0;
+            // ACI 318 Eq 17.7.2.3.1
+            if (e_shear_effective > 0) {
+                psi_ec_V = 1.0 / (1.0 + (2.0 * e_shear_effective) / (3.0 * I.ca1_1));
+            }
 
             // Step 8: Splitting Factor (psi_cp_N)
             let psi_cp_N = 1.0;
@@ -2192,32 +2809,165 @@
             const futa_eff = Math.min(I.futa, futa_limit);
             const Nsa = I.ase * futa_eff;
             const phi_Nsa = phi_st * Nsa; 
-            const ratio_st = I.T > 0 ? (I.T / phi_Nsa) : 0;
+            const ratio_st = (max_anchor_tension > 0) ? (max_anchor_tension / phi_Nsa) : 0;
 
             let Vsa_coeff = 0.6; 
             let Vsa = Vsa_coeff * I.ase * futa_eff;
             if (I.is_grouted) Vsa *= 0.8;
             const phi_Vsa = phi_sv * Vsa; 
-            const ratio_sv = I.V > 0 ? (I.V / phi_Vsa) : 0;
+            // Distribute shear equally among n anchors (Standard assumption without Torsion input)
+            const shear_per_anchor = (n_active > 0) ? (I.V / n_active) : 0;
+            const ratio_sv = shear_per_anchor > 0 ? (shear_per_anchor / phi_Vsa) : 0;
 
-            // --- Breakout Logic ---
+            // --- 1. GEOMETRY & BOUNDING BOX ---
+            // Hoisted to top so Anc_1 can use actual dimensions
+            const xs = anchors.map(a => a.x);
+            const ys = anchors.map(a => a.y);
+            const minX = Math.min(...xs);
+            const maxX = Math.max(...xs);
+            const minY = Math.min(...ys);
+            const maxY = Math.max(...ys);
+            
+            // Actual Dimensions of the anchor group
+            const total_s1 = maxY - minY; // Height
+            const total_s2 = maxX - minX; // Width
+            
             const Nb = I.kc * I.lambda * Math.sqrt(I.fc) * Math.pow(I.hef, 1.5);
             const Anco = 9 * Math.pow(I.hef, 2);
-            const Anc_1 = 2 * (1.5 * I.hef) * (I.ca1 + I.s1 + 1.5 * I.hef);
+            const hef15 = 1.5 * I.hef;
+            // --- 2. ANc CALCULATION (Revised Logic) ---
+            let h_single = (I.ca1 < hef15) ? (I.ca1 + hef15) : (2 * hef15);
+            let w_single = (I.ca2 < hef15) ? (I.ca2 + hef15) : (2 * hef15);
+            const Anc_1 = h_single * w_single;
             
-            // Logic Update: Anchor Reinforcement Replacement (Tension)
-            const phi_Ncb_concrete = seis_conc * phi_c * (Anc_1 / Anco) * psi_ed_N * 1.0 * psi_cp_N * Nb;
+            // Single Ratio
+            let ratio_Anc1 = Anc_1 / Anco;
+            if (ratio_Anc1 > 1.0) ratio_Anc1 = 1.0;
 
+            // Single Capacity (Concrete Breakout)
+            const phi_Ncb_concrete = seis_conc * phi_c * ratio_Anc1 * psi_ed_N * 1.0 * psi_cp_N * Nb;
+            
+            // Single Final (Check Reinforcement)
             let phi_Ncb_final = phi_Ncb_concrete;
-            let N_reinf_cap = 0;
-
+            let N_reinf_single_cap = 0; // Cap per anchor
+            
             if (I.is_reinf && I.reinf_area > 0) {
-                N_reinf_cap = I.reinf_area * I.reinf_fy;
-                const phi_Nreinf = phi_reinf * N_reinf_cap;
-                // Take MINIMUM (governing failure mode)
-                phi_Ncb_final = Math.min(phi_Ncb_concrete, phi_Nreinf);
+                N_reinf_single_cap = I.reinf_area * I.reinf_fy * phi_reinf; 
+                phi_Ncb_final = Math.min(phi_Ncb_concrete, N_reinf_single_cap);
             }
-            const ratio_1 = I.T > 0 ? (I.T / phi_Ncb_final) : 0;
+            const ratio_1 = max_anchor_tension > 0 ? (max_anchor_tension / phi_Ncb_final) : 0;
+            let h_group = 0;
+            if (I.ca1 < hef15) {
+                h_group = I.ca1 + total_s1 + hef15;
+            } else {
+                h_group = hef15 + total_s1 + hef15;
+            }
+
+            let w_group = 0;
+            if (I.ca2 < hef15) {
+                w_group = I.ca2 + total_s2 + hef15;
+            } else {
+                w_group = hef15 + total_s2 + hef15;
+            }
+
+            const Anc_3 = h_group * w_group;
+
+            const uniqueX_sorted = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
+            const uniqueY_sorted = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
+            
+            let max_sx = 0;
+            for(let i=1; i<uniqueX_sorted.length; i++) max_sx = Math.max(max_sx, uniqueX_sorted[i] - uniqueX_sorted[i-1]);
+            
+            let max_sy = 0;
+            for(let i=1; i<uniqueY_sorted.length; i++) max_sy = Math.max(max_sy, uniqueY_sorted[i] - uniqueY_sorted[i-1]);
+
+            // [MODIFIED] Spacing Separation Logic (Cluster Analysis)
+            const limit_3hef = 3.0 * I.hef;
+            let override_Ncbg = null;
+
+            // Helper to find valid continuous ranges (zones) in one dimension
+            const getRanges = (vals) => {
+                const unique = [...new Set(vals)].sort((a, b) => a - b);
+                const ranges = [];
+                if (unique.length === 0) return ranges;
+                let start = unique[0]; 
+                let prev = unique[0];
+                for (let i = 1; i < unique.length; i++) {
+                    // Check if the gap to the next anchor exceeds the limit
+                    if (unique[i] - prev >= limit_3hef) {
+                        ranges.push({min: start, max: prev});
+                        start = unique[i];
+                    }
+                    prev = unique[i];
+                }
+                ranges.push({min: start, max: prev});
+                return ranges;
+            };
+
+            const xRanges = getRanges(anchors.map(a => a.x));
+            const yRanges = getRanges(anchors.map(a => a.y));
+
+            // Find the largest cluster of anchors falling within overlapping valid zones
+            let max_cluster_size = 0;
+            xRanges.forEach(xr => {
+                yRanges.forEach(yr => {
+                    // Count how many anchors exist in this specific X/Y intersection
+                    const count = anchors.filter(a => 
+                        a.x >= xr.min - 0.01 && a.x <= xr.max + 0.01 && 
+                        a.y >= yr.min - 0.01 && a.y <= yr.max + 0.01
+                    ).length;
+                    if (count > max_cluster_size) max_cluster_size = count;
+                });
+            });
+
+            // --- 3. VALIDATION & CLAMPING ---
+            // Check Geometric Limits
+            if (I.ca1 >= hef15) {
+                const w_ca1 = currentLang === 'zh' 
+                    ? `警告: Ca1 (${I.ca1}) ≥ 1.5hef (超出範圍)` 
+                    : `Warning: Ca1 (${I.ca1}) ≥ 1.5hef.`;
+                warnings.push(w_ca1);
+            }
+
+            // If the largest connected cluster is smaller than total anchors, separation occurred
+            if (max_cluster_size < n_anchors) {
+                // Translated: Spacing > 3hef (25.5cm). Cones separate.
+                const w1 = currentLang === 'zh' 
+                    ? `${t('warn_spacing')} (${limit_3hef.toFixed(1)}cm)`
+                    : `Spacing > 3hef (${limit_3hef.toFixed(1)}cm). Cones separate.`;
+                warnings.push(w1);
+
+                // Translated: Strength calculated using only the largest cluster: 12 of 14 anchors.
+                const w2 = currentLang === 'zh'
+                    ? `${t('warn_cluster')} ${max_cluster_size} / ${n_anchors} ${t('lbl_list_title').split('.')[1]}`
+                    : `Strength calculated using only the largest cluster: ${max_cluster_size} of ${n_anchors} anchors.`;
+                warnings.push(w2);
+                
+                override_Ncbg = max_cluster_size * phi_Ncb_concrete;
+            }
+
+            // Group Ratio Cap (Anc / Anco <= n_active)
+            let ratio_Anc3 = Anc_3 / Anco;
+            const limit_n = (override_Ncbg) ? n_active : n_anchors; 
+            
+            if (ratio_Anc3 > limit_n) {
+                // Translated: Group ANc/ANco (27.05) > 12. Capped to 12.
+                const w3 = currentLang === 'zh'
+                    ? `${t('warn_group_cap')} (${ratio_Anc3.toFixed(2)} > ${limit_n}) -> ${limit_n}`
+                    : `Group ANc/ANco (${ratio_Anc3.toFixed(2)}) > ${limit_n}. Capped to ${limit_n}.`;
+                warnings.push(w3);
+                ratio_Anc3 = limit_n;
+            }
+            // Group Capacity (Concrete Breakout)
+            let phi_Ncbg = seis_conc * phi_c * ratio_Anc3 * psi_ec_N * psi_ed_N * 1.0 * psi_cp_N * Nb;
+
+            // Group Final (Check Reinforcement)
+            if (I.is_reinf && I.reinf_area > 0) {
+                // If reinf exists, Group Cap is Min(GroupBreakout, n * ReinfPerAnchor)
+                const group_reinf_cap = N_reinf_single_cap * n_anchors;
+                phi_Ncbg = Math.min(phi_Ncbg, group_reinf_cap);
+            }
+            const ratio_3 = I.T > 0 ? (I.T / phi_Ncbg) : 0;
 
 			// Helper for Shear Breakout
 			const calcShearBreakout = (edgeDist) => {
@@ -2298,23 +3048,17 @@
             }
 			const ratio_2 = I.V > 0 ? (I.V / phi_Vcb_final) : 0;
 
-            // Group Calcs (Simplified, not applying corner logic here for brevity as instructed "min lines")
-            // Calculate actual group area based on anchor positions
-            const xs = anchors.map(a => a.x);
-            const ys = anchors.map(a => a.y);
-            const minX = Math.min(...xs);
-            const maxX = Math.max(...xs);
-            const minY = Math.min(...ys);
-            const maxY = Math.max(...ys);
+            // --- GROUP VALIDATION ---
+            // Determine Rows/Cols
+            const uniqueX = [...new Set(anchors.map(a => a.x))];
+            const uniqueY = [...new Set(anchors.map(a => a.y))];
+            const num_cols = uniqueX.length;
+            const num_rows = uniqueY.length;
 
-            // Group area considers all anchors' projection
-            const groupWidth = (maxX - minX) + 2 * (1.5 * I.hef);
-            const groupHeight = (maxY - minY) + 2 * (1.5 * I.hef);
-            const Anc_3 = groupWidth * groupHeight;
-            let phi_Ncbg = seis_conc * phi_c * (Anc_3 / Anco) * psi_ec_N * psi_ed_N * 1.0 * psi_cp_N * Nb;
-            if (I.is_reinf) phi_Ncbg = phi_Ncb_final * anchors.length; // Reinforcement scales with # of anchors
-            const ratio_3 = I.T > 0 ? (I.T / phi_Ncbg) : 0;  // Total load = per-anchor load × count
-
+            // Check Dimensions: width < cols * 1.5hef ?
+            const limit_width = num_cols * (1.5 * I.hef);
+            const limit_height = num_rows * (1.5 * I.hef);
+            
             // Group shear area based on actual layout
             const Avc_4 = ((maxX - minX) + 2 * (1.5 * I.ca1_1)) * I.ha;
             const Vb_basic = Math.min(
@@ -2323,7 +3067,7 @@
             );
             const Avco_basic = 4.5 * Math.pow(I.ca1_1, 2);
             let phi_Vcbg = shear_para_factor * seis_conc * phi_c * (Avc_4 / Avco_basic) * psi_ec_V * psi_ed_V * I.psi_c_V * 1.0 * Vb_basic;
-            if (I.is_reinf) phi_Vcbg = phi_Vcb_final * anchors.length;
+            if (I.is_reinf && I.reinf_area > 0) phi_Vcbg = phi_Vcb_final * anchors.length;
             const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0; // Total load scales with anchors
 
             // --- STEP 2: Pullout & Pryout Logic ---
@@ -2334,12 +3078,14 @@
                 Np = 0.9 * I.fc * I.eh * I.da;
             } else {
                 Np = I.np_cert;
+            
             }
             const Npn = Np * I.psi_c_P;
             const phi_Npn = seis_pull * phi_p * Npn; 
-            const ratio_pn = I.T > 0 ? (I.T / phi_Npn) : 0;
+            // Pullout checked against highest loaded anchor (ACI 318 17.6.3.1)
+            const ratio_pn = max_anchor_tension > 0 ? (max_anchor_tension / phi_Npn) : 0;
 
-            const kcp = (I.hef >= 6.35) ? 2.0 : 1.0; 
+            const kcp = (I.hef >= 6.35) ? 2.0 : 1.0;
             // Nominal Breakout Ncp (approximate reverse calc)
             const N_breakout_nominal = Math.min(phi_Ncb_final / (phi_c * seis_conc), phi_Ncbg / (phi_c * seis_conc)); 
             
@@ -2357,10 +3103,11 @@
                 if (isUncracked && ca_min < I.cac) psi_cp_Na = ca_min / I.cac;
 
                 const Nba = I.lambda * I.tau * Math.PI * I.da * I.hef;
-                const Na = (ANa_val / ANao) * psi_ed_Na * psi_cp_Na * Nba;
+                // Include psi_ec_N for eccentricity in bond group (ACI 17.6.5.3.1)
+                const Na = (ANa_val / ANao) * psi_ed_Na * psi_cp_Na * psi_ec_N * Nba;
                 const phi_Na = seis_bond * phi_bond * Na; 
                 const ratio_b = I.T > 0 ? (I.T / phi_Na) : 0;
-                const sust_cap = 0.4 * phi_bond * Na; 
+                const sust_cap = 0.4 * phi_bond * Na;
                 const sust_ok = I.loadT_sust <= sust_cap;
                 bond_res = { nba: Nba, cna: cNa, na: Na, cap: phi_Na, ratio: ratio_b, ok: ratio_b < 1.0, sust_ok: sust_ok, sust_cap: sust_cap, na_nominal: Na };
 
@@ -2429,7 +3176,7 @@
             } else if (max_V <= 0.2 && max_N <= 1.0) {
                 int_check = "OK (V≤0.2)";
             } else {
-                if (int_val > 1.2) int_check = "FAIL";
+                if (int_val > 1.2) int_check = t('val_fail'); // Uses "FAIL" or "失敗"
                 else int_check = "OK";
             }
 
@@ -2442,7 +3189,7 @@
                     bond: bond_res,
                     sb: { nsb: Nsb, cap: phi_Nsb, ratio: ratio_sb, ok: ratio_sb < 1.0, applicable: sb_applicable }, 
                     sl: sl_res, // Shear Lug
-                    c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb_final, load: I.T, ratio: ratio_1, ok: ratio_1 < 1.0, is_reinf: I.is_reinf },
+                    c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb_final, load: max_anchor_tension, ratio: ratio_1, ok: ratio_1 < 1.0, is_reinf: I.is_reinf },
                     c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb_final, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0, is_reinf: I.is_reinf },
                     c3: { anc: Anc_3, cap: phi_Ncbg, load: I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
                     c4: { avc: Avc_4, cap: phi_Vcbg, load: I.V, ratio: ratio_4, psih: psi_h_V, ok: ratio_4 < 1.0 },
@@ -2488,6 +3235,57 @@
             // Toggle visibility based on selected mode
             document.getElementById('card-viz').style.display = (currentVizMode === '2d') ? 'block' : 'none';
             document.getElementById('card-3d').style.display = (currentVizMode === '3d') ? 'block' : 'none';
+            
+            // Populate Individual Force List
+            const indivList = document.getElementById('indiv-force-list');
+            const indivContent = document.getElementById('indiv-force-content');
+            
+            if (indivList && indivContent) {
+                if (currentData.anchors && currentData.anchors.length > 0) {
+                    indivList.classList.remove('hidden');
+                    const shearPerAnchor = I.V / currentData.anchors.length;
+                    
+                    indivContent.innerHTML = currentData.anchors.map((a, i) => {
+                        const tensionVal = a.forceN || 0;
+                        const isTension = tensionVal >= 0;
+                        const typeLabel = isTension ? t('lbl_tension') : t('lbl_compression');
+                        const valDisplay = Math.abs(Math.round(tensionVal));
+                        
+                        let colorClass = isTension ? 'text-blue-700' : 'text-red-700';
+                        let rowClass = "flex justify-between border-b last:border-0 pb-1 mb-1";
+                        
+                        // Define content vars
+                        let tensionContent = `${typeLabel} = <strong>${valDisplay}</strong> kgf`;
+                        // Calculate shear text logic
+                        const shearTextVal = Math.round(shearPerAnchor);
+                        let shearContent = `${t('lbl_shear')} = <strong>${shearTextVal}</strong> kgf`;
+
+                        // Handle Excluded
+                        if (a.excluded) {
+                            colorClass = "text-gray-400 line-through";
+                            rowClass += " bg-gray-50 opacity-60";
+                            // Override content to just show EXCLUDED (Translated) without the label prefix
+                            const exText = `<span class="line-through">${t('val_excluded')}</span>`;
+                            tensionContent = exText;
+                            shearContent = exText;
+                        }
+                        
+                        return `<div class="${rowClass}">
+                            <span class="font-mono font-bold text-gray-600">#${i+1}</span>
+                            <span class="${colorClass}">${tensionContent}</span>
+                            <span class="text-gray-600">${shearContent}</span>
+                        </div>`;
+                        
+                        return `<div class="flex justify-between border-b last:border-0 pb-1 mb-1">
+                            <span class="font-mono font-bold text-gray-600">#${i+1}</span>
+                            <span class="${colorClass}">${typeLabel} = <strong>${valDisplay}</strong> kgf</span>
+                            <span class="text-gray-600">${t('lbl_shear')} = <strong>${shearDisplay}</strong> kgf</span>
+                        </div>`;
+                    }).join('');
+                } else {
+                    indivList.classList.add('hidden');
+                }
+            }
 
             // Seismic Badge Display Logic
             const seisDisplay = I.is_seismic ? 'inline' : 'none';
@@ -2576,7 +3374,14 @@
                 document.getElementById('r2-ratio').innerText = (d.c2.ratio || 0).toFixed(2);
                 setStatus('badge-2', d.c2.ok);
 
-                set('r4-avc', d.c4.avc, ' cm²'); set('r4-cap', d.c4.cap, ' kgf'); set('r4-psi', f.psi_ec_V.toFixed(2));
+                set('r4-avc', d.c4.avc, ' cm²'); set('r4-cap', d.c4.cap, ' kgf');
+                // Show the calculated factor
+                document.getElementById('r4-psi').innerText = f.psi_ec_V.toFixed(2);
+                
+                // Optional: Add a visual cue if eccentricity was auto-linked
+                if (f.psi_ec_V < 1.0 && I.e_prime_v === 0) {
+                     document.getElementById('r4-psi').innerHTML += " <span class='text-[9px] text-blue-500'>(Linked)</span>";
+                }
                 document.getElementById('r4-ratio').innerText = (d.c4.ratio || 0).toFixed(2);
                 setStatus('badge-4', d.c4.ok);
 
@@ -2603,133 +3408,6 @@
             }
         }
 
-        // NEW Step 7: Visualization Function
-        function drawVisualization() {
-            const canvas = document.getElementById('viz-canvas');
-            if (!canvas || !currentData) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width;
-            const h = canvas.height;
-            const I = currentData.inputs;
-            const min_s = 6 * I.da;
-            const min_c = 6 * I.da;
-
-            // Clear
-            ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#f8fafc'; // bg-slate-50
-            ctx.fillRect(0, 0, w, h);
-
-            // Scale logic: We need to fit (ca2 + s2 + margin) width and (ca1 + s1 + margin) height
-            // Assume concrete extends slightly beyond anchors.
-            // Coordinates: (0,0) is top-left of canvas.
-            // Edge Top (ca1) is Y axis. Edge Left (ca2) is X axis.
-            
-            // Determine logical bounding box
-            // Determine logical bounding box based on actual anchor positions
-            const anchors = currentData.anchors || [];
-            let maxAnchorX = 0;
-            let maxAnchorY = 0;
-
-            if (anchors.length > 0) {
-                maxAnchorX = Math.max(...anchors.map(a => a.x));
-                maxAnchorY = Math.max(...anchors.map(a => a.y));
-            }
-
-            // Calculate concrete dimensions to cover all anchors plus edge distances
-            const totalWidth = maxAnchorX + I.ca2 + 20; // max anchor X + right edge + margin
-            const totalHeight = maxAnchorY + I.ca1 + 20; // max anchor Y + bottom edge + margin
-
-            const padding = 40;
-            const scaleX = (w - 2 * padding) / totalWidth;
-            const scaleY = (h - 2 * padding) / totalHeight;
-            const scale = Math.min(scaleX, scaleY);
-
-            // Origin (Top-Left Edge Corner)
-            const ox = padding;
-            const oy = padding;
-
-            // Draw Concrete Edges
-            ctx.beginPath();
-            ctx.strokeStyle = '#94a3b8'; // slate-400
-            ctx.lineWidth = 2;
-            ctx.moveTo(ox + totalWidth * scale, oy); // Right top
-            ctx.lineTo(ox, oy); // Top Left (Corner)
-            ctx.lineTo(ox, oy + totalHeight * scale); // Bottom Left
-            ctx.stroke();
-
-            // Draw Infinite Concrete (Dashed lines)
-            ctx.beginPath();
-            ctx.setLineDash([5, 5]);
-            ctx.moveTo(ox + totalWidth * scale, oy);
-            ctx.lineTo(ox + totalWidth * scale, oy + totalHeight * scale);
-            ctx.lineTo(ox, oy + totalHeight * scale);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Check violations for coloring
-            const bad_s1 = (I.s1 > 0 && I.s1 < min_s);
-            const bad_s2 = (I.s2 > 0 && I.s2 < min_s);
-            const bad_ca1 = (I.ca1 < min_c);
-            const bad_ca2 = (I.ca2 < min_c);
-
-            anchors.forEach(p => {
-                const cx = ox + p.x * scale;
-                const cy = oy + p.y * scale;
-                const r = Math.max(I.da * scale / 2, 4); // Min 4px radius
-                
-                ctx.beginPath();
-                ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-                ctx.fillStyle = '#cbd5e1'; // slate-300
-                ctx.fill();
-                ctx.strokeStyle = '#334155'; // slate-700
-                ctx.stroke();
-                
-                // Crosshair center
-                ctx.beginPath();
-                ctx.moveTo(cx - 2, cy); ctx.lineTo(cx + 2, cy);
-                ctx.moveTo(cx, cy - 2); ctx.lineTo(cx, cy + 2);
-                ctx.stroke();
-            });
-
-            // Dimensions Helpers
-            function drawDim(x1, y1, x2, y2, text, isBad) {
-                ctx.beginPath();
-                ctx.strokeStyle = isBad ? '#ef4444' : '#64748b'; // red or slate
-                ctx.fillStyle = isBad ? '#ef4444' : '#64748b';
-                ctx.lineWidth = 1;
-                // Line
-                ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-                ctx.stroke();
-                // Arrows (simple dots for now)
-                ctx.beginPath(); ctx.arc(x1, y1, 2, 0, 2*Math.PI); ctx.fill();
-                ctx.beginPath(); ctx.arc(x2, y2, 2, 0, 2*Math.PI); ctx.fill();
-                // Text
-                const mx = (x1 + x2) / 2;
-                const my = (y1 + y2) / 2;
-                ctx.font = isBad ? "bold 12px sans-serif" : "12px sans-serif";
-                ctx.fillText(text, mx + 5, my - 5);
-            }
-
-            // Draw Ca1
-            const ax = ox + I.ca2 * scale; 
-            drawDim(ax, oy, ax, oy + I.ca1 * scale, `Ca1=${I.ca1} cm`, bad_ca1);
-
-            // Draw Ca2
-            const ay = oy + I.ca1 * scale;
-            drawDim(ox, ay, ox + I.ca2 * scale, ay, `Ca2=${I.ca2} cm`, bad_ca2);
-
-            // Draw S1 (if exists)
-            if (I.s1 > 0) {
-                const sx = ox + I.ca2 * scale + 20; // Offset slightly
-                drawDim(sx, ay, sx, ay + I.s1 * scale, `s1=${I.s1} cm`, bad_s1);
-            }
-
-            // Draw S2 (if exists)
-            if (I.s2 > 0) {
-                const sy = oy + I.ca1 * scale + 20;
-                drawDim(ax, sy, ax + I.s2 * scale, sy, `s2=${I.s2} cm`, bad_s2);
-            }
-        }
 
         function setStatus(id, isOk) {
             const el = document.getElementById(id);
@@ -2739,15 +3417,37 @@
 
         window.saveResult = async function () {
             if (!currentUser) { alert("Please login first."); return; }
-            const btn = document.getElementById('save-btn'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>' + (currentLang === 'en' ? 'Saving...' : '儲存中...');
-            performCalculation(); if (!currentData) return;
+            
+            const btn = document.getElementById('save-btn'); 
+            // Use translation for "Saving..."
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>${t('btn_saving')}`;
+            
+            performCalculation(); 
+            if (!currentData) return;
+            
             try {
                 await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').add({
-                    inputs: currentData.inputs, summary: { ratio1: currentData.calcs.c1.ratio, ratio2: currentData.calcs.c2.ratio, ratio3: currentData.calcs.c3.ratio, ratio4: currentData.calcs.c4.ratio, allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok && currentData.calcs.s1.ok && currentData.calcs.s2.ok && currentData.calcs.pn.ok && currentData.calcs.cp.ok },
+                    inputs: currentData.inputs, 
+                    summary: { 
+                        ratio1: currentData.calcs.c1.ratio, 
+                        ratio2: currentData.calcs.c2.ratio, 
+                        ratio3: currentData.calcs.c3.ratio, 
+                        ratio4: currentData.calcs.c4.ratio, 
+                        allPass: currentData.calcs.c1.ok && currentData.calcs.c2.ok && currentData.calcs.c3.ok && currentData.calcs.c4.ok && currentData.calcs.s1.ok && currentData.calcs.s2.ok && currentData.calcs.pn.ok && currentData.calcs.cp.ok 
+                    },
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Saved!'; setTimeout(() => btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`, 2000);
-            } catch (e) { console.error(e); btn.innerHTML = 'Error'; }
+                
+                // Use translation for "Saved!"
+                btn.innerHTML = `<i class="fa-solid fa-check mr-2"></i>${t('btn_saved')}`; 
+                
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`;
+                }, 2000);
+            } catch (e) { 
+                console.error(e); 
+                btn.innerHTML = t('btn_error'); 
+            }
         };
 
         window.clearHistory = async function () {
@@ -2784,9 +3484,9 @@
             const I = data.inputs;
             setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef); setVal('s1', I.s1); setVal('s2', I.s2);
             setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2); setVal('loadT', I.T); setVal('loadV', I.V);
-            setVal('kc_select', I.kc || 10); setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);
-            setVal('le_select', I.le_mode || 'default'); setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
-            setVal('e_prime_n', I.e_prime_n || 0); setVal('e_prime_v', I.e_prime_v || 0);
+            setVal('loadMux', I.Mux || 0); setVal('loadMuy', I.Muy || 0);
+            setVal('kc_select', I.kc || 10); setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);            setVal('le_select', I.le_mode || 'default'); setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
+            setVal('e_prime_n_x', I.e_prime_n_x || 0); setVal('e_prime_n_y', I.e_prime_n_y || 0);
             
             // Restore Step 1
             if (I.futa) setVal('futa', I.futa);
@@ -2877,7 +3577,7 @@
                     const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
                     html += `<div onclick="restoreFromHistory('${d.id}')" class="p-4 hover:bg-blue-50 flex justify-between items-center border-b cursor-pointer transition active:bg-blue-100">
                                 <div><div class="flex items-center gap-2 mb-1">${status}<span class="text-xs font-mono text-gray-500">${date}</span></div>
-                                <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V}</div>
+                                <div class="text-sm font-semibold text-gray-700">T: ${d.inputs.T} | V: ${d.inputs.V} <br> <span class="text-xs font-normal text-gray-500">Mx: ${d.inputs.Mux || 0} | My: ${d.inputs.Muy || 0}</span></div>
                                 <div class="text-xs text-gray-400 mt-1 flex flex-wrap gap-1"><span class="bg-gray-100 px-1 rounded border">hef: ${d.inputs.hef}</span><span class="bg-gray-100 px-1 rounded border">da: ${d.inputs.da}</span></div></div>
                                 <div class="flex items-center gap-4">
                                     <div class="text-eng-primary text-xs font-bold flex items-center">${t('open')} <i class="fa-solid fa-chevron-right ml-1"></i></div>
@@ -2901,9 +3601,17 @@
             const dateStr = new Date().toLocaleDateString();
             const staging = document.getElementById('print-staging');
             const txt = (key) => translations[currentLang][key] || key;
-
             const showT = d.inputs.T > 0;
             const showV = d.inputs.V > 0;
+
+            // --- Generate High-Res 2D Image for Print (Auto-Fit) ---
+            const printCanvas = document.createElement('canvas');
+            printCanvas.width = 800; // High resolution
+            printCanvas.height = 600;
+            // Draw to temp canvas with forceFit = true
+            drawVisualization(printCanvas, true); 
+            const layoutImgData = printCanvas.toDataURL();
+            // -------------------------------------------
 
             // --- 1. DEFINING FORMATTED EQUATIONS ---
             // Concrete Breakout (Tension)
@@ -2967,19 +3675,105 @@
                     </div>
                 </div>
 
-                ${(d.geo_warnings && d.geo_warnings.length > 0) ? `
-                    <div style="background-color:#fee2e2; color:#b91c1c; padding:10px; margin-bottom:20px; border-left:5px solid #ef4444;">
-                        <strong>${txt('warn_title')}</strong>
-                        <ul>${d.geo_warnings.map(w => `<li>${w}</li>`).join('')}</ul>
-                    </div>
-                ` : ''}
-
-
                 <h3>${txt('rpt_layout')} (${currentVizMode.toUpperCase()})</h3>
                 <div style="text-align:center; padding: 15px; border: 1px solid #eee; margin-bottom: 20px;">
                     <img src="${currentVizMode === '2d' ? document.getElementById('viz-canvas').toDataURL() : renderer.domElement.toDataURL()}" style="max-width: 100%; border: 1px solid #ccc; height: 200px; object-fit: contain;">
                 </div>
+                
+                ${(d.calcs.geo_warnings && d.calcs.geo_warnings.length > 0) ? `
+                    <div style="background-color:#fee2e2; color:#b91c1c; padding: 0px 0px 0px 0px; margin-bottom:0px; border-left:5px solid #ef4444;">
+                        <strong><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px; margin-left:150px;"></i>${txt('warn_title')}</strong>
+                        <ul style="list-style-type: disc; margin-left: 20px; margin-top: 5px;">${d.calcs.geo_warnings.map(w => `<li>${w}</li>`).join('')}</ul>
+                    </div>
+                ` : ''}
 
+                <h4>${txt('sec_loads')}</h4>
+                <table style="margin-bottom: 20px;">
+                    <tr>
+                        <th style="width: 25%">${txt('tbl_param')}</th>
+                        <th style="width: 25%">${txt('tbl_val')}</th>
+                        <th style="width: 25%">${txt('tbl_unit')}</th>
+                        <th style="width: 25%">${txt('tbl_dir')}</th>
+                    </tr>
+                    ${(() => {
+                        const valT = d.inputs.T;
+                        const isTen = valT >= 0;
+                        const dirLabel = isTen ? txt('lbl_tension') : txt('lbl_compression');
+                        const dirColor = isTen ? '#1d4ed8' : '#b91c1c'; // Blue / Red
+                        return `
+                        <tr>
+                            <td>${txt('lbl_t')}</td>
+                            <td style="font-family:monospace; font-weight:bold;">${valT}</td>
+                            <td>kgf</td>
+                            <td style="color:${dirColor}; font-weight:bold;">${dirLabel}</td>
+                        </tr>`;
+                    })()}
+                    <tr>
+                        <td>${txt('lbl_v')}</td>
+                        <td style="font-family:monospace; font-weight:bold;">${d.inputs.V}</td>
+                        <td>kgf</td>
+                        <td>${d.inputs.v_dir === 'para' ? txt('opt_v_para') : txt('opt_v_perp')}</td>
+                    </tr>
+                    <tr>
+                        <td>${txt('lbl_mux')}</td>
+                        <td style="font-family:monospace; font-weight:bold;">${d.inputs.Mux}</td>
+                        <td>kgf-cm</td>
+                        <td>X-Axis</td>
+                    </tr>
+                    <tr>
+                        <td>${txt('lbl_muy')}</td>
+                        <td style="font-family:monospace; font-weight:bold;">${d.inputs.Muy}</td>
+                        <td>kgf-cm</td>
+                        <td>Y-Axis</td>
+                    </tr>
+                    ${d.inputs.is_adhesive ? `
+                    <tr>
+                        <td>${txt('lbl_tsust')}</td>
+                        <td style="font-family:monospace; font-weight:bold;">${d.inputs.loadT_sust}</td>
+                        <td>kgf</td>
+                        <td>-</td>
+                    </tr>` : ''}
+                </table>
+
+                <h4>${txt('lbl_indiv_forces')}</h4>
+                <table>
+                    <tr>
+                        <th style="width:10%">#</th>
+                        <th style="width:45%">${txt('lbl_tension')} / ${txt('lbl_compression')}</th>
+                        <th style="width:45%">${txt('lbl_shear')}</th>
+                    </tr>
+                    ${d.anchors.map((a, i) => {
+                        const tVal = a.forceN || 0;
+                        const isTen = tVal >= 0;
+                        const label = isTen ? txt('lbl_tension') : txt('lbl_compression');
+                        // Color Swap: Tension=Blue (#1d4ed8), Compression=Red (#b91c1c)
+                        const color = isTen ? '#1d4ed8' : '#b91c1c'; 
+                        const visualIcon = isTen ? '■' : '■'; // Uses the same character but styled by color
+
+                        // Handle active count for shear
+                        const activeCount = d.anchors.filter(x => !x.excluded).length;
+                        const sVal = a.excluded ? 0 : (d.inputs.V / activeCount).toFixed(0);
+
+                        if(a.excluded) {
+                            return `<tr>
+                                <td style="text-align:center; color:#999;">#${i+1}</td>
+                                <td style="color:#999; text-decoration:line-through;">${txt('val_excluded')}</td>
+                                <td style="color:#999; text-decoration:line-through;">${txt('val_excluded')}</td>
+                            </tr>`;
+                        }
+
+                        return `<tr>
+                            <td style="text-align:center; font-weight:bold;">${i+1}</td>
+                            <td style="color:${color}; font-weight:bold;">
+                                <span style="font-size:1.2em; vertical-align:middle; margin-right:5px;">${visualIcon}</span>
+                                ${label} = ${Math.round(Math.abs(tVal))} kgf
+                            </td>
+                            <td>${Math.round(sVal)} kgf</td>
+                        </tr>`;
+                    }).join('')}
+                </table>
+                <div style="margin-bottom: 20px;"></div>
+                <div class="page-break"></div>
                 <h2>${txt('sec_mat')}</h2>
                 <table>
                     <tr><th>${txt('tbl_param')}</th><th>${txt('tbl_val')}</th><th>${txt('tbl_unit')}</th></tr>
@@ -3007,39 +3801,55 @@
                     <tr><th>${txt('tbl_factor')}</th><th>${txt('tbl_val')}</th><th>${txt('tbl_note')}</th></tr>
                     <tr>
                         <td>${txt('lbl_kc')}</td>
+                        <td>${d.inputs.kc}</td>
                         <td>${d.inputs.kc_raw === '10' ? txt('opt_cast') : (d.inputs.kc_raw === 'screw' ? txt('opt_screw') : txt('opt_post'))}</td>
-                        <td></td>
                     </tr>
-                    <tr><td>${txt('lbl_lambda')}</td><td>${d.inputs.lambda}</td><td></td></tr>
+                    <tr>
+                        <td>${txt('lbl_lambda')}</td>
+                        <td>${d.inputs.lambda}</td>
+                        <td>${d.inputs.lambda === 1.0 ? txt('opt_lam1') : (d.inputs.lambda === 0.8 ? txt('opt_lam2') : txt('opt_lam3'))}</td>
+                    </tr>
                     <tr>
                         <td>${txt('lbl_le')}</td>
+                        <td>${d.inputs.le_mode}</td>
                         <td>${d.inputs.le_mode === 'sleeve' ? txt('opt_le2') : (d.inputs.le_mode === 'torque' ? txt('opt_le3') : txt('opt_le1'))}</td>
-                        <td></td>
                     </tr>
                     <tr>
                         <td>${txt('lbl_reinf')}</td>
+                        <td>${d.inputs.psi_c_V}</td>
                         <td>${d.inputs.psi_c_V === 1.2 ? txt('opt_reinf2') : (d.inputs.psi_c_V === 1.4 ? txt('opt_reinf3') : txt('opt_reinf1'))}</td>
-                        <td></td>
                     </tr>
-                    <tr><td>${txt('lbl_en')}</td><td>${d.inputs.e_prime_n}</td><td>cm</td></tr>
-                    <tr><td>${txt('lbl_ev')}</td><td>${d.inputs.e_prime_v}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_en_x')} x</td><td>${d.inputs.e_prime_n_x}</td><td>cm</td></tr>
+                    <tr><td>${txt('lbl_en_y')} y</td><td>${d.inputs.e_prime_n_y}</td><td>cm</td></tr>
                     <tr>
                         <td>${txt('lbl_pull_mode')}</td>
+                        <td>${d.inputs.pull_mode}</td>
                         <td>${d.inputs.pull_mode === 'hooked' ? txt('opt_hooked') : (d.inputs.pull_mode === 'post' ? txt('opt_post_cert') : txt('opt_headed'))}</td>
-                        <td></td>
                     </tr>
-                    <tr><td>${txt('lbl_is_adh')}</td><td>${d.inputs.is_adhesive ? txt('val_yes') : txt('val_no')}</td><td></td></tr>
+                    <tr>
+                        <td>${txt('lbl_is_adh')}</td>
+                        <td>${d.inputs.is_adhesive}</td>
+                        <td>${d.inputs.is_adhesive ? txt('val_yes') : txt('val_no')}</td>
+                    </tr>
                     <tr>
                         <td>${txt('lbl_cond')}</td>
+                        <td>${d.inputs.cond_ab}</td>
                         <td>${d.inputs.cond_ab === 'A' ? txt('opt_cond_a') : txt('opt_cond_b')}</td>
-                        <td></td>
                     </tr>
-                    <tr><td>${txt('lbl_cat')}</td><td>${d.inputs.category}</td><td></td></tr>
-                    <tr><td>${txt('lbl_seismic')}</td><td>${d.inputs.is_seismic ? txt('val_yes') : txt('val_no')}</td><td></td></tr>
+                    <tr>
+                        <td>${txt('lbl_cat')}</td>
+                        <td>${d.inputs.category}</td>
+                        <td>${d.inputs.category === 1 ? txt('opt_cat1') : (d.inputs.category === 2 ? txt('opt_cat2') : txt('opt_cat3'))}</td>
+                    </tr>
+                    <tr>
+                        <td>${txt('lbl_seismic')}</td>
+                        <td>${d.inputs.is_seismic}</td>
+                        <td>${d.inputs.is_seismic ? txt('val_yes') : txt('val_no')}</td>
+                    </tr>
                     <tr>
                         <td>${txt('lbl_v_dir')}</td>
+                        <td>${d.inputs.v_dir}</td>
                         <td>${d.inputs.v_dir === 'para' ? txt('opt_v_para') : txt('opt_v_perp')}</td>
-                        <td></td>
                     </tr>
                 </table>
 
@@ -3063,6 +3873,17 @@
 
             // --- STEEL STRENGTH SECTION ---
             if(showT || showV) {
+                // Generate distribution boxes
+                let distHtml = `<div class="col-span-5 grid grid-cols-4 gap-2 mb-2">`;
+                if(d.anchors && d.anchors.length > 0) {
+                    d.anchors.forEach((a, i) => {
+                        const f = a.forceN || 0;
+                        const c = f > 0 ? 'text-red-600 bg-red-50' : 'text-blue-600 bg-blue-50';
+                        distHtml += `<div class="text-[10px] border rounded p-1 text-center ${c}">#${i+1}: <strong>${Math.round(f)}</strong></div>`;
+                    });
+                }
+                distHtml += `</div>`;
+
                  html += `
                     <h3>${txt('res_s_title')}</h3>
                     <table>
@@ -3073,8 +3894,8 @@
                             <th>${txt('tbl_unit')}</th>
                             <th>${txt('tbl_stat')}</th>
                         </tr>
-                        
-                        <tr><td>${txt('res_nsa')}</td><td>${e_Nsa}</td><td>${Math.round(d.calcs.s1.nsa)}</td><td>kgf</td><td>-</td></tr>
+
+                        <tr><td>${txt('res_nsa')} (Max)</td><td>${e_Nsa}</td><td>${Math.round(d.calcs.s1.load)}</td><td>kgf</td><td>-</td></tr>
                         <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_nsa')}</strong></td><td>${e_phiNsa}</td><td><strong>${Math.round(d.calcs.s1.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s1.ok ? 'pass' : 'fail'}">${d.calcs.s1.ok ? txt('pass') : txt('fail')}</span></td></tr>
                         <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.s1.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
 
@@ -3088,6 +3909,7 @@
             // --- PULLOUT & PRYOUT SECTION ---
             if(showT || showV) {
                  html += `
+                    <div class="page-break"></div>
                     <h3>${txt('res_p_title')}</h3>
                     <table>
                         <tr>
@@ -3146,12 +3968,15 @@
                             <td><span class="${d.calcs.bond.sust_ok ? 'pass' : 'fail'}">${d.calcs.bond.sust_ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                     </table>
+                    
                 `;
             }
 
+            
             // --- CONCRETE BREAKOUT (TENSION) ---
             if (showT) {
                 html += `
+                    <div class="page-break"></div>
                     <h3>${txt('res_t_title')}</h3>
                     <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Nb_pdf}</div>
 
@@ -3183,7 +4008,7 @@
                             <td>-</td>
                         </tr>
                     </table>
-
+                    
                     <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Ncbg_pdf}</div>
                     <h4>${txt('res_tg_sub')}</h4>
                     <table>
@@ -3211,7 +4036,7 @@
                             <td>-</td>
                         </tr>
                     </table>
-                    
+                    <div class="page-break"></div>
                     ${d.calcs.sb.applicable ? `
                         <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #f59e0b"></div>
                         <h4>${txt('res_sb_title')}</h4> <!-- REMOVED HARDCODED (Step 5) -->
@@ -3360,6 +4185,7 @@
         toggleSeismicDetailing();
         updateCac();
         init3D();
+        initVizControls();
     </script>
 </body>
 </html>
