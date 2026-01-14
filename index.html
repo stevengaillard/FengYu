@@ -2616,6 +2616,10 @@
             // --- REVISED: Geometric Properties (Active Only) ---
             const activeAnchors = anchors.filter(a => !a.excluded);
             const n_active = activeAnchors.length;
+
+            // Distribute shear equally among ACTIVE anchors
+            const shear_per_anchor = (n_active > 0) ? (I.V / n_active) : 0;
+            // Note: ratio_sv calculation moved down to Step 1 section where phi_Vsa is defined
             
             let centroid = { x: 0, y: 0 };
             if (n_active > 0) {
@@ -2814,9 +2818,8 @@
             let Vsa_coeff = 0.6; 
             let Vsa = Vsa_coeff * I.ase * futa_eff;
             if (I.is_grouted) Vsa *= 0.8;
-            const phi_Vsa = phi_sv * Vsa; 
-            // Distribute shear equally among n anchors (Standard assumption without Torsion input)
-            const shear_per_anchor = (n_active > 0) ? (I.V / n_active) : 0;
+            const phi_Vsa = phi_sv * Vsa;
+
             const ratio_sv = shear_per_anchor > 0 ? (shear_per_anchor / phi_Vsa) : 0;
 
             // --- 1. GEOMETRY & BOUNDING BOX ---
@@ -3243,7 +3246,9 @@
             if (indivList && indivContent) {
                 if (currentData.anchors && currentData.anchors.length > 0) {
                     indivList.classList.remove('hidden');
-                    const shearPerAnchor = I.V / currentData.anchors.length;
+                    // Calculate based on ACTIVE anchors only
+                    const activeCount = currentData.anchors.filter(x => !x.excluded).length;
+                    const shearPerAnchor = activeCount > 0 ? (I.V / activeCount) : 0;
                     
                     indivContent.innerHTML = currentData.anchors.map((a, i) => {
                         const tensionVal = a.forceN || 0;
