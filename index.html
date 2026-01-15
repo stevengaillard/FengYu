@@ -1575,12 +1575,6 @@
             document.getElementById('div_np').classList.toggle('hidden', !showNp);
         };
 
-        // NEW Step 3: Toggle Adhesive
-        window.toggleAdhesive = function() {
-            const isAdh = document.getElementById('is_adhesive').checked;
-            document.getElementById('div_adhesive').classList.toggle('hidden', !isAdh);
-        }
-
         // NEW Feature: Toggle Shear Lug Inputs
         window.toggleShearLug = function() {
             const isSL = document.getElementById('is_shearlug').checked;
@@ -3715,7 +3709,14 @@
             setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef); setVal('s1', I.s1); setVal('s2', I.s2);
             setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2); setVal('loadT', I.T); setVal('loadV', I.V);
             setVal('loadMux', I.Mux || 0); setVal('loadMuy', I.Muy || 0);
-            setVal('kc_select', I.kc || 10); setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);            setVal('le_select', I.le_mode || 'default'); setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
+            
+            // FIX: Restore Anchor Type correctly (Priority: Raw String > Legacy Adhesive Bool > Legacy KC Number)
+            let typeVal = I.kc_raw || (I.is_adhesive ? 'adhesive' : (I.kc || 10));
+            setVal('kc_select', typeVal);
+
+            setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);            
+            setVal('le_select', I.le_mode || 'default'); 
+            setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
             setVal('e_prime_n_x', I.e_prime_n_x || 0); setVal('e_prime_n_y', I.e_prime_n_y || 0);
             
             // Restore Step 1
@@ -3727,17 +3728,16 @@
             // Restore Step 2
             if (I.pull_mode) {
                 setVal('pullout_mode', I.pull_mode);
-                togglePulloutInputs(); 
+                // togglePulloutInputs will be called by updateAnchorConfig later
                 setVal('abrg', I.abrg || 0);
                 setVal('eh', I.eh || 0);
                 setVal('np_certified', I.np_cert || 0);
                 setVal('crack_cond_p', I.psi_c_P || 1.4);
             }
 
-            // Restore Step 3
+            // Restore Step 3 (Adhesive)
+            // FIX: Removed call to crashing toggleAdhesive()
             if (I.is_adhesive !== undefined) {
-                setChk('is_adhesive', I.is_adhesive);
-                toggleAdhesive();
                 setVal('tau', I.tau || 100);
             }
 
@@ -3771,26 +3771,27 @@
             }
             
             if (I.stretch_len) setVal('stretch_len', I.stretch_len);
+            
             // --- RESTORE LAYOUT & ANCHORS ---
             if (I.layout_mode) {
                 setVal('layout_mode', I.layout_mode);
-                // Call toggleLayoutMode to show/hide the correct UI elements (Custom Coords Box vs Spacing Inputs)
                 toggleLayoutMode();
             }
 
             if (I.custom_coords) {
                 setVal('custom_coords', I.custom_coords);
-                // Parse the string back into the array so the visual table can populate
                 anchorData = parseCoords(); 
-                // Render the table rows
                 renderAnchorTable();
             } else {
-                // If legacy data or grid mode was saved, ensure list is empty visually
                 anchorData = [];
                 renderAnchorTable();
             }
             
-            switchTab('calculator'); performCalculation();
+            // FIX: Ensure UI visibility states (Adhesive inputs, etc.) are synced
+            updateAnchorConfig(); 
+            
+            switchTab('calculator'); 
+            performCalculation();
         };
 
         window.loadHistory = function () {
