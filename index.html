@@ -280,6 +280,16 @@
                         <!-- 1. Geometry -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_mat">Material & Geometry</h4>
+                            <!-- REVISION: Anchor Type moved to top -->
+                            <div class="mb-3 bg-blue-50 p-2 rounded border border-blue-200">
+                                <label class="text-xs font-bold text-eng-primary" data-i18n="lbl_kc">Anchor Type (Governing)</label>
+                                <select id="kc_select" class="w-full border border-blue-300 rounded p-2 text-xs font-bold text-slate-700 mt-1" onchange="updateAnchorConfig()">
+                                    <option value="10" data-i18n="opt_cast_10">Cast-in Anchors (10)</option>
+                                    <option value="7" data-i18n="opt_post">Post-installed (7)</option>
+                                    <option value="screw" data-i18n="opt_screw">Screw Anchor</option>
+                                    <option value="adhesive" data-i18n="opt_adhesive_full">Adhesive Anchor</option>
+                                </select>
+                            </div>
                             <!-- Advanced Layout Editor -->
                             <div class="bg-blue-50 p-3 rounded border border-blue-200">
                                 <div class="flex justify-between items-center mb-2">
@@ -392,10 +402,6 @@
                                         <label class="text-xs text-gray-500" data-i18n="lbl_da">Diameter (<span class="math-symbol">d<sub>a</sub></span>) [cm]</label>
                                         <input type="number" id="da" value="1.6" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                                     </div>
-                                    <div>
-                                        <label class="text-xs text-gray-500" data-i18n="lbl_ase">Eff. Area (<span class="math-symbol">A<sub>se</sub></span>) [cm²]</label>
-                                        <input type="number" id="ase" value="1.57" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
-                                    </div>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div>
                                             <label class="text-xs text-gray-500" data-i18n="lbl_futa">Ult (<span class="math-symbol">f<sub>uta</sub></span>)</label>
@@ -426,13 +432,7 @@
                             <div class="pt-2 border-t border-dashed space-y-2">
                                 <div>
                                     <label class="text-xs text-gray-500" data-i18n="lbl_hef">Embedment (<span class="math-symbol">h<sub>ef</sub></span>) [cm]</label>
-                                    <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right" oninput="updateCac()">
-                                </div>
-                                <!-- Step 8: Critical Edge Distance -->
-                                <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_cac">Critical Edge Dist (<span class="math-symbol">c<sub>ac</sub></span>) [cm]</label>
-                                    <input type="number" id="cac" value="21.25" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
-                                    <p class="text-[10px] text-gray-400 mt-0.5 text-right" data-i18n="msg_cac_default">Default: 2.5hef (Undercut) or 4hef (Exp)</p>
+                                    <input type="number" id="hef" value="8.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right" oninput="updateAnchorConfig()">
                                 </div>
                             </div>
                         </div>
@@ -470,16 +470,6 @@
                         <!-- 3. Coefficients -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_factors">Factors & Coefficients</h4>
-
-                            <div>
-                                <label class="text-xs text-gray-500" data-i18n="lbl_kc">Anchor Type (<span class="math-symbol">k<sub>c</sub></span>)</label>
-                                <select id="kc_select" class="w-full border border-gray-300 rounded p-2 text-xs" onchange="updateCac()">
-                                    <option value="10" data-i18n="opt_cast">Cast-in Anchors (10)</option>
-                                    <option value="7" data-i18n="opt_post">Post-installed (7)</option>
-                                    <!-- NEW 6. Screw Anchor -->
-                                    <option value="screw" data-i18n="opt_screw">Screw Anchor</option>
-                                </select>
-                            </div>
 
                             <!-- NEW Step 6: Seismic Design -->
                             <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
@@ -533,26 +523,21 @@
                                 </div>
                             </div>
 
-                            <!-- Adhesive Toggle -->
-                            <div class="bg-blue-50 p-2 rounded border border-blue-100">
-                                <div class="flex items-center space-x-2 mb-1">
-                                    <input type="checkbox" id="is_adhesive" onchange="toggleAdhesive()" class="rounded border-gray-300 text-eng-primary shadow-sm focus:border-eng-primary focus:ring focus:ring-eng-primary focus:ring-opacity-50">
-                                    <label for="is_adhesive" class="text-xs font-bold text-blue-800" data-i18n="lbl_is_adh">Adhesive Anchor</label>
-                                </div>
-                                <div id="div_adhesive" class="hidden mt-1">
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_tau">Bond Stress (<span class="math-symbol">τ</span>) [kgf/cm²]</label>
-                                    <input type="number" id="tau" value="100" class="calc-input w-full border border-blue-300 rounded p-1 text-right text-xs bg-white">
-                                </div>
+                            <!-- REVISION: Adhesive Input (Controlled by Top Dropdown) -->
+                            <div id="div_adhesive" class="hidden bg-blue-50 p-2 rounded border border-blue-100 mt-2">
+                                <label class="text-xs font-bold text-blue-700" data-i18n="lbl_tau">Bond Stress (<span class="math-symbol">τ</span>) [kgf/cm²]</label>
+                                <input type="number" id="tau" value="100" class="calc-input w-full border border-blue-300 rounded p-1 text-right text-xs bg-white mt-1">
                             </div>
 
                             <!-- Pullout Inputs (Step 2) -->
                             <div>
-                                <label class="text-xs text-gray-500" data-i18n="lbl_pull_mode">Pullout Mode</label>
-                                <select id="pullout_mode" class="w-full border border-gray-300 rounded p-2 text-xs" onchange="togglePulloutInputs()">
-                                    <option value="headed" data-i18n="opt_headed">Headed Bolt/Stud</option>
-                                    <option value="hooked" data-i18n="opt_hooked">Hooked Bolt (J/L)</option>
-                                    <option value="post" data-i18n="opt_post_cert">Post-installed (Cert.)</option>
-                                </select>
+                                <div id="div_pull_mode_container"> <label class="text-xs text-gray-500" data-i18n="lbl_pull_mode">Pullout Mode</label>
+                                    <select id="pullout_mode" class="w-full border border-gray-300 rounded p-2 text-xs" onchange="togglePulloutInputs()">
+                                        <option value="headed" data-i18n="opt_headed">Headed Bolt/Stud</option>
+                                        <option value="hooked" data-i18n="opt_hooked">Hooked Bolt (J/L)</option>
+                                        <option value="post" data-i18n="opt_post_cert">Post-installed (Cert.)</option>
+                                    </select>
+                                </div>   
                             </div>
 
                             <div id="div_abrg">
@@ -605,25 +590,31 @@
                                     <option value="1.4" data-i18n="opt_reinf3">Reinf ≥ D13 + Ties (1.4)</option>
                                 </select>
                             </div>
-
-                            <div class="grid grid-cols-3 gap-2">
-                                <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_en_x">Eccentric <span class="math-symbol">e'<sub>x</sub></span> [cm]</label>
-                                    <input type="number" id="e_prime_n_x" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-500" data-i18n="lbl_en_y">Eccentric <span class="math-symbol">e'<sub>y</sub></span> [cm]</label>
-                                    <input type="number" id="e_prime_n_y" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
-                                </div>
-                            </div>
-
                         </div>
                     </div>
 
-                    <!-- Loads -->
                     <div class="px-6 pb-6">
-                        <h4 class="text-xs font-bold text-eng-danger uppercase border-b pb-1 mb-2 text-red-600" data-i18n="sec_loads">Applied Loads</h4>
+                        <!-- REVISION: Header with Inline Moments Checkbox -->
+                        <div class="flex justify-between items-end border-b border-gray-200 pb-1 mb-3">
+                            <h4 class="text-xs font-bold text-eng-danger uppercase text-red-600" data-i18n="sec_loads">Applied Loads</h4>
+                            <label class="flex items-center space-x-2 text-[10px] text-gray-500 hover:text-red-600 cursor-pointer pb-0.5 select-none">
+                                <input type="checkbox" id="chk_moments" onchange="toggleMoments()" class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                <span data-i18n="lbl_add_moment">Add Moments (<span class="math-symbol">M<sub>u</sub></span>)</span>
+                            </label>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-4">
+                            <!-- REVISION: Eccentricities (Always Visible, outside moment checklist) -->
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_en_x">Eccentric <span class="math-symbol">e'<sub>x</sub></span> [cm]</label>
+                                <input type="number" id="e_prime_n_x" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500" data-i18n="lbl_en_y">Eccentric <span class="math-symbol">e'<sub>y</sub></span> [cm]</label>
+                                <input type="number" id="e_prime_n_y" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
+                            </div>
+
+                            <!-- Tension & Shear -->
                             <div class="bg-red-50 p-3 rounded border border-red-100">
                                 <label class="text-xs font-bold text-red-700" data-i18n="lbl_t">Tension (<span class="math-symbol">T<sub>u</sub></span>) [kgf]</label>
                                 <input type="number" id="loadT" value="1000" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
@@ -632,20 +623,27 @@
                                 <label class="text-xs font-bold text-red-700" data-i18n="lbl_v">Shear (<span class="math-symbol">V<sub>u</sub></span>) [kgf]</label>
                                 <input type="number" id="loadV" value="600" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
                             </div>
-                            <div class="bg-red-50 p-3 rounded border border-red-100">
-                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_mux">Moment X (<span class="math-symbol">M<sub>ux</sub></span>)  [kgf-cm]</label>
-                                <input type="number" id="loadMux" value="0" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+
+                            <!-- REVISION: Moments (Hidden by default, toggled by header checkbox) -->
+                            <div id="div_moments" class="col-span-2 grid grid-cols-2 gap-4 hidden bg-red-50 p-2 rounded border border-red-100 border-dashed">
+                                <div>
+                                    <label class="text-xs font-bold text-red-700" data-i18n="lbl_mux">Moment X (<span class="math-symbol">M<sub>ux</sub></span>) [kgf-cm]</label>
+                                    <input type="number" id="loadMux" value="0" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-red-700" data-i18n="lbl_muy">Moment Y (<span class="math-symbol">M<sub>uy</sub></span>) [kgf-cm]</label>
+                                    <input type="number" id="loadMuy" value="0" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
+                                </div>
+                                <p class="col-span-2 text-[10px] text-gray-400 italic" data-i18n="msg_elastic_note">
+                                    * Note: Analysis assumes elastic distribution.
+                                </p>
                             </div>
-                            <div class="bg-red-50 p-3 rounded border border-red-100">
-                                <label class="text-xs font-bold text-red-700" data-i18n="lbl_muy">Moment Y (<span class="math-symbol">M<sub>uy</sub></span>) [kgf-cm]</label>
-                                <input type="number" id="loadMuy" value="0" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
-                            </div>
-                            <!-- Step 6: Sustained Tension -->
+
+                            <!-- Sustained & Direction -->
                             <div class="bg-blue-50 p-3 rounded border border-blue-100 col-span-2">
                                 <label class="text-xs font-bold text-blue-700" data-i18n="lbl_tsust">Sustained Tension (<span class="math-symbol">T<sub>sust</sub></span>) [kgf]</label>
                                 <input type="number" id="loadT_sust" value="0" class="calc-input w-full border border-blue-300 rounded p-1 mt-1 text-right text-blue-800">
                             </div>
-                            <!-- Step 11: Shear Direction -->
                             <div class="bg-orange-50 p-3 rounded border border-orange-100 col-span-2">
                                 <label class="text-xs font-bold text-orange-700" data-i18n="lbl_v_dir">Shear Load Direction</label>
                                 <select id="shear_dir" class="w-full border border-orange-300 rounded p-1 mt-1 text-xs text-orange-800">
@@ -1081,6 +1079,10 @@
                 lbl_indiv_forces: "Individual Anchor Forces",
                 lbl_tension: "Tension",
                 tbl_dir: "Direction",
+                opt_cast_10: "Cast-in Anchors (10)",
+                opt_adhesive_full: "Adhesive Anchor",
+                lbl_add_moment: "Add Moments (<span class='math-symbol'>M<sub>u</sub></span>)",
+                msg_elastic_note: "* Note: Analysis assumes elastic distribution.",
                 lbl_compression: "Compression",
                 lbl_shear: "Shear",
                 lbl_cac: "Critical Edge Dist (<span class='math-symbol'>c<sub>ac</sub></span>) [cm]",
@@ -1114,6 +1116,10 @@
 
                 // --- NEW TRANSLATIONS ADDED BELOW ---
                 btn_saving: "Saving...", // <--- ADD THIS
+                opt_cast_10: "Cast-in Anchors (10)",
+                opt_adhesive_full: "Adhesive Anchor",
+                lbl_add_moment: "Add Moments (<span class='math-symbol'>M<sub>u</sub></span>)",
+                msg_elastic_note: "* Note: Analysis assumes elastic distribution.",
                 btn_saved: "Saved!",     // <--- ADD THIS
                 btn_error: "Error",      // <--- ADD THIS
                 btn_loads: "Loads",
@@ -1198,6 +1204,11 @@
                 lbl_t: "拉力設計載重 (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
                 lbl_tsust: "長期拉力載重 (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]",
                 lbl_indiv_forces: "單根錨栓受力分析",
+                msg_split_warn: "劈裂警告: 邊距 (%1) < 臨界值 (%2). 強度折減係數: %3.",
+                opt_adhesive_full: "化學黏結錨栓 (Adhesive)",
+                lbl_add_moment: "加入彎矩 (<span class='math-symbol'>M<sub>u</sub></span>)",
+                msg_elastic_note: "* 備註: 分析假設彈性分佈。",
+                opt_cast_10: "預埋式錨栓 (10)",
                 lbl_tension: "拉力",
                 tbl_dir: "方向",
                 lbl_compression: "壓力",
@@ -1237,6 +1248,11 @@
                 btn_error: "錯誤",       // <--- ADD THIS
                 btn_loads: "顯示載重",
                 btn_reset: "重置",
+                msg_split_warn: "劈裂警告: 邊距 (%1) < 臨界值 (%2). 強度折減係數: %3.",
+                opt_adhesive_full: "化學黏結錨栓 (Adhesive)",
+                lbl_add_moment: "加入彎矩 (<span class='math-symbol'>M<sub>u</sub></span>)",
+                msg_elastic_note: "* 備註: 分析假設彈性分佈。",
+                opt_cast_10: "預埋式錨栓 (10)",
                 warn_spacing: "間距 > 3hef (錐體分離)",
                 warn_cluster: "僅計算最大群集強度:",
                 warn_group_cap: "群錨 ANc/ANco 比值上限已修正",
@@ -1408,13 +1424,156 @@
             }
         });
         document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
+        
+        // REVISION: Auto-calculate Ase
+        window.autoCalculateAse = function() {
+            const da = parseFloat(document.getElementById('da').value) || 0;
+            // Approximation: Ase approx 0.8 * Gross Area (Pi/4 * da^2)
+            // Or use standard coarse thread lookup approx: 0.7854 * (d - 0.9382*p)^2
+            // For general purpose, 0.8 factor is safe/standard approx for user not looking up tables.
+            if (da > 0) {
+                const areaGross = (Math.PI / 4) * Math.pow(da, 2);
+                const ase = areaGross * 0.8; 
+                document.getElementById('ase').value = ase.toFixed(2);
+            }
+            performCalculation();
+        };
 
+        // REVISION: Master Config for Anchor Type
+        window.updateAnchorConfig = function() {
+            const typeSelect = document.getElementById('kc_select');
+            const pullSelect = document.getElementById('pullout_mode');
+            const pullContainer = document.getElementById('div_pull_mode_container');
+            
+            if (!typeSelect || !pullSelect) return; 
+            
+            const type = typeSelect.value;
+            
+            // --- NEW: Toggle Pullout Mode Visibility ---
+            if (type === '10') { 
+                // CAST-IN: Show Mode Selector
+                if (pullContainer) pullContainer.classList.remove('hidden');
+                
+                // Fix: If "post" option exists (from initial load), rebuild the list to remove it
+                if (pullSelect.querySelector('option[value="post"]')) {
+                     const currentVal = pullSelect.value;
+                     pullSelect.innerHTML = `
+                        <option value="headed" data-i18n="opt_headed">${t('opt_headed')}</option>
+                        <option value="hooked" data-i18n="opt_hooked">${t('opt_hooked')}</option>
+                    `;
+                    // Preserve selection if it was already headed or hooked
+                    if (currentVal === 'headed' || currentVal === 'hooked') {
+                        pullSelect.value = currentVal;
+                    } else {
+                        pullSelect.value = 'headed';
+                    }
+                }
+            } else {
+                // POST-INSTALLED: Hide Mode Selector
+                // Hide Mode Selector (Only "Certified Pullout" applies)
+                if (pullContainer) pullContainer.classList.add('hidden');
+                
+                // Force internal mode to 'post' so the code asks for Np (Certified Strength)
+                if (!pullSelect.querySelector('option[value="post"]')) {
+                     pullSelect.innerHTML = `<option value="post" data-i18n="opt_post_cert">${t('opt_post_cert')}</option>`;
+                }
+                pullSelect.value = 'post';
+            }
+            
+            // Update input fields (Shows Np input if mode is 'post', Abrg if 'headed')
+            togglePulloutInputs();
+            // ----------------------------------------
+            
+            // 1. Adhesive Logic
+            const divAdh = document.getElementById('div_adhesive');
+            if (divAdh) {
+                // Show bond stress input ONLY if type is 'adhesive'
+                divAdh.classList.toggle('hidden', type !== 'adhesive');
+            }
+            
+            // 2. Critical Edge Distance (cac) Logic
+            // cac is required for Post-Installed Mechanical Anchors to check Splitting
+            const divCac = document.getElementById('div_cac');
+            const inpCac = document.getElementById('cac');
+            const msgCac = document.querySelector('[data-i18n="msg_cac_default"]');
+
+            // Select elements for Failure Factor auto-suggestion
+            const lambdaSelect = document.getElementById('lambda_select');
+
+            if (divCac && inpCac) {
+                if (type === '10' || type === 'adhesive') { 
+                    // Cast-in: Splitting controlled by spacing/cover (Code defaults)
+                    // Adhesive: Controlled by Bond Splitting (cNa)
+                    divCac.classList.add('hidden'); 
+                    
+                    // Auto-suggest Lambda
+                    if (lambdaSelect) {
+                        if (type === '10' || type === 'screw') {
+                            lambdaSelect.value = "1.0";
+                        } else if (type === '7' || type === 'adhesive') {
+                            // Default to 0.8 for Expansion/Bonded unless user manually chose 0.6
+                            if (lambdaSelect.value !== '0.6') {
+                                lambdaSelect.value = "0.8";
+                            }
+                        }
+                    }
+                } else {
+                    divCac.classList.remove('hidden'); // Show for Post-installed Mechanical
+                    
+                    // Auto-Calculate Default cac based on ACI 318
+                    let factor = 0;
+                    if (type === '7') {
+                        factor = 4.0; // Expansion Anchors
+                        if (msgCac) msgCac.innerText = "Default: 4.0hef (Expansion)";
+                        if (lambdaSelect) lambdaSelect.value = "0.8"; // Expansion usually lower reliability
+                    } else if (type === 'screw') {
+                        factor = 2.5; // Undercut / Screw Anchors
+                        if (msgCac) msgCac.innerText = "Default: 2.5hef (Screw/Undercut)";
+                        if (lambdaSelect) lambdaSelect.value = "1.0"; // Screw usually high performance
+                    }
+                    
+                    if (factor > 0 && hef > 0) {
+                        inpCac.value = (factor * hef).toFixed(2);
+                    }
+                }
+            }
+
+            performCalculation();
+        };
+
+        // REVISION: Toggle Moment Inputs
+        window.toggleMoments = function() {
+            const show = document.getElementById('chk_moments').checked;
+            document.getElementById('div_moments').classList.toggle('hidden', !show);
+            if(!show) {
+                document.getElementById('loadMux').value = 0;
+                document.getElementById('loadMuy').value = 0;
+            }
+            performCalculation();
+        };
         window.togglePulloutInputs = function() {
+            const kcVal = document.getElementById('kc_select').value; // Get Anchor Type
             const mode = document.getElementById('pullout_mode').value;
+
+            // 1. Headed/Hooked/Post inputs visibility
+            // Only show Abrg if mode is Headed
             document.getElementById('div_abrg').classList.toggle('hidden', mode !== 'headed');
+            // Only show Hook Length if mode is Hooked
             document.getElementById('div_eh').classList.toggle('hidden', mode !== 'hooked');
-            document.getElementById('div_np').classList.toggle('hidden', mode !== 'post');
-        }
+            
+            // 2. Certified Pullout (Np) Visibility Logic
+            // Show Np ONLY if it is Post-installed (Expansion or Screw)
+            // HIDE Np if it is Cast-in OR Adhesive
+            const isAdhesive = (kcVal === 'adhesive');
+            const isCastIn = (kcVal === '10');
+            
+            // If it's Cast-in (headed/hooked), we don't need certified Np (we calc it).
+            // If it's Adhesive, we don't need Np (we use Bond Stress).
+            // If it's Screw or Expansion, we NEED Np.
+            const showNp = !isCastIn && !isAdhesive; 
+
+            document.getElementById('div_np').classList.toggle('hidden', !showNp);
+        };
 
         // NEW Step 3: Toggle Adhesive
         window.toggleAdhesive = function() {
@@ -1438,23 +1597,6 @@
             const isSeis = document.getElementById('is_seismic').checked;
             const isDuctile = document.getElementById('steel_ductility').value === 'ductile';
             document.getElementById('div_stretch').classList.toggle('hidden', !(isSeis && isDuctile));
-        }
-        // NEW Feature: Auto-calculate Critical Edge Distance (Lookup Logic)
-        window.updateCac = function () {
-            const hef = parseFloat(document.getElementById('hef').value) || 0;
-            const type = document.getElementById('kc_select').value;
-            let factor = 0;
-
-            // ACI 318 Default assumptions for Critical Edge Distance
-            if (type === '7') factor = 4.0; // Expansion anchors default
-            else if (type === 'screw') factor = 2.5; // Screw/Undercut anchors default
-            else factor = 0; // Cast-in usually relies on cover/spacing, not cac splitting check
-
-            // Only auto-update if a factor applies
-            if (factor > 0) {
-                document.getElementById('cac').value = (hef * factor).toFixed(2);
-            }
-            performCalculation(); // Live update results
         }
 
         let scene, camera, renderer, controls;
@@ -2447,44 +2589,106 @@
         };
         
         window.performCalculation = function () {
-            const val = (id) => parseFloat(document.getElementById(id).value) || 0;
-            const str = (id) => document.getElementById(id).value;
-            const chk = (id) => document.getElementById(id).checked;
-            
+            const val = (id) => {
+                const el = document.getElementById(id);
+                return el ? (parseFloat(el.value) || 0) : 0;
+            };
+            const str = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+            const chk = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.checked : false;
+            };
+            const warnings = [];
+
+            // REVISION: Determine Anchor Type & Adhesive Status from Dropdown
+            let kcVal = 10; 
+            let isAdh = false;
+            const typeRaw = str('kc_select');
+
+            if (typeRaw === 'adhesive') {
+                kcVal = 7; // Base factor, will use Bond Strength equations
+                isAdh = true;
+            } else if (typeRaw === 'screw') {
+                kcVal = 10; // Treat similar to cast-in for basic breakout, or custom factor
+            } else {
+                kcVal = parseFloat(typeRaw) || 10;
+            }
+
+            // REVISION: Calculate Ase internally (Input removed)
+            const daVal = val('da');
+            // Approx Effective Area = 0.8 * Gross Area
+            const calcAse = (daVal > 0) ? (Math.PI / 4 * Math.pow(daVal, 2) * 0.8) : 0;
+
             const I = {
-                fc: val('fc'), ha: val('ha'), da: val('da'), hef: val('hef'), s1: val('s1'), s2: val('s2'),
-                ca1: val('ca1'), ca1_1: val('ca1_1'), ca2: val('ca2'), T: val('loadT'), V: val('loadV'),
-                Mux: val('loadMux'), Muy: val('loadMuy'), // ADD THIS LINE
-                // Locate inside window.performCalculation = function () { ... const I = {
-                kc: parseFloat(str('kc_select')), lambda: parseFloat(str('lambda_select')), le_mode: str('le_select'), psi_c_V: parseFloat(str('psi_c_V_select')),
-                // UPDATED inputs for biaxial
-                e_prime_n_x: val('e_prime_n_x'), 
-                e_prime_n_y: val('e_prime_n_y'), 
-                // DELETE: e_prime_v: val('e_prime_v'),
+                fc: val('fc'), ha: val('ha'), da: daVal, hef: val('hef'), 
+                s1: val('s1'), s2: val('s2'),
+                ca1: val('ca1'), ca1_1: val('ca1_1'), ca2: val('ca2'), 
+                T: val('loadT'), V: val('loadV'),
+                Mux: val('loadMux'), Muy: val('loadMuy'),
                 
-                // Steel inputs
-                futa: val('futa'), fya: val('fya'), ase: val('ase'), is_grouted: chk('is_grouted'),
-                // Step 2 Inputs
-                pull_mode: str('pullout_mode'), abrg: val('abrg'), eh: val('eh'), np_cert: val('np_certified'), psi_c_P: parseFloat(str('crack_cond_p')),
-                // Step 3 Inputs
-                is_adhesive: chk('is_adhesive'), tau: val('tau'),
-                // Step 4 Inputs
-                cond_ab: str('condition_ab'), category: parseFloat(str('anchor_category')), ductility: str('steel_ductility'),
-                // Step 6 Inputs
+                // Factors
+                lambda: parseFloat(str('lambda_select')) || 1.0, 
+                le_mode: str('le_select'), 
+                psi_c_V: parseFloat(str('psi_c_V_select')) || 1.0,
+                e_prime_n_x: val('e_prime_n_x'), 
+                e_prime_n_y: val('e_prime_n_y'),
+                
+                // Key Configs
+                kc: kcVal, 
+                kc_raw: typeRaw,
+                is_adhesive: isAdh,
+                
+                // Steel (Use calculated Ase)
+                futa: val('futa'), fya: val('fya'), 
+                ase: calcAse, // <--- Calculated here
+                is_grouted: chk('is_grouted'),
+                
+                // Other inputs...
+                pull_mode: str('pullout_mode'), abrg: val('abrg'), eh: val('eh'), np_cert: val('np_certified'), psi_c_P: parseFloat(str('crack_cond_p')) || 1.0,
+                tau: val('tau'),
+                cond_ab: str('condition_ab'), category: parseFloat(str('anchor_category')) || 1, ductility: str('steel_ductility'),
                 is_seismic: chk('is_seismic'), loadT_sust: val('loadT_sust'),
-                // Step 8 Input
                 cac: val('cac'),
-                // NEW Step 11: Shear Direction
                 v_dir: str('shear_dir'),
-                // NEW Features Inputs
                 is_shearlug: chk('is_shearlug'), sl_h: val('sl_h'), sl_w: val('sl_w'), sl_t: val('sl_t'), sl_c: val('sl_c'),
                 is_reinf: chk('is_reinf'), reinf_area: val('reinf_area'), reinf_fy: val('reinf_fy'),
-                stretch_len: val('stretch_len'), kc_raw: str('kc_select'),
+                stretch_len: val('stretch_len'), 
                 layout_mode: str('layout_mode'),
                 custom_coords: str('custom_coords')
             };
+            // --- REVISION: Automatic Critical Edge Distance (cac) Logic ---
+            let cac_auto = 0;
+            // 1. Determine cac based on Anchor Type
+            if (I.kc_raw === '7') {
+                // Post-installed Expansion: 4.0 * hef
+                cac_auto = 4.0 * I.hef;
+            } else if (I.kc_raw === 'screw') {
+                // Post-installed Screw/Undercut: 2.5 * hef
+                cac_auto = 2.5 * I.hef;
+            }
+            // Cast-in and Adhesive use different mechanisms (cover or cNa), so cac_auto remains 0 (ignored)
 
-            const warnings = [];
+            // 2. Check for Splitting Failure (Uncracked Concrete Only)
+            let psi_cp_N = 1.0;
+            const ca_min_actual = Math.min(I.ca1, I.ca1_1, I.ca2);
+            
+            // Check if Concrete is Uncracked (Derived from Pullout Cracking Factor input)
+            const isUncracked = (I.psi_c_P >= 1.4); 
+
+            if (cac_auto > 0 && isUncracked) {
+                if (ca_min_actual < cac_auto) {
+                    // Calculate Splitting Reduction Factor
+                    // ACI 318-19 Eq 17.6.2.6.1b
+                    const factor = Math.max(ca_min_actual / cac_auto, (1.5 * I.hef) / cac_auto);
+                    psi_cp_N = factor;
+                }
+            }
+
+            // Store cac in Input object for report usage (even though not in UI)
+            I.cac = cac_auto;
             // --- STEP 10: Dynamic Anchor Array ---
             let anchors = [];
             const lMode = I.layout_mode;
@@ -2797,14 +3001,27 @@
                 psi_ec_V = 1.0 / (1.0 + (2.0 * e_shear_effective) / (3.0 * I.ca1_1));
             }
 
-            // Step 8: Splitting Factor (psi_cp_N)
-            let psi_cp_N = 1.0;
-            const isUncracked = I.psi_c_V >= 1.4;
-            const isPost = I.kc < 10; // 7 is post or screw
-            if (isPost && isUncracked) {
-                if (ca_min < I.cac) {
-                    // PDF Eq 17.6.2.6.1b: Max of (ca_min/cac) and (1.5hef/cac)
-                    psi_cp_N = Math.max(ca_min / I.cac, (1.5 * I.hef) / I.cac);
+            // --- Step 8: Splitting Factor (psi_cp_N) ---
+            // ACI 318-19 Sec 17.6.2.6: For post-installed anchors in uncracked concrete
+            
+            // Check if Concrete is Uncracked (Derived from Pullout Cracking Factor input)
+            // 1.4 implies Uncracked, 1.0 implies Cracked
+            const isPostInstalled = (I.kc_raw === '7' || I.kc_raw === 'screw');
+
+            if (isPostInstalled && isUncracked) {
+                // If edge distance is less than critical cac, splitting governs
+                if (I.cac > 0 && ca_min < I.cac) {
+                    psi_cp_N = ca_min / I.cac;
+                    let warnMsg = "";
+                    if (currentLang === 'zh') {
+                        warnMsg = translations['zh']['msg_split_warn']
+                            .replace('%1', ca_min)
+                            .replace('%2', I.cac)
+                            .replace('%3', psi_cp_N.toFixed(2));
+                    } else {
+                        warnMsg = `Splitting Warning: Edge (${ca_min}) < Critical (${I.cac}). Strength reduced by ${psi_cp_N.toFixed(2)}.`;
+                    }
+                    warnings.push(warnMsg);
                 }
             }
 
@@ -3075,19 +3292,27 @@
 
             // --- STEP 2: Pullout & Pryout Logic ---
             let Np = 0;
-            if (I.pull_mode === 'headed') {
-                Np = 8 * I.abrg * I.fc;
-            } else if (I.pull_mode === 'hooked') {
-                Np = 0.9 * I.fc * I.eh * I.da;
-            } else {
-                Np = I.np_cert;
-            
-            }
-            const Npn = Np * I.psi_c_P;
-            const phi_Npn = seis_pull * phi_p * Npn; 
-            // Pullout checked against highest loaded anchor (ACI 318 17.6.3.1)
-            const ratio_pn = max_anchor_tension > 0 ? (max_anchor_tension / phi_Npn) : 0;
+            let Npn = 0;
+            let phi_Npn = 0;
+            let ratio_pn = 0;
+            let pullout_applicable = true;
 
+            if (I.is_adhesive) {
+                // Adhesive anchors do NOT check Pullout (Np). They check Bond (Na).
+                pullout_applicable = false;
+            } else {
+                if (I.pull_mode === 'headed') {
+                    Np = 8 * I.abrg * I.fc;
+                } else if (I.pull_mode === 'hooked') {
+                    Np = 0.9 * I.fc * I.eh * I.da;
+                } else {
+                    // Screw or Expansion
+                    Np = I.np_cert;
+                }
+                Npn = Np * I.psi_c_P;
+                phi_Npn = seis_pull * phi_p * Npn; 
+                ratio_pn = max_anchor_tension > 0 ? (max_anchor_tension / phi_Npn) : 0;
+            }
             const kcp = (I.hef >= 6.35) ? 2.0 : 1.0;
             // Nominal Breakout Ncp (approximate reverse calc)
             const N_breakout_nominal = Math.min(phi_Ncb_final / (phi_c * seis_conc), phi_Ncbg / (phi_c * seis_conc)); 
@@ -4184,11 +4409,10 @@
 
         // Initialize UI States
         togglePulloutInputs();
-        toggleAdhesive();
         toggleShearLug();
         toggleReinf();
         toggleSeismicDetailing();
-        updateCac();
+        updateAnchorConfig();
         init3D();
         initVizControls();
     </script>
