@@ -26,6 +26,7 @@
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -192,6 +193,55 @@
         #print-staging {
             display: none;
         }
+
+        /* --- Dark Mode Overrides --- */
+        .dark body { background-color: #0f172a; color: #f1f5f9; }
+        .dark .bg-white { background-color: #1e293b !important; color: #e2e8f0; }
+        .dark .bg-gray-50, .dark .bg-gray-100 { background-color: #0f172a !important; border-color: #334155 !important; }
+        .dark .bg-slate-50 { background-color: #0f172a !important; }
+        
+        /* Inputs & Selects */
+        .dark input, .dark select, .dark textarea { 
+            background-color: #334155 !important; 
+            border-color: #475569 !important; 
+            color: #f8fafc !important; 
+        }
+        
+        /* Borders */
+        .dark .border-gray-200, .dark .border-gray-300, .dark .border-blue-100, .dark .border-blue-200, .dark .border-blue-300 { 
+            border-color: #334155 !important; 
+        }
+
+        /* Colored Panels (Light Mode tints -> Dark Mode deep colors) */
+        .dark .bg-blue-50 { background-color: #1e3a8a !important; border-color: #1e40af !important; }
+        .dark .text-blue-700, .dark .text-blue-800 { color: #93c5fd !important; }
+        
+        .dark .bg-red-50 { background-color: #450a0a !important; border-color: #7f1d1d !important; }
+        .dark .text-red-600, .dark .text-red-700, .dark .text-red-800 { color: #fca5a5 !important; }
+        .dark .border-red-100, .dark .border-red-300 { border-color: #7f1d1d !important; }
+
+        .dark .bg-yellow-50 { background-color: #422006 !important; border-color: #713f12 !important; }
+        .dark .text-yellow-800 { color: #fde047 !important; }
+        
+        .dark .bg-orange-50 { background-color: #431407 !important; border-color: #7c2d12 !important; }
+        .dark .text-orange-700, .dark .text-orange-800 { color: #fdba74 !important; }
+
+        /* Text Utilities */
+        .dark .text-slate-700, .dark .text-gray-700, .dark .text-gray-600, .dark .text-gray-500 { color: #94a3b8 !important; }
+        .dark .text-eng-primary { color: #38bdf8 !important; }
+        
+        /* Tables */
+        .dark th { background-color: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important; }
+        .dark td { border-color: #475569 !important; }
+        .dark tr:hover { background-color: #334155 !important; }
+        .dark #anchor_table_body tr:hover { background-color: #334155 !important; } /* Fix hover */
+
+        /* Specific Component Fixes */
+        .dark .shadow-md, .dark .shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
+        .dark #card-interaction { background-color: #0f172a !important; border-color: #334155 !important; }
+        
+        /* 2D Viz Canvas Container */
+        .dark canvas#viz-canvas { filter: invert(0); } /* Handled via JS, but ensures no double invert */
     </style>
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans">
@@ -209,6 +259,10 @@
                     </div>
                 </div>
                 <div id="auth-section" class="flex items-center gap-2">
+                    <div id="auth-section" class="flex items-center gap-2">
+                    <button onclick="toggleDarkMode()" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold border border-blue-600 transition">
+                        <i id="dark-icon" class="fa-solid fa-moon"></i>
+                    </button>
                     <button onclick="toggleLanguage()" class="bg-blue-800 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-bold border border-blue-600 transition">
                         <i class="fa-solid fa-language mr-1"></i> <span id="lang-label">中文</span>
                     </button>
@@ -227,31 +281,37 @@
         <main class="flex-grow max-w-5xl mx-auto w-full p-4 space-y-6">
 
             <!-- Auth Modal -->
-            <div id="auth-modal" class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-                <div class="bg-white rounded-lg shadow-2xl p-8 w-11/12 max-w-sm border-t-4 border-eng-primary">
-                    <h2 class="text-2xl font-bold mb-2 text-center text-eng-primary" data-i18n="modal_title">Access Portal</h2>
-                    <p class="text-gray-500 mb-4 text-center text-sm" data-i18n="modal_desc">Sign in to sync your data across devices.</p>
+            <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[60] hidden transition-opacity duration-300">
+                <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100">
+                    
+                    <h2 class="text-3xl font-extrabold mb-2 text-center text-[#004a99] tracking-tight" data-i18n="modal_title">Access Portal</h2>
+                    <p class="text-gray-500 mb-6 text-center text-sm font-medium" data-i18n="modal_desc">Sign in to sync your data across devices.</p>
 
-                    <div class="space-y-3 mb-4">
-                        <input type="email" id="auth-email" placeholder="Email" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-eng-primary outline-none">
-                        <input type="password" id="auth-password" placeholder="Password" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-eng-primary outline-none">
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <input type="email" id="auth-email" placeholder="Email" class="w-full bg-gray-100 border-2 border-transparent rounded-md px-4 py-3 text-sm focus:bg-white focus:border-[#004a99] focus:outline-none transition-all placeholder-gray-400 text-gray-700">
+                        </div>
+                        <div>
+                            <input type="password" id="auth-password" placeholder="Password" class="w-full bg-gray-100 border-2 border-transparent rounded-md px-4 py-3 text-sm focus:bg-white focus:border-[#004a99] focus:outline-none transition-all placeholder-gray-400 text-gray-700">
+                        </div>
                     </div>
 
-                    <div class="flex gap-2 mb-4">
-                        <button id="email-login-btn" class="flex-1 bg-eng-primary text-white py-2 rounded text-sm font-bold hover:bg-blue-800 transition" data-i18n="btn_login_submit">Login</button>
-                        <button id="email-register-btn" class="flex-1 bg-white text-eng-primary border border-eng-primary py-2 rounded text-sm font-bold hover:bg-blue-50 transition" data-i18n="btn_register">Register</button>
+                    <div class="flex gap-3 mb-6">
+                        <button id="email-login-btn" class="flex-1 bg-[#004a99] text-white py-2.5 rounded-md text-sm font-bold hover:bg-blue-800 transition shadow-sm" data-i18n="btn_login_submit">Login</button>
+                        <button id="email-register-btn" class="flex-1 bg-white text-[#004a99] border border-[#004a99] py-2.5 rounded-md text-sm font-bold hover:bg-blue-50 transition shadow-sm" data-i18n="btn_register">Register</button>
                     </div>
 
-                    <div class="relative flex py-2 items-center">
-                        <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink mx-4 text-gray-400 text-xs">OR</span>
-                        <div class="flex-grow border-t border-gray-300"></div>
+                    <div class="relative flex py-2 items-center mb-6">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink mx-4 text-gray-400 text-xs font-medium uppercase tracking-wider">OR</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
                     </div>
 
-                    <button id="guest-login" class="w-full bg-gray-200 text-gray-700 py-2 rounded mb-3 text-sm font-semibold hover:bg-gray-300 transition shadow-sm" data-i18n="btn_guest">
+                    <button id="guest-login" class="w-full bg-gray-200 text-gray-700 py-3 rounded-md text-sm font-bold hover:bg-gray-300 transition shadow-sm" data-i18n="btn_guest">
                         Continue as Guest
                     </button>
-                    <p id="auth-error" class="text-xs text-red-500 text-center hidden mt-2"></p>
+                    
+                    <p id="auth-error" class="text-xs text-red-500 text-center mt-4 hidden font-medium bg-red-50 p-2 rounded border border-red-100"></p>
                 </div>
             </div>
 
@@ -1003,6 +1063,7 @@
         let currentData = null;
         let historyCache = {};
         let currentLang = 'en';
+        let isDarkMode = false;
 
         // --- VISUALIZER STATE (ADD THIS BLOCK) ---
         let vizState = { scale: 1.0, panX: 0, panY: 0, isDragging: false, lastX: 0, lastY: 0 };
@@ -1822,7 +1883,7 @@
             }
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xffffff); // slate-900
+            scene.background = new THREE.Color(isDarkMode ? 0x1e293b : 0xffffff);
 
             const width = container.clientWidth || 800;
             const height = container.clientHeight || 256;
@@ -2223,7 +2284,7 @@
 
             // Clear background
             ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#f8fafc'; 
+            ctx.fillStyle = isDarkMode ? '#0f172a' : '#f8fafc';
             ctx.fillRect(0, 0, w, h);
 
             // 1. Determine Logic Bounds
@@ -2270,9 +2331,9 @@
 
             // --- Helper: Draw Architectural Dimension Line ---
             function drawDimLine(p1, p2, text, offset, isVert, isBad) {
-                const mainColor = isBad ? '#ef4444' : '#475569'; 
-                const extColor = isBad ? 'rgba(239, 68, 68, 0.4)' : 'rgba(71, 85, 105, 0.3)'; 
-                const fontColor = isBad ? '#b91c1c' : '#0f172a';
+                const mainColor = isBad ? '#ef4444' : (isDarkMode ? '#94a3b8' : '#475569'); 
+                const extColor = isBad ? 'rgba(239, 68, 68, 0.4)' : (isDarkMode ? 'rgba(148, 163, 184, 0.3)' : 'rgba(71, 85, 105, 0.3)'); 
+                const fontColor = isBad ? '#ef4444' : (isDarkMode ? '#e2e8f0' : '#0f172a');
                 
                 let dimX1, dimY1, dimX2, dimY2, textX, textY;
 
@@ -2360,8 +2421,8 @@
             }
 
             // 2. Draw Concrete Slab
-            ctx.fillStyle = '#e2e8f0';
-            ctx.strokeStyle = '#475569';
+            ctx.fillStyle = isDarkMode ? '#1e293b' : '#e2e8f0'; // Slate-800 vs Slate-200
+            ctx.strokeStyle = isDarkMode ? '#475569' : '#475569';
             ctx.lineWidth = 2;
             ctx.fillRect(ox, oy, visW, visH);
             ctx.strokeRect(ox, oy, visW, visH);
@@ -2398,7 +2459,7 @@
 
                 // Only draw the ID label if we are in 'numbers' mode
                 if (displayMode2D === 'numbers') {
-                    ctx.fillStyle = '#0f172a';
+                    ctx.fillStyle = isDarkMode ? '#f1f5f9' : '#0f172a';
                     ctx.font = 'bold 14px sans-serif';
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'top';
@@ -4415,6 +4476,34 @@
         toggleSeismicDetailing();
         updateAnchorConfig();
         init3D();
+
+        // --- NIGHT MODE LOGIC ---
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            const html = document.documentElement;
+            const icon = document.getElementById('dark-icon');
+
+            if (isDarkMode) {
+                html.classList.add('dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                html.classList.remove('dark');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+
+            // Update 3D Scene Background
+            if (scene) {
+                scene.background = new THREE.Color(isDarkMode ? 0x1e293b : 0xffffff); // Slate-800 vs White
+                if (renderer) renderer.render(scene, camera);
+            }
+
+            // Redraw 2D Visualization with new colors
+            drawVisualization();
+        }
+
         initVizControls();
     </script>
 </body>
