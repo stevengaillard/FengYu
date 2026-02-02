@@ -1046,7 +1046,7 @@
     <script>
         // ... existing firebase config ...
         const firebaseConfig = {
-            apiKey: "AIzaSyDY90ijPaKO9rhLa68PEdELuibTJ3tkD2w",
+            apiKey: "AIzaSyAP0nsg3Saf_W0lEk5Mdt4oVKhFQJ69BOg",
             authDomain: "anchor-app-a1426.firebaseapp.com",
             projectId: "anchor-app-a1426",
             storageBucket: "anchor-app-a1426.firebasestorage.app",
@@ -1248,21 +1248,48 @@
                 lbl_tsust: "Sustained Tension (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]"
             },
             zh: {
-                app_title: "錨栓設計分析", app_subtitle: "ACI/結構規範檢核工具",
-                tab_analysis: "結構分析", tab_database: "資料庫",
-                sec_params: "設計參數", sec_mat: "材料與幾何", sec_space: "間距與邊距", sec_factors: "修正因數/參數", sec_loads: "設計載重",
+                app_title: "錨栓設計分析", 
+                app_subtitle: "ACI/結構規範檢核工具",
+                tab_analysis: "結構分析", 
+                tab_database: "資料庫",
+                sec_params: "設計參數", 
+                sec_mat: "材料與幾何", 
+                sec_space: "間距與邊距", 
+                sec_factors: "修正因數/參數", 
+                sec_loads: "設計載重",
                 sec_steel_props: "錨栓鋼材性質",
-                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", lbl_ha: "母材構件深度 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", lbl_hef: "錨栓埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
-                lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", lbl_ca1: "上方錨栓距梁頂邊 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", lbl_ca1_1: "下方錨栓距梁底邊 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", lbl_ca2: "錨栓距梁邊 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
-                lbl_kc: "錨栓類型 (<span class='math-symbol'>k<sub>c</sub></span>)", lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", 
+                lbl_fc: "混凝土抗壓強度 (<span class='math-symbol'>f'c</span>) [kgf/cm²]", 
+                lbl_ha: "基材構件深度 (<span class='math-symbol'>h<sub>a</sub></span>) [cm]", 
+                lbl_da: "錨栓直徑 (<span class='math-symbol'>d<sub>a</sub></span>) [cm]", 
+                lbl_hef: "有效埋入深度 (<span class='math-symbol'>h<sub>ef</sub></span>) [cm]",
+                lbl_s1: "錨栓垂直間距 (<span class='math-symbol'>S<sub>1</sub></span>) [cm]", 
+                lbl_s2: "錨栓水平間距 (<span class='math-symbol'>S<sub>2</sub></span>) [cm]", 
+                lbl_ca1: "距基材頂邊距離 (<span class='math-symbol'>C<sub>a1</sub></span>) [cm]", 
+                lbl_ca1_1: "距基材底邊距離 (<span class='math-symbol'>C<sub>a1,1</sub></span>) [cm]", 
+                lbl_ca2: "距基材側邊距離 (<span class='math-symbol'>C<sub>a2</sub></span>) [cm]",
+                lbl_kc: "錨栓類型參數 (<span class='math-symbol'>k<sub>c</sub></span>)", 
+                lbl_lambda: "混凝土破壞參數 (<span class='math-symbol'>λ<sub>a</sub></span>)", 
+                lbl_le: "承壓長度模式 (<span class='math-symbol'>l<sub>e</sub></span>)", 
+                lbl_reinf: "開裂/配筋參數 (<span class='math-symbol'>ψ<sub>c,V</sub></span>)", 
                 lbl_en_x: "偏心距 <span class='math-symbol'>e'<sub>Nx</sub></span> [cm]", 
                 lbl_en_y: "偏心距 <span class='math-symbol'>e'<sub>Ny</sub></span> [cm]",
-                lbl_ase: "有效斷面積 (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", lbl_futa: "極限強度 (<span class='math-symbol'>f<sub>uta</sub></span>)", lbl_fya: "降伏強度 (<span class='math-symbol'>f<sub>ya</sub></span>)", lbl_grouted: "灌漿錨栓 (0.8x 剪力)",
-                lbl_pull_mode: "拉出模式", lbl_abrg: "承壓面積 (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", lbl_eh: "彎鉤長度 (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", lbl_np_cert: "認證拉出強度 (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", lbl_crack_p: "拉出開裂參數 (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
-                lbl_is_adh: "化學黏結錨栓", lbl_tau: "黏結強度 (<span class='math-symbol'>τ</span>) [kgf/cm²]",
-                lbl_cond: "混凝土狀況", lbl_cat: "錨栓類別 (可靠度)", lbl_ductility: "延展性",
+                lbl_ase: "有效斷面積 (<span class='math-symbol'>A<sub>se</sub></span>) [cm²]", 
+                lbl_futa: "極限強度 (<span class='math-symbol'>f<sub>uta</sub></span>)", 
+                lbl_fya: "降伏強度 (<span class='math-symbol'>f<sub>ya</sub></span>)", 
+                lbl_grouted: "灌漿錨栓 (0.8x 剪力)",
+                lbl_pull_mode: "拉出模式", 
+                lbl_abrg: "承壓面積 (<span class='math-symbol'>A<sub>brg</sub></span>) [cm²]", 
+                lbl_eh: "彎鉤長度 (<span class='math-symbol'>e<sub>h</sub></span>) [cm]", 
+                lbl_np_cert: "驗證拉出強度 (Verified) (<span class='math-symbol'>N<sub>p</sub></span>) [kgf]", 
+                lbl_crack_p: "拉出開裂參數 (<span class='math-symbol'>ψ<sub>c,P</sub></span>)",
+                lbl_is_adh: "化學黏結錨栓", 
+                lbl_tau: "黏結強度 (<span class='math-symbol'>τ</span>) [kgf/cm²]",
+                lbl_cond: "混凝土狀況", 
+                lbl_cat: "錨栓類別 (可靠度)", 
+                lbl_ductility: "延展性",
                 lbl_seismic: "耐震設計 (0.75 折減)",
-                lbl_t: "拉力設計載重 (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
+                lbl_t: "拉力設計載重 (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", 
+                lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
                 lbl_tsust: "長期拉力載重 (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]",
                 lbl_indiv_forces: "單根錨栓受力分析",
                 msg_split_warn: "劈裂警告: 邊距 (%1) < 臨界值 (%2). 強度折減係數: %3.",
@@ -1270,50 +1297,112 @@
                 lbl_add_moment: "加入彎矩 (<span class='math-symbol'>M<sub>u</sub></span>)",
                 msg_elastic_note: "* 備註: 分析假設彈性分佈。",
                 opt_cast_10: "預埋式錨栓 (10)",
-                lbl_tension: "拉力",
+                lbl_tension: "拉力", 
                 tbl_dir: "方向",
-                lbl_compression: "壓力",
+                lbl_compression: "壓力", 
                 lbl_shear: "剪力",
                 lbl_cac: "臨界邊距 (<span class='math-symbol'>c<sub>ac</sub></span>) [cm]",
                 lbl_v_dir: "剪力載重方向",
-                lbl_is_sl: "剪力榫 (Sec 17.11)", lbl_is_reinf: "有錨栓鋼筋?",
+                lbl_is_sl: "剪力榫 (Sec 17.11)", 
+                lbl_is_reinf: "具備輔助配筋?",
                 lbl_stretch: "延伸長度 (<span class='math-symbol'>L<sub>str</sub></span>) [cm]",
-                btn_run: "執行結構分析", btn_save: "儲存至雲端", btn_pdf: "下載報告",
-                opt_cast: "預埋式錨栓 (10)", opt_post: "後置式錨栓 (7)",
-                opt_lam1: "預埋/擴底錨栓 (1.0)", opt_lam2: "膨脹/黏結錨栓 (0.8)", opt_lam3: "黏結破壞 (0.6)",
-                opt_le1: "預設/所有情況 (8da)", opt_le2: "全套筒/擴頭 (hef)", opt_le3: "扭力控制 (2da)",
-                opt_reinf1: "無輔助鋼筋 / < D13 (1.0)", opt_reinf2: "配筋 ≥ D13 (1.2)", opt_reinf3: "配筋 ≥ D13 + 箍筋 (1.4)",
-                opt_headed: "擴頭螺栓/釘 (Headed)", opt_hooked: "彎鉤螺栓 (Hooked)", opt_post_cert: "後置式 (認證值)", opt_uncracked: "未開裂 (1.4)", opt_cracked: "開裂 (1.0)",
-                opt_cond_a: "A (有輔助筋)", opt_cond_b: "B (無輔助筋)", opt_ductile: "延展性 (Ductile)", opt_brittle: "脆性 (Brittle)",
-                opt_v_perp: "垂直於邊距 (標準)", opt_v_para: "平行於邊距 (2x 強度)",
+                btn_run: "執行結構分析", 
+                btn_save: "儲存至雲端", 
+                btn_pdf: "下載報告",
+                opt_cast: "預埋式錨栓 (10)", 
+                opt_post: "後置式錨栓 (7)",
+                opt_lam1: "預埋/擴底錨栓 (1.0)", 
+                opt_lam2: "膨脹/黏結錨栓 (0.8)", 
+                opt_lam3: "黏結破壞 (0.6)",
+                opt_le1: "預設/所有情況 (8da)", 
+                opt_le2: "全套筒/擴頭 (hef)", 
+                opt_le3: "扭力控制 (2da)",
+                opt_reinf1: "無輔助鋼筋 / < D13 (1.0)", 
+                opt_reinf2: "配筋 ≥ D13 (1.2)", 
+                opt_reinf3: "配筋 ≥ D13 + 箍筋 (1.4)",
+                opt_headed: "擴頭螺栓/釘 (Headed)", 
+                opt_hooked: "彎鉤螺栓 (Hooked)", 
+                opt_post_cert: "後置式 (驗證值)", 
+                opt_uncracked: "未開裂 (1.4)", 
+                opt_cracked: "開裂 (1.0)",
+                opt_cond_a: "A (有輔助筋)", 
+                opt_cond_b: "B (無輔助筋)", 
+                opt_ductile: "延展性 (Ductile)", 
+                opt_brittle: "脆性 (Brittle)",
+                opt_v_perp: "垂直於邊緣 (標準)", 
+                opt_v_para: "平行於邊緣 (2x 強度)",
                 opt_screw: "螺紋錨栓 (Screw)",
-                res_s_title: "錨栓鋼材強度檢核", res_nsa: "鋼材拉力 (Nsa)", res_phi_nsa: "φNsa 強度", res_vsa: "鋼材剪力 (Vsa)", res_phi_vsa: "φVsa 強度", res_check_t: "拉力檢核", res_check_v: "剪力檢核",
-                res_p_title: "拉出與撬破檢核", res_npn: "拉出強度 (Npn)", res_phi_npn: "φNpn 強度", res_vcp: "撬破強度 (Vcp)", res_phi_vcp: "φVcp 強度",
-                res_b_title: "化學錨栓黏結強度", res_nba: "基本黏結 (Nba)", res_cna: "臨界間距 (cNa)", res_na: "黏結強度 (Na)", res_phi_na: "φNa 強度",
-                res_sust_load: "長期拉力載重", res_sust_check: "長期檢核 (≤ 0.4φNa)",
-                res_int_title: "交互作用檢核", res_max_n: "最大拉力比", res_max_v: "最大剪力比", res_sum: "交互作用值",
-                res_t_title: "混凝土拉破檢核", res_t1_sub: "單根錨栓", res_tg_sub: "錨栓群",
-                res_sb_title: "側面爆裂檢核", res_nsb: "爆裂強度 (Nsb)", res_phi_nsb: "φNsb 強度",
-                res_v_title: "混凝土剪破檢核", res_v1_sub: "單根錨栓", res_vg_sub: "錨栓群",
-                res_nb: "基本拉破強度", res_anc: "破壞投影面積", res_anc_g: "群錨面積", res_anco: "參考面積", res_edge: "邊距修正因數", res_cap: "強度", res_cap_g: "群錨強度", res_load: "載重", res_ratio: "比值", res_check: "檢核",
+                res_s_title: "錨栓鋼材強度檢核", 
+                res_nsa: "鋼材拉力 (Nsa)", 
+                res_phi_nsa: "φNsa 強度", 
+                res_vsa: "鋼材剪力 (Vsa)", 
+                res_phi_vsa: "φVsa 強度", 
+                res_check_t: "拉力檢核", 
+                res_check_v: "剪力檢核",
+                res_p_title: "拉出與撬破檢核", 
+                res_npn: "拉出強度 (Npn)", 
+                res_phi_npn: "φNpn 強度", 
+                res_vcp: "撬破強度 (Vcp)", 
+                res_phi_vcp: "φVcp 強度",
+                res_b_title: "化學錨栓黏結強度", 
+                res_nba: "基本黏結 (Nba)", 
+                res_cna: "臨界間距 (cNa)", 
+                res_na: "黏結強度 (Na)", 
+                res_phi_na: "φNa 強度",
+                res_sust_load: "長期拉力載重", 
+                res_sust_check: "長期檢核 (≤ 0.4φNa)",
+                res_int_title: "交互作用檢核", 
+                res_max_n: "最大拉力比", 
+                res_max_v: "最大剪力比", 
+                res_sum: "交互作用值",
+                res_t_title: "混凝土拉破檢核", 
+                res_t1_sub: "單根錨栓", 
+                res_tg_sub: "錨栓群",
+                res_sb_title: "側面爆裂檢核", 
+                res_nsb: "爆裂強度 (Nsb)", 
+                res_phi_nsb: "φNsb 強度",
+                res_v_title: "混凝土剪破檢核", 
+                res_v1_sub: "單根錨栓", 
+                res_vg_sub: "錨栓群",
+                res_nb: "基本拉破強度", 
+                res_anc: "破壞投影面積", 
+                res_anc_g: "群錨面積", 
+                res_anco: "參考面積", 
+                res_edge: "邊距修正因數", 
+                res_cap: "強度", 
+                res_cap_g: "群錨強度", 
+                res_load: "載重", 
+                res_ratio: "比值", 
+                res_check: "檢核",
                 res_psi_cp: "劈裂因數 (ψcp)",
-                res_vb: "基本剪破強度", res_h: "厚度修正因數", res_avc: "破壞投影面積", res_avc_g: "群錨面積", res_avco: "參考面積", res_ecc: "偏心修正因數",
-                modal_title: "存取入口", modal_desc: "登入以同步您的資料。", btn_login: "登入", btn_login_submit: "登入", btn_register: "註冊", btn_guest: "訪客登入",
-                history_title: "資料庫紀錄", btn_clear: "清除全部", btn_refresh: "重新整理", msg_auth_req: "需驗證才能查看紀錄。", msg_no_rec: "找不到紀錄。",
-                open: "開啟", pass: "通過", fail: "失敗",
-                warn_title: "幾何限制警告", viz_title: "配置可視化", viz_3d: "3D 互動模型",
-
-                // --- NEW TRANSLATIONS ADDED BELOW ---
-                btn_saving: "儲存中...", // <--- ADD THIS
-                btn_saved: "已儲存!",    // <--- ADD THIS
-                btn_error: "錯誤",       // <--- ADD THIS
+                res_vb: "基本剪破強度", 
+                res_h: "厚度修正因數", 
+                res_avc: "破壞投影面積", 
+                res_avc_g: "群錨面積", 
+                res_avco: "參考面積", 
+                res_ecc: "偏心修正因數",
+                modal_title: "存取入口", 
+                modal_desc: "登入以同步您的資料。", 
+                btn_login: "登入", 
+                btn_login_submit: "登入", 
+                btn_register: "註冊", 
+                btn_guest: "訪客登入",
+                history_title: "資料庫紀錄", 
+                btn_clear: "清除全部", 
+                btn_refresh: "重新整理", 
+                msg_auth_req: "需驗證才能查看紀錄。", 
+                msg_no_rec: "找不到紀錄。",
+                open: "開啟", 
+                pass: "通過", 
+                fail: "失敗",
+                warn_title: "幾何限制警告", 
+                viz_title: "配置可視化", 
+                viz_3d: "3D 互動模型",
+                btn_saving: "儲存中...",
+                btn_saved: "已儲存!",
+                btn_error: "錯誤",
                 btn_loads: "顯示載重",
                 btn_reset: "重置",
-                msg_split_warn: "劈裂警告: 邊距 (%1) < 臨界值 (%2). 強度折減係數: %3.",
-                opt_adhesive_full: "化學黏結錨栓 (Adhesive)",
-                lbl_add_moment: "加入彎矩 (<span class='math-symbol'>M<sub>u</sub></span>)",
-                msg_elastic_note: "* 備註: 分析假設彈性分佈。",
-                opt_cast_10: "預埋式錨栓 (10)",
                 warn_spacing: "間距 > 3hef (錐體分離)",
                 warn_cluster: "僅計算最大群集強度:",
                 warn_group_cap: "群錨 ANc/ANco 比值上限已修正",
@@ -1322,7 +1411,7 @@
                 lbl_sl_h: "高度 (cm)",
                 lbl_sl_w: "寬度 (cm)",
                 lbl_sl_t: "厚度 (cm)",
-                lbl_sl_c: "邊距 (cm)",
+                lbl_sl_c: "距邊緣距離 (cm)",
                 opt_cat1: "1 (高可靠度)",
                 opt_cat2: "2 (中可靠度)",
                 opt_cat3: "3 (低可靠度)",
@@ -1357,24 +1446,21 @@
                 tbl_head_num: "#",
                 tbl_head_x: "X (cm)",
                 tbl_head_y: "Y (cm)",
-                tbl_head_action:  "動作",
+                tbl_head_action: "動作",
                 msg_no_def: "尚未定義錨栓",
                 btn_add_pt: "新增點",
-                lbl_reinf_area: "面積 (cm²)",
+                lbl_reinf_area: "截面積 (cm²)",
                 lbl_reinf_yield: "降伏強度 (kgf/cm²)",
                 lbl_viz_mode: "檢視模式:",
                 btn_viz_2d: "2D 視圖 (預設)",
                 btn_viz_3d: "3D 視圖",
-                btn_reset: "重置",
                 lbl_3d_hint: "拖曳旋轉 | 滾輪縮放",
                 warn_custom_empty: "自訂座標為空。使用預設 2x2 網格。",
                 rpt_layout: "配置確認圖",
                 btn_dims: "標註尺寸",
                 btn_id_mode: "編號模式",
-                lbl_t: "拉力設計載重 (<span class='math-symbol'>T<sub>u</sub></span>) [kgf]", lbl_v: "剪力設計載重 (<span class='math-symbol'>V<sub>u</sub></span>) [kgf]",
-                lbl_mux: "彎矩 X-axis (<span class='math-symbol'>M<sub>ux</sub></span>) [kgf-cm]", 
-                lbl_muy: "彎矩 Y-axis (<span class='math-symbol'>M<sub>uy</sub></span>) [kgf-cm]", 
-                lbl_tsust: "長期拉力載重 (<span class='math-symbol'>T<sub>sust</sub></span>) [kgf]"
+                lbl_mux: "彎矩 X-軸 (<span class='math-symbol'>M<sub>ux</sub></span>) [kgf-cm]", 
+                lbl_muy: "彎矩 Y-軸 (<span class='math-symbol'>M<sub>uy</sub></span>) [kgf-cm]"
             }
         };
 
@@ -1828,20 +1914,36 @@
             // Show/hide the Custom Table UI
             document.getElementById('div_custom_coords').classList.toggle('hidden', !isCustom);
             
-            // Grey out Spacing & Edge inputs instead of hiding the section
-            const spacingSection = document.getElementById('spacing-inputs-section');
-            const inputs = spacingSection.querySelectorAll('input');
+            // MODIFY: Freeze Spacing (S1, S2) AND Top/Side Edges (Ca1, Ca2) in Custom Mode.
+            // Keep Ca1,1 (Bottom Edge) editable.
+            const inputsToFreeze = [
+                document.getElementById('s1'), 
+                document.getElementById('s2'),
+                document.getElementById('ca1'),
+                document.getElementById('ca2')
+            ];
             
-            inputs.forEach(input => {
-                input.disabled = isCustom;
-                if (isCustom) {
-                    input.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
-                    input.classList.remove('border-gray-300');
-                } else {
-                    input.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
-                    input.classList.add('border-gray-300');
+            const ca1_1 = document.getElementById('ca1_1');
+
+            inputsToFreeze.forEach(input => {
+                if (input) {
+                    input.disabled = isCustom;
+                    if (isCustom) {
+                        input.classList.add('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
+                        input.classList.remove('border-gray-300');
+                    } else {
+                        input.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
+                        input.classList.add('border-gray-300');
+                    }
                 }
             });
+
+            // Ensure Ca1,1 is always enabled
+            if (ca1_1) {
+                ca1_1.disabled = false;
+                ca1_1.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
+                ca1_1.classList.add('border-gray-300');
+            }
 
             if (isCustom) {
                 if (anchorData.length === 0) anchorData = parseCoords();
@@ -1991,8 +2093,8 @@
             }
 
             const margin = 10;
-            const slabW = maxAnchorX + I.ca2 + margin; 
-            const slabH = maxAnchorY + I.ca1_1 + margin; 
+            const slabW = maxAnchorX + I.ca2; 
+            const slabH = maxAnchorY + I.ca1_1;
             
             // Validation Thresholds for Red coloring
             const min_s = 6 * I.da;
@@ -2126,7 +2228,7 @@
 
             // --- 5. Draw the Dimensions (WRAPPED IN CONDITION) ---
             // Use typeof check to avoid ReferenceError if showDims wasn't declared globally
-            if (typeof showDims !== 'undefined' && showDims) { // <--- START CONDITIONAL
+            if (typeof showDims !== 'undefined' && showDims) { 
                 const uniqueX = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
                 const uniqueY = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
 
@@ -2141,6 +2243,13 @@
                         draw3DDim(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 30 + (i*15), true, isBad);
                     }
                 }
+
+                // ADD: Draw Ca1,1 (Bottom Edge)
+                // From the lowest anchor (last in uniqueY) to the concrete bottom (slabH)
+                const lastY = uniqueY[uniqueY.length - 1];
+                const slabBottom = slabH; // slabH was calculated as maxAnchorY + I.ca1_1
+                const bad_ca1_1 = I.ca1_1 < min_c;
+                draw3DDim(lastY, slabBottom, `Ca1,1=${I.ca1_1}`, 15, true, bad_ca1_1);
 
                 // B. Horizontal Dimensions (Bottom Side)
                 const bad_ca2 = I.ca2 < min_c;
@@ -2297,8 +2406,8 @@
             const internalMargin = 20; // Extra concrete past the last anchor
             
             // Real world concrete dimensions (Logic)
-            const realW = maxX + I.ca2 + internalMargin; 
-            const realH = maxY + I.ca1_1 + internalMargin; 
+            const realW = maxX + I.ca2; 
+            const realH = maxY + I.ca1_1; 
 
             // Canvas Layout Config
             const topMargin = 50;  // Increased margin for bigger text
@@ -2482,7 +2591,13 @@
                     drawDimLine(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 45 + (i*20), true, isBad);
                 }
             }
-
+            
+            // ADD: Draw Ca1,1 (Bottom Edge)
+            const lastY = uniqueY[uniqueY.length - 1];
+            const bad_ca1_1 = I.ca1_1 < min_c;
+            drawDimLine(lastY, realH, `Ca1,1=${I.ca1_1}`, 20, true, bad_ca1_1);
+            // realH was calculated as maxY + I.ca1_1
+            const slabBottom = realH;
             // --- Horizontal Dimensions (Bottom Side) ---
             const bad_ca2 = I.ca2 < min_c;
             drawDimLine(0, uniqueX[0], `Ca2=${I.ca2}`, 20, false, bad_ca2);
@@ -4508,4 +4623,3 @@
     </script>
 </body>
 </html>
-
