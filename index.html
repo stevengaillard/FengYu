@@ -4,26 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Structural Anchor Analysis</title>
-
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23004a99%22/></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23004a99%22/></svg>">
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-    <!-- Three.js for 3D Visualization -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -48,12 +37,10 @@
             font-family: 'Courier New', monospace;
             font-weight: 600;
         }
-
         .math-symbol {
             font-family: 'Times New Roman', serif;
             font-style: italic;
         }
-
         select {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 0.5rem center;
@@ -63,20 +50,14 @@
             -webkit-appearance: none;
             appearance: none;
         }
-
-        /* PRINT SPECIFIC STYLES */
         @media print {
             @page {
                 size: A4;
                 margin: 15mm;
             }
-
-            /* Hide the web app UI */
             #root, #auth-modal, nav {
                 display: none !important;
             }
-
-            /* Show the print staging area */
             #print-staging {
                 display: block !important;
                 background: white;
@@ -84,14 +65,10 @@
                 font-family: 'Arial', sans-serif;
                 font-size: 11pt;
             }
-
-            /* Force background colors to print */
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-
-            /* Page Break Logic */
             .page-break {
                 break-before: page;
                 page-break-before: always;
@@ -99,13 +76,10 @@
                 display: block;
                 clear: both;
             }
-
             table, tr, td, th {
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
-
-            /* Report Styling */
             h1 {
                 color: #004a99;
                 font-size: 24pt;
@@ -114,7 +88,6 @@
                 border-bottom: 2px solid #004a99;
                 padding-bottom: 10px;
             }
-
             h2 {
                 color: #333;
                 font-size: 14pt;
@@ -124,7 +97,6 @@
                 padding: 5px 10px;
                 font-weight: bold;
             }
-
             h3 {
                 color: #004a99;
                 font-size: 14pt;
@@ -133,7 +105,6 @@
                 border-bottom: 1px solid #ddd;
                 padding-bottom: 5px;
             }
-
             h4 {
                 color: #555;
                 font-size: 11pt;
@@ -142,14 +113,12 @@
                 text-transform: uppercase;
                 font-weight: bold;
             }
-
             table {
                 width: 100%;
                 border-collapse: collapse;
                 margin-bottom: 15px;
                 font-size: 10pt;
             }
-
             th {
                 background-color: #004a99;
                 color: white;
@@ -157,27 +126,22 @@
                 text-align: left;
                 font-weight: bold;
             }
-
             td {
                 border: 1px solid #ddd;
                 padding: 8px;
                 vertical-align: middle;
             }
-
             tr:nth-child(even) {
                 background-color: #f9f9f9;
             }
-
             .pass {
                 color: green;
                 font-weight: bold;
             }
-
             .fail {
                 color: red;
                 font-weight: bold;
             }
-
             .report-footer {
                 margin-top: 30px;
                 border-top: 1px solid #ccc;
@@ -188,66 +152,43 @@
                 width: 100%;
             }
         }
-
-        /* Hide print staging on normal screen */
         #print-staging {
             display: none;
         }
-
-        /* --- Dark Mode Overrides --- */
         .dark body { background-color: #0f172a; color: #f1f5f9; }
         .dark .bg-white { background-color: #1e293b !important; color: #e2e8f0; }
         .dark .bg-gray-50, .dark .bg-gray-100 { background-color: #0f172a !important; border-color: #334155 !important; }
         .dark .bg-slate-50 { background-color: #0f172a !important; }
-        
-        /* Inputs & Selects */
         .dark input, .dark select, .dark textarea { 
             background-color: #334155 !important; 
             border-color: #475569 !important; 
             color: #f8fafc !important; 
         }
-        
-        /* Borders */
         .dark .border-gray-200, .dark .border-gray-300, .dark .border-blue-100, .dark .border-blue-200, .dark .border-blue-300 { 
             border-color: #334155 !important; 
         }
-
-        /* Colored Panels (Light Mode tints -> Dark Mode deep colors) */
         .dark .bg-blue-50 { background-color: #1e3a8a !important; border-color: #1e40af !important; }
         .dark .text-blue-700, .dark .text-blue-800 { color: #93c5fd !important; }
-        
         .dark .bg-red-50 { background-color: #450a0a !important; border-color: #7f1d1d !important; }
         .dark .text-red-600, .dark .text-red-700, .dark .text-red-800 { color: #fca5a5 !important; }
         .dark .border-red-100, .dark .border-red-300 { border-color: #7f1d1d !important; }
-
         .dark .bg-yellow-50 { background-color: #422006 !important; border-color: #713f12 !important; }
         .dark .text-yellow-800 { color: #fde047 !important; }
-        
         .dark .bg-orange-50 { background-color: #431407 !important; border-color: #7c2d12 !important; }
         .dark .text-orange-700, .dark .text-orange-800 { color: #fdba74 !important; }
-
-        /* Text Utilities */
         .dark .text-slate-700, .dark .text-gray-700, .dark .text-gray-600, .dark .text-gray-500 { color: #94a3b8 !important; }
         .dark .text-eng-primary { color: #38bdf8 !important; }
-        
-        /* Tables */
         .dark th { background-color: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important; }
         .dark td { border-color: #475569 !important; }
         .dark tr:hover { background-color: #334155 !important; }
-        .dark #anchor_table_body tr:hover { background-color: #334155 !important; } /* Fix hover */
-
-        /* Specific Component Fixes */
+        .dark #anchor_table_body tr:hover { background-color: #334155 !important; } 
         .dark .shadow-md, .dark .shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); }
         .dark #card-interaction { background-color: #0f172a !important; border-color: #334155 !important; }
-        
-        /* 2D Viz Canvas Container */
-        .dark canvas#viz-canvas { filter: invert(0); } /* Handled via JS, but ensures no double invert */
+        .dark canvas#viz-canvas { filter: invert(0); } 
     </style>
 </head>
 <body class="bg-gray-50 text-slate-800 font-sans">
-
     <div id="root" class="min-h-screen flex flex-col">
-
         <!-- Navbar -->
         <nav class="bg-eng-primary text-white shadow-md sticky top-0 z-50">
             <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -276,17 +217,13 @@
                 </div>
             </div>
         </nav>
-
         <!-- Main Content -->
         <main class="flex-grow max-w-5xl mx-auto w-full p-4 space-y-6">
-
             <!-- Auth Modal -->
             <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[60] hidden transition-opacity duration-300">
                 <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100">
-                    
                     <h2 class="text-3xl font-extrabold mb-2 text-center text-[#004a99] tracking-tight" data-i18n="modal_title">Access Portal</h2>
                     <p class="text-gray-500 mb-6 text-center text-sm font-medium" data-i18n="modal_desc">Sign in to sync your data across devices.</p>
-
                     <div class="space-y-4 mb-6">
                         <div>
                             <input type="email" id="auth-email" placeholder="Email" class="w-full bg-gray-100 border-2 border-transparent rounded-md px-4 py-3 text-sm focus:bg-white focus:border-[#004a99] focus:outline-none transition-all placeholder-gray-400 text-gray-700">
@@ -295,26 +232,21 @@
                             <input type="password" id="auth-password" placeholder="Password" class="w-full bg-gray-100 border-2 border-transparent rounded-md px-4 py-3 text-sm focus:bg-white focus:border-[#004a99] focus:outline-none transition-all placeholder-gray-400 text-gray-700">
                         </div>
                     </div>
-
                     <div class="flex gap-3 mb-6">
                         <button id="email-login-btn" class="flex-1 bg-[#004a99] text-white py-2.5 rounded-md text-sm font-bold hover:bg-blue-800 transition shadow-sm" data-i18n="btn_login_submit">Login</button>
                         <button id="email-register-btn" class="flex-1 bg-white text-[#004a99] border border-[#004a99] py-2.5 rounded-md text-sm font-bold hover:bg-blue-50 transition shadow-sm" data-i18n="btn_register">Register</button>
                     </div>
-
                     <div class="relative flex py-2 items-center mb-6">
                         <div class="flex-grow border-t border-gray-200"></div>
                         <span class="flex-shrink mx-4 text-gray-400 text-xs font-medium uppercase tracking-wider">OR</span>
                         <div class="flex-grow border-t border-gray-200"></div>
                     </div>
-
                     <button id="guest-login" class="w-full bg-gray-200 text-gray-700 py-3 rounded-md text-sm font-bold hover:bg-gray-300 transition shadow-sm" data-i18n="btn_guest">
                         Continue as Guest
                     </button>
-                    
                     <p id="auth-error" class="text-xs text-red-500 text-center mt-4 hidden font-medium bg-red-50 p-2 rounded border border-red-100"></p>
                 </div>
             </div>
-
             <!-- Tabs -->
             <div class="flex border-b border-gray-300 bg-white rounded-t-lg shadow-sm">
                 <button onclick="switchTab('calculator')" id="tab-calculator" class="flex-1 py-4 text-center font-bold text-eng-primary border-b-4 border-eng-primary transition-colors">
@@ -324,19 +256,15 @@
                     <i class="fa-solid fa-server mr-2"></i><span data-i18n="tab_database">Database</span>
                 </button>
             </div>
-
             <!-- TAB: CALCULATOR -->
             <div id="view-calculator" class="space-y-6 pb-20">
-
                 <!-- INPUTS -->
                 <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
                     <div class="bg-gray-100 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
                         <h3 class="font-bold text-slate-700"><i class="fa-solid fa-pen-to-square mr-2"></i><span data-i18n="sec_params">Design Parameters</span></h3>
                         <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border">Units: kgf, cm</span>
                     </div>
-
                     <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
                         <!-- 1. Geometry -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_mat">Material & Geometry</h4>
@@ -379,7 +307,6 @@
                                             <div><label class="text-[9px] text-gray-500" data-i18n="lbl_sp_y">Start Y</label><input type="number" id="grid_st_y" value="0" class="w-full text-xs border rounded p-1"></div>
                                         </div>
                                     </div>
-
                                     <!-- Anchor List Table -->
                                     <div>
                                         <div class="flex justify-between items-end mb-1">
@@ -408,7 +335,6 @@
                                             <button onclick="addSingleAnchor()" class="flex-1 bg-gray-200 text-gray-700 text-[10px] py-1 rounded hover:bg-gray-300"><i class="fa-solid fa-plus mr-1"></i><span data-i18n="btn_add_pt">Add Point</span></button>
                                         </div>
                                     </div>
-                                    
                                     <!-- Hidden Textarea for Logic Connection -->
                                     <textarea id="custom_coords" class="hidden"></textarea>
                                 </div>
@@ -417,12 +343,10 @@
                                 <label class="text-xs text-gray-500" data-i18n="lbl_fc">Concrete Strength (<span class="math-symbol">f'c</span>) [kgf/cm²]</label>
                                 <input type="number" id="fc" value="280" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_ha">Base Thickness (<span class="math-symbol">h<sub>a</sub></span>) [cm]</label>
                                 <input type="number" id="ha" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
-
                             <!-- NEW 1. Shear Lug Input -->
                             <div class="bg-gray-50 p-2 rounded border border-gray-200">
                                 <div class="flex items-center space-x-2 mb-1">
@@ -453,7 +377,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Steel Properties Section -->
                             <div class="pt-2">
                                 <h5 class="text-xs font-bold text-gray-400 mb-1" data-i18n="sec_steel_props">ANCHOR STEEL</h5>
@@ -488,7 +411,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="pt-2 border-t border-dashed space-y-2">
                                 <div>
                                     <label class="text-xs text-gray-500" data-i18n="lbl_hef">Embedment (<span class="math-symbol">h<sub>ef</sub></span>) [cm]</label>
@@ -496,41 +418,33 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- 2. Spacing -->
                         <div id="spacing-inputs-section" class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_space">Spacing & Edge Dist</h4>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_s1">Vertical Spacing (<span class="math-symbol">S<sub>1</sub></span>) [cm]</label>
                                 <input type="number" id="s1" value="22" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_s2">Horizontal Spacing (<span class="math-symbol">S<sub>2</sub></span>) [cm]</label>
                                 <input type="number" id="s2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_ca1">Top Edge (<span class="math-symbol">C<sub>a1</sub></span>) [cm]</label>
                                 <input type="number" id="ca1" value="13" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_ca1_1">Bottom Edge (<span class="math-symbol">C<sub>a1,1</sub></span>) [cm]</label>
                                 <input type="number" id="ca1_1" value="35" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_ca2">Side Edge (<span class="math-symbol">C<sub>a2</sub></span>) [cm]</label>
                                 <input type="number" id="ca2" value="15" class="calc-input w-full border border-gray-300 rounded p-2 text-right">
                             </div>
                         </div>
-
                         <!-- 3. Coefficients -->
                         <div class="space-y-4">
                             <h4 class="text-xs font-bold text-eng-primary uppercase border-b pb-1 mb-2" data-i18n="sec_factors">Factors & Coefficients</h4>
-
                             <!-- NEW Step 6: Seismic Design -->
                             <div class="bg-yellow-50 p-2 rounded border border-yellow-200">
                                 <div class="flex items-center space-x-2">
@@ -543,7 +457,6 @@
                                     <input type="number" id="stretch_len" placeholder=">= 8da" class="calc-input w-full border border-yellow-300 rounded p-1 text-right text-xs bg-white">
                                 </div>
                             </div>
-
                             <!-- Condition A/B and Category -->
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
@@ -562,7 +475,6 @@
                                     </select>
                                 </div>
                             </div>
-
                             <!-- NEW 2. Anchor Reinforcement -->
                             <div class="bg-gray-50 p-2 rounded border border-gray-200">
                                 <div class="flex items-center space-x-2 mb-1">
@@ -582,13 +494,11 @@
                                     </div>
                                 </div>
                             </div>
-
                             <!-- REVISION: Adhesive Input (Controlled by Top Dropdown) -->
                             <div id="div_adhesive" class="hidden bg-blue-50 p-2 rounded border border-blue-100 mt-2">
                                 <label class="text-xs font-bold text-blue-700" data-i18n="lbl_tau">Bond Stress (<span class="math-symbol">τ</span>) [kgf/cm²]</label>
                                 <input type="number" id="tau" value="100" class="calc-input w-full border border-blue-300 rounded p-1 text-right text-xs bg-white mt-1">
                             </div>
-
                             <!-- Pullout Inputs (Step 2) -->
                             <div>
                                 <div id="div_pull_mode_container"> <label class="text-xs text-gray-500" data-i18n="lbl_pull_mode">Pullout Mode</label>
@@ -599,22 +509,18 @@
                                     </select>
                                 </div>   
                             </div>
-
                             <div id="div_abrg">
                                 <label class="text-xs text-gray-500" data-i18n="lbl_abrg">Bearing Area (<span class="math-symbol">A<sub>brg</sub></span>) [cm²]</label>
                                 <input type="number" id="abrg" value="3.5" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
                             </div>
-
                             <div id="div_eh" class="hidden">
                                 <label class="text-xs text-gray-500" data-i18n="lbl_eh">Hook Length (<span class="math-symbol">e<sub>h</sub></span>) [cm]</label>
                                 <input type="number" id="eh" value="5.0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
                             </div>
-
                             <div id="div_np" class="hidden">
                                 <label class="text-xs text-gray-500" data-i18n="lbl_np_cert">Certified Pullout (<span class="math-symbol">N<sub>p</sub></span>) [kgf]</label>
                                 <input type="number" id="np_certified" value="2000" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_crack_p">Pullout Cracking (<span class="math-symbol">ψ<sub>c,P</sub></span>)</label>
                                 <select id="crack_cond_p" class="w-full border border-gray-300 rounded p-2 text-xs">
@@ -623,7 +529,6 @@
                                 </select>
                             </div>
                             <!-- End Step 2 Inputs -->
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_lambda">Failure Factor (<span class="math-symbol">λ<sub>a</sub></span>)</label>
                                 <select id="lambda_select" class="w-full border border-gray-300 rounded p-2 text-xs">
@@ -632,7 +537,6 @@
                                     <option value="0.6" data-i18n="opt_lam3">Bonded Failure (0.6)</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_le">Load Length (<span class="math-symbol">l<sub>e</sub></span>)</label>
                                 <select id="le_select" class="w-full border border-gray-300 rounded p-2 text-xs">
@@ -641,7 +545,6 @@
                                     <option value="torque" data-i18n="opt_le3">Torque-controlled (2da)</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="text-xs text-gray-500" data-i18n="lbl_reinf">Cracking/Reinf (<span class="math-symbol">ψ<sub>c,V</sub></span>)</label>
                                 <select id="psi_c_V_select" class="w-full border border-gray-300 rounded p-2 text-xs">
@@ -652,7 +555,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="px-6 pb-6">
                         <!-- REVISION: Header with Inline Moments Checkbox -->
                         <div class="flex justify-between items-end border-b border-gray-200 pb-1 mb-3">
@@ -662,7 +564,6 @@
                                 <span data-i18n="lbl_add_moment">Add Moments (<span class="math-symbol">M<sub>u</sub></span>)</span>
                             </label>
                         </div>
-
                         <div class="grid grid-cols-2 gap-4">
                             <!-- REVISION: Eccentricities (Always Visible, outside moment checklist) -->
                             <div>
@@ -673,7 +574,6 @@
                                 <label class="text-xs text-gray-500" data-i18n="lbl_en_y">Eccentric <span class="math-symbol">e'<sub>y</sub></span> [cm]</label>
                                 <input type="number" id="e_prime_n_y" value="0" class="calc-input w-full border border-gray-300 rounded p-2 text-right text-xs">
                             </div>
-
                             <!-- Tension & Shear -->
                             <div class="bg-red-50 p-3 rounded border border-red-100">
                                 <label class="text-xs font-bold text-red-700" data-i18n="lbl_t">Tension (<span class="math-symbol">T<sub>u</sub></span>) [kgf]</label>
@@ -683,7 +583,6 @@
                                 <label class="text-xs font-bold text-red-700" data-i18n="lbl_v">Shear (<span class="math-symbol">V<sub>u</sub></span>) [kgf]</label>
                                 <input type="number" id="loadV" value="600" class="calc-input w-full border border-red-300 rounded p-1 mt-1 text-right text-red-800">
                             </div>
-
                             <!-- REVISION: Moments (Hidden by default, toggled by header checkbox) -->
                             <div id="div_moments" class="col-span-2 grid grid-cols-2 gap-4 hidden bg-red-50 p-2 rounded border border-red-100 border-dashed">
                                 <div>
@@ -698,7 +597,6 @@
                                     * Note: Analysis assumes elastic distribution.
                                 </p>
                             </div>
-
                             <!-- Sustained & Direction -->
                             <div class="bg-blue-50 p-3 rounded border border-blue-100 col-span-2">
                                 <label class="text-xs font-bold text-blue-700" data-i18n="lbl_tsust">Sustained Tension (<span class="math-symbol">T<sub>sust</sub></span>) [kgf]</label>
@@ -713,14 +611,12 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="bg-gray-50 p-4 border-t border-gray-200">
                         <button onclick="performCalculation()" class="w-full bg-eng-primary hover:bg-blue-800 text-white font-bold py-3 px-6 rounded shadow-lg transform transition active:scale-[0.99] flex justify-center items-center">
                             <i class="fa-solid fa-gears mr-2"></i> <span data-i18n="btn_run">Run Structural Analysis</span>
                         </button>
                     </div>
                 </div>
-
                 <!-- RESULTS CONTAINER (Interactive View) -->
                 <div id="results-container" class="hidden space-y-6">
                     <div class="bg-white rounded shadow border border-gray-200 p-2 flex justify-center gap-4">
@@ -739,7 +635,6 @@
                         <p class="font-bold flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2"></i><span data-i18n="warn_title">Geometry Violation</span></p>
                         <ul id="geo-warn-list" class="list-disc list-inside text-sm mt-1"></ul>
                     </div>
-
                     <div class="flex space-x-2">
                         <button onclick="saveResult()" id="save-btn" class="flex-1 bg-green-600 text-white py-2 rounded shadow hover:bg-green-700 transition font-bold text-sm">
                             <i class="fa-solid fa-cloud-arrow-up mr-2"></i><span data-i18n="btn_save">Save to Cloud</span>
@@ -748,72 +643,56 @@
                             <i class="fa-solid fa-print mr-2"></i><span data-i18n="btn_pdf">Download Report</span>
                         </button>
                     </div>
-
                     <!-- 3D Interactive Model -->
                     <div id="card-3d" class="bg-white rounded shadow border border-gray-200 overflow-hidden">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center h-12">
-                            
                             <h4 class="font-bold text-sm text-gray-700 flex items-center">
                                 <i class="fa-solid fa-cube mr-2 text-eng-primary"></i>
                                 <span data-i18n="viz_3d">3D Interactive Model</span>
                             </h4>
-
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-gray-400 mr-2 hidden sm:inline" data-i18n="lbl_3d_hint">Drag to Rotate | Scroll to Zoom</span>
-                                
                                 <button onclick="toggle3DDimensions()" id="btn-3d-dims" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center">
                                     <i class="fa-solid fa-ruler-combined mr-1"></i> <span data-i18n="btn_dims">Dimensions</span>
                                 </button>
-
                                 <button onclick="toggle3DLoads()" id="btn-3d-loads" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center">
                                     <i class="fa-solid fa-arrow-up-long mr-1"></i> <span data-i18n="btn_loads">Loads</span>
                                 </button>
-
                                 <div class="h-4 w-px bg-gray-300 mx-1"></div>
-
                                 <button onclick="reset3DView()" class="text-[10px] bg-white hover:bg-gray-100 text-gray-600 border border-gray-300 px-3 py-1 rounded transition font-medium flex items-center shadow-sm" title="Reset Camera">
                                     <i class="fa-solid fa-arrows-rotate mr-1"></i> <span data-i18n="btn_reset">Reset</span>
                                 </button>
                             </div>
                         </div>
-                        
                         <div id="canvas-3d-container" class="w-full h-64 bg-white relative"></div>
                     </div>
-
                     <!-- Step 7: 2D Visualizer -->
                     <div id="card-viz" class="bg-white rounded shadow border border-gray-200 overflow-hidden">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center h-12">
-                            
                             <h4 class="font-bold text-sm text-gray-700 flex items-center">
                                 <i class="fa-solid fa-compass-drafting mr-2 text-eng-primary"></i>
                                 <span data-i18n="viz_title">Layout Visualization</span>
                             </h4>
-
                             <div class="flex items-center gap-2">
                                 <button onclick="toggleLoads()" id="btn-toggle-loads" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center">
                                     <i class="fa-solid fa-arrow-up-long mr-1"></i> <span data-i18n="btn_loads">Loads</span>
                                 </button>
-
                                 <div class="h-4 w-px bg-gray-300 mx-1"></div>
-
                                 <button onclick="reset2DView()" class="text-[10px] bg-white hover:bg-gray-100 text-gray-600 border border-gray-300 px-3 py-1 rounded transition font-medium flex items-center shadow-sm" title="Reset View">
                                     <i class="fa-solid fa-arrows-rotate mr-1"></i> <span data-i18n="btn_reset">Reset</span>
                                 </button>
                             </div>
                         </div>
-
                         <div class="relative w-full h-64 bg-slate-50 flex justify-center items-center overflow-hidden">
                             <canvas id="viz-canvas" width="800" height="400" class="w-full h-full object-contain cursor-grab active:cursor-grabbing"></canvas>
                         </div>
                     </div>
-
                     <div id="indiv-force-list" class="bg-white rounded shadow border border-gray-200 overflow-hidden hidden">
                         <div class="p-3 bg-gray-50 border-b">
                             <h4 class="font-bold text-sm text-gray-700"><i class="fa-solid fa-list-ol mr-2"></i><span data-i18n="lbl_indiv_forces">Individual Anchor Forces</span></h4>
                         </div>
                         <div id="indiv-force-content" class="p-4 space-y-2 text-sm"></div>
                     </div>
-
                     <!-- Interaction Check Card (Step 4) -->
                     <div id="card-interaction" class="bg-slate-800 rounded shadow text-white">
                         <div class="p-3 border-b border-slate-700 flex justify-between items-center">
@@ -838,7 +717,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Steel Strength Card (Step 1) -->
                     <div id="card-steel" class="bg-white rounded border-l-4 border-l-gray-600 shadow">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
@@ -850,24 +728,19 @@
                                 <!-- Tension Row 1 -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_nsa">Steel Tension (Nsa)</span><span id="r-nsa" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_nsa">φNsa Capacity</span><span id="r-phi-nsa" class="text-lg font-bold text-eng-primary"></span></div>
-
                                 <!-- Tension Row 2 (Ratio & Check) -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-st-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check_t">Tension Check</span><span id="badge-st" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
-
                                 <div class="col-span-2 border-t my-1"></div>
-
                                 <!-- Shear Row 1 -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_vsa">Steel Shear (Vsa)</span><span id="r-vsa" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_vsa">φVsa Capacity</span><span id="r-phi-vsa" class="text-lg font-bold text-eng-primary"></span></div>
-
                                 <!-- Shear Row 2 (Ratio & Check) -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-sv-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check_v">Shear Check</span><span id="badge-sv" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Bond Strength Card (Step 3) -->
                     <div id="card-bond" class="bg-white rounded border-l-4 border-l-blue-600 shadow hidden">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
@@ -881,15 +754,12 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_nba">Basic Bond (Nba)</span><span id="r-nba" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_cna">Crit. Spacing (cNa)</span><span id="r-cna" class="font-mono text-gray-600"></span></div>
-
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_na">Bond Strength (Na)</span><span id="r-na" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_na">φNa Capacity</span><span id="r-phi-na" class="text-lg font-bold text-eng-primary"></span></div>
-
                                 <div class="col-span-2 border-t pt-2 grid grid-cols-2 gap-4">
                                     <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-b-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                     <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-b" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
                                 </div>
-
                                 <!-- Step 6: Sustained Check -->
                                 <div id="row-sust" class="col-span-2 border-t pt-2 grid grid-cols-2 gap-4 bg-blue-50 p-2 rounded hidden">
                                     <div><span class="text-blue-800 text-xs block font-bold" data-i18n="res_sust_load">Sustained Load</span><span id="r-sust-load" class="font-mono font-bold text-blue-900"></span></div>
@@ -898,7 +768,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Pullout & Pryout Card (Step 2) -->
                     <div id="card-pullout" class="bg-white rounded border-l-4 border-l-eng-warning shadow">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
@@ -912,9 +781,7 @@
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_npn">φNpn Capacity</span><span id="r-phi-npn" class="text-lg font-bold text-eng-primary"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_ratio">Ratio</span><span id="r-pn-ratio" class="font-mono font-bold text-purple-700"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-pn" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
-
                                 <div class="col-span-2 border-t my-1"></div>
-
                                 <!-- Pryout Row -->
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_vcp">Pryout (Vcp)</span><span id="r-vcp" class="font-mono font-bold"></span></div>
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_phi_vcp">φVcp Capacity</span><span id="r-phi-vcp" class="text-lg font-bold text-eng-primary"></span></div>
@@ -923,14 +790,12 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- 1. Tension Breakout (Combined) -->
                     <div id="card-tension" class="bg-white rounded border-l-4 border-l-eng-primary shadow">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
                             <h4 class="font-bold text-sm text-gray-700"><span data-i18n="res_t_title">Concrete Tension Breakout</span></h4>
                             <span id="badge-seis-t" class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded font-bold hidden">Seismic</span>
                         </div>
-
                         <!-- Single Tension Results -->
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm border-b">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_t1_sub">Single Anchor</h5>
@@ -944,7 +809,6 @@
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_psi_cp">Splitting (ψcp)</span><span id="r1-psi-cp" class="font-mono text-gray-600">1.0</span></div>
                             </div>
                         </div>
-
                         <!-- Side-Face Blowout Row (Step 5) -->
                         <div id="row-sb" class="p-4 grid grid-cols-1 gap-2 text-sm border-b hidden bg-yellow-50">
                             <h5 class="font-bold text-yellow-700 text-xs mb-2 uppercase"><span data-i18n="res_sb_title">Side-Face Blowout</span> (Headed, deep)</h5>
@@ -955,7 +819,6 @@
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-sb" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
                             </div>
                         </div>
-
                         <!-- Group Tension Results -->
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_tg_sub">Anchor Group</h5>
@@ -968,7 +831,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- 2. Shear Breakout (Combined) -->
                     <div id="card-shear" class="bg-white rounded border-l-4 border-l-eng-primary shadow">
                         <div class="p-3 bg-gray-50 border-b flex justify-between items-center">
@@ -986,7 +848,6 @@
                                 <div><span class="text-gray-500 text-xs block" data-i18n="res_check">Check</span><span id="badge-2" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
                             </div>
                         </div>
-
                         <!-- NEW: Shear Lug Row -->
                         <div id="row-sl" class="p-4 grid grid-cols-1 gap-2 text-sm border-b hidden bg-gray-50">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase">Shear Lug (Sec 17.11)</h5>
@@ -997,7 +858,6 @@
                                 <div><span class="text-gray-500 text-xs block">Check</span><span id="badge-sl" class="text-xs px-2 py-0.5 rounded font-bold"></span></div>
                             </div>
                         </div>
-
                         <!-- Group Shear Results -->
                         <div class="p-4 grid grid-cols-1 gap-2 text-sm">
                             <h5 class="font-bold text-gray-600 text-xs mb-2 uppercase" data-i18n="res_vg_sub">Anchor Group</h5>
@@ -1010,10 +870,8 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
-
             <!-- TAB: HISTORY -->
             <div id="view-history" class="hidden">
                 <!-- ... existing history code ... -->
@@ -1033,18 +891,13 @@
                     </div>
                 </div>
             </div>
-
         </main>
-
     </div>
-
     <!-- PRINT STAGING AREA (Hidden on Screen, Visible on Print) -->
     <!-- MOVED OUTSIDE OF #ROOT TO PREVENT BEING HIDDEN BY CSS -->
     <div id="print-staging"></div>
-
     <!-- Logic Script -->
     <script>
-        // ... existing firebase config ...
         const firebaseConfig = {
             apiKey: "AIzaSyAP0nsg3Saf_W0lEk5Mdt4oVKhFQJ69BOg",
             authDomain: "anchor-app-a1426.firebaseapp.com",
@@ -1054,41 +907,30 @@
             appId: "1:822722897072:web:32f8dabc44735718af0775",
             measurementId: "G-5GVPXDBJM1"
         };
-        // ... existing auth init ...
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-
         let currentUser = null;
         let currentData = null;
         let historyCache = {};
         let currentLang = 'en';
         let isDarkMode = false;
-
-        // --- VISUALIZER STATE (ADD THIS BLOCK) ---
         let vizState = { scale: 1.0, panX: 0, panY: 0, isDragging: false, lastX: 0, lastY: 0 };
-
         function initVizControls() {
             const canvas = document.getElementById('viz-canvas');
             if (!canvas) return;
-
-            // Mouse Down - Start Pan
             canvas.addEventListener('mousedown', (e) => {
                 vizState.isDragging = true;
                 vizState.lastX = e.clientX;
                 vizState.lastY = e.clientY;
                 canvas.style.cursor = 'grabbing';
             });
-
-            // Mouse Up - Stop Pan (Window level to catch dragging outside canvas)
             window.addEventListener('mouseup', () => {
                 vizState.isDragging = false;
                 if (document.getElementById('viz-canvas')) {
                     document.getElementById('viz-canvas').style.cursor = 'grab';
                 }
             });
-
-            // Mouse Move - Pan
             canvas.addEventListener('mousemove', (e) => {
                 if (!vizState.isDragging) return;
                 const dx = e.clientX - vizState.lastX;
@@ -1099,26 +941,19 @@
                 vizState.lastY = e.clientY;
                 requestAnimationFrame(() => drawVisualization());
             });
-
-            // Scroll Wheel - Zoom
             canvas.addEventListener('wheel', (e) => {
-                e.preventDefault(); // Stop page scrolling
+                e.preventDefault(); 
                 const zoomIntensity = 0.1;
                 const delta = e.deltaY > 0 ? -zoomIntensity : zoomIntensity;
                 const newScale = vizState.scale + delta;
-                // Limit zoom range (0.1x to 10x)
                 vizState.scale = Math.min(Math.max(0.1, newScale), 10.0);
                 requestAnimationFrame(() => drawVisualization());
             }, { passive: false });
         }
-
-        // Reset function for the "Reset" button
         window.reset2DView = function() {
             vizState = { scale: 1.0, panX: 0, panY: 0, isDragging: false, lastX: 0, lastY: 0 };
             drawVisualization();
         };
-
-        // --- TRANSLATION DATA ---
         const translations = {
             en: {
                 app_title: "Anchor Analysis", app_subtitle: "ACI/Structural Compliance Tool",
@@ -1174,15 +1009,13 @@
                 history_title: "Database Records", btn_clear: "Clear All", btn_refresh: "Refresh", msg_auth_req: "Authentication required to view records.", msg_no_rec: "No records found.",
                 open: "Open", pass: "PASS", fail: "FAIL",
                 warn_title: "Geometry Violation", viz_title: "Layout Visualization", viz_3d: "3D Interactive Model",
-
-                // --- NEW TRANSLATIONS ADDED BELOW ---
-                btn_saving: "Saving...", // <--- ADD THIS
+                btn_saving: "Saving...", 
                 opt_cast_10: "Cast-in Anchors (10)",
                 opt_adhesive_full: "Adhesive Anchor",
                 lbl_add_moment: "Add Moments (<span class='math-symbol'>M<sub>u</sub></span>)",
                 msg_elastic_note: "* Note: Analysis assumes elastic distribution.",
-                btn_saved: "Saved!",     // <--- ADD THIS
-                btn_error: "Error",      // <--- ADD THIS
+                btn_saved: "Saved!",     
+                btn_error: "Error",      
                 btn_loads: "Loads",
                 btn_reset: "Reset",
                 warn_spacing: "Spacing > 3hef. Cones separate.",
@@ -1463,16 +1296,11 @@
                 lbl_muy: "彎矩 Y-軸 (<span class='math-symbol'>M<sub>uy</sub></span>) [kgf-cm]"
             }
         };
-
-        // --- FORMULA IMAGES (SVG) ---
-        // Detailed Formula Images for PDF Header
         const math_Nb_pdf = `<svg height="30" viewBox="0 0 250 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><text x="0" y="22" font-family="Times New Roman" font-size="18" font-style="italic">N<tspan dy="5" font-size="12">b</tspan><tspan dy="-5" font-size="18"> = </tspan>k<tspan dy="5" font-size="12">c</tspan><tspan dy="-5" font-size="18"> </tspan>λ<tspan dy="5" font-size="12">a</tspan><tspan dy="-5" font-size="18"> √f'</tspan><tspan dy="5" font-size="12">c</tspan><tspan dy="-5" font-size="18"> h</tspan><tspan dy="5" font-size="12">ef</tspan><tspan dy="-10" font-size="12">1.5</tspan></text></svg>`;
         const math_Vb_pdf = `<svg height="30" viewBox="0 0 250 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><text x="0" y="22" font-family="Times New Roman" font-size="18" font-style="italic">V<tspan dy="5" font-size="12">b</tspan><tspan dy="-5" font-size="18"> = min(V</tspan><tspan dy="5" font-size="12">b1</tspan><tspan dy="-5" font-size="18">, V</tspan><tspan dy="5" font-size="12">b2</tspan><tspan dy="-5" font-size="18">)</tspan></text></svg>`;
         const math_Ncbg_pdf = `<svg height="30" viewBox="0 0 450 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><text x="0" y="22" font-family="Times New Roman" font-size="18" font-style="italic">φN<tspan dy="5" font-size="12">cbg</tspan><tspan dy="-5" font-size="18"> = φ (A</tspan><tspan dy="5" font-size="12">Nc</tspan><tspan dy="-5" font-size="18">/A</tspan><tspan dy="5" font-size="12">Nco</tspan><tspan dy="-5" font-size="18">) ψ</tspan><tspan dy="5" font-size="12">ec,N</tspan><tspan dy="-5" font-size="18"> ψ</tspan><tspan dy="5" font-size="12">ed,N</tspan><tspan dy="-5" font-size="18"> ψ</tspan><tspan dy="5" font-size="12">c,N</tspan><tspan dy="-5" font-size="18"> ψ</tspan><tspan dy="5" font-size="12">cp,N</tspan><tspan dy="-5" font-size="18"> N</tspan><tspan dy="5" font-size="12">b</tspan></text></svg>`;
         const math_Vcbg_pdf = `<svg height="30" viewBox="0 0 450 30" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle"><text x="0" y="22" font-family="Times New Roman" font-size="18" font-style="italic">φV<tspan dy="5" font-size="12">cbg</tspan><tspan dy="-5" font-size="18"> = φ (A</tspan><tspan dy="5" font-size="12">Vc</tspan><tspan dy="-5" font-size="18">/A</tspan><tspan dy="5" font-size="12">Vco</tspan><tspan dy="-5" font-size="18">) ψ</tspan><tspan dy="5" font-size="12">ec,V</tspan><tspan dy="-5" font-size="18"> ψ</tspan><tspan dy="5" font-size="12">ed,V</tspan><tspan dy="-5" font-size="18"> ψ</tspan><tspan dy="5" font-size="12">h,V</tspan><tspan dy="-5" font-size="18"> V</tspan><tspan dy="5" font-size="12">b</tspan></text></svg>`;
-
         function t(key) { return translations[currentLang][key] || key; }
-
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'zh' : 'en';
             document.getElementById('lang-label').innerText = currentLang === 'en' ? '中文' : 'EN';
@@ -1483,7 +1311,6 @@
             if (currentData) performCalculation();
             if (!document.getElementById('view-history').classList.contains('hidden')) loadHistory();
         }
-        
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             if (user) {
@@ -1498,36 +1325,24 @@
                 document.getElementById('login-btn').classList.remove('hidden');
             }
         });
-
         document.getElementById('login-btn').addEventListener('click', () => document.getElementById('auth-modal').classList.remove('hidden'));
         document.getElementById('guest-login').addEventListener('click', async () => { await auth.signInAnonymously(); document.getElementById('auth-modal').classList.add('hidden'); });
-        // --- EMAIL LOGIN LOGIC ---
         document.getElementById('email-login-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const errorMsg = document.getElementById('auth-error');
-       
-            // Reset error
             errorMsg.classList.add('hidden');
             errorMsg.innerText = '';
-       
             if (!email || !password) {
                 errorMsg.innerText = "Please enter both email and password.";
                 errorMsg.classList.remove('hidden');
                 return;
             }
-       
             try {
-                // Change button text to indicate loading
                 const btn = document.getElementById('email-login-btn');
                 const originalText = btn.innerText;
                 btn.innerText = 'Processing...';
-       
                 await auth.signInWithEmailAndPassword(email, password);
-               
-                // Modal will close automatically via the onAuthStateChanged listener you already wrote
-               
-                // Reset button text
                 btn.innerText = originalText;
             } catch (error) {
                 console.error(error);
@@ -1536,32 +1351,22 @@
                 document.getElementById('email-login-btn').innerText = "Login";
             }
         });
-       
-        // --- EMAIL REGISTER LOGIC ---
         document.getElementById('email-register-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const errorMsg = document.getElementById('auth-error');
-       
-            // Reset error
             errorMsg.classList.add('hidden');
             errorMsg.innerText = '';
-       
             if (!email || !password) {
                 errorMsg.innerText = "Please enter both email and password.";
                 errorMsg.classList.remove('hidden');
                 return;
             }
-       
             try {
                 const btn = document.getElementById('email-register-btn');
                 const originalText = btn.innerText;
                 btn.innerText = 'Creating...';
-       
                 await auth.createUserWithEmailAndPassword(email, password);
-               
-                // Modal closes automatically via onAuthStateChanged
-               
                 btn.innerText = originalText;
             } catch (error) {
                 console.error(error);
@@ -1571,13 +1376,8 @@
             }
         });
         document.getElementById('logout-btn').addEventListener('click', () => { auth.signOut(); window.location.reload(); });
-        
-        // REVISION: Auto-calculate Ase
         window.autoCalculateAse = function() {
             const da = parseFloat(document.getElementById('da').value) || 0;
-            // Approximation: Ase approx 0.8 * Gross Area (Pi/4 * da^2)
-            // Or use standard coarse thread lookup approx: 0.7854 * (d - 0.9382*p)^2
-            // For general purpose, 0.8 factor is safe/standard approx for user not looking up tables.
             if (da > 0) {
                 const areaGross = (Math.PI / 4) * Math.pow(da, 2);
                 const ase = areaGross * 0.8; 
@@ -1585,30 +1385,20 @@
             }
             performCalculation();
         };
-
-        // REVISION: Master Config for Anchor Type
         window.updateAnchorConfig = function() {
             const typeSelect = document.getElementById('kc_select');
             const pullSelect = document.getElementById('pullout_mode');
             const pullContainer = document.getElementById('div_pull_mode_container');
-            
             if (!typeSelect || !pullSelect) return; 
-            
             const type = typeSelect.value;
-            
-            // --- NEW: Toggle Pullout Mode Visibility ---
             if (type === '10') { 
-                // CAST-IN: Show Mode Selector
                 if (pullContainer) pullContainer.classList.remove('hidden');
-                
-                // Fix: If "post" option exists (from initial load), rebuild the list to remove it
                 if (pullSelect.querySelector('option[value="post"]')) {
                      const currentVal = pullSelect.value;
                      pullSelect.innerHTML = `
                         <option value="headed" data-i18n="opt_headed">${t('opt_headed')}</option>
                         <option value="hooked" data-i18n="opt_hooked">${t('opt_hooked')}</option>
                     `;
-                    // Preserve selection if it was already headed or hooked
                     if (currentVal === 'headed' || currentVal === 'hooked') {
                         pullSelect.value = currentVal;
                     } else {
@@ -1616,79 +1406,52 @@
                     }
                 }
             } else {
-                // POST-INSTALLED: Hide Mode Selector
-                // Hide Mode Selector (Only "Certified Pullout" applies)
                 if (pullContainer) pullContainer.classList.add('hidden');
-                
-                // Force internal mode to 'post' so the code asks for Np (Certified Strength)
                 if (!pullSelect.querySelector('option[value="post"]')) {
                      pullSelect.innerHTML = `<option value="post" data-i18n="opt_post_cert">${t('opt_post_cert')}</option>`;
                 }
                 pullSelect.value = 'post';
             }
-            
-            // Update input fields (Shows Np input if mode is 'post', Abrg if 'headed')
             togglePulloutInputs();
-            // ----------------------------------------
-            
-            // 1. Adhesive Logic
             const divAdh = document.getElementById('div_adhesive');
             if (divAdh) {
-                // Show bond stress input ONLY if type is 'adhesive'
                 divAdh.classList.toggle('hidden', type !== 'adhesive');
             }
-            
-            // 2. Critical Edge Distance (cac) Logic
-            // cac is required for Post-Installed Mechanical Anchors to check Splitting
             const divCac = document.getElementById('div_cac');
             const inpCac = document.getElementById('cac');
             const msgCac = document.querySelector('[data-i18n="msg_cac_default"]');
-
-            // Select elements for Failure Factor auto-suggestion
             const lambdaSelect = document.getElementById('lambda_select');
-
             if (divCac && inpCac) {
                 if (type === '10' || type === 'adhesive') { 
-                    // Cast-in: Splitting controlled by spacing/cover (Code defaults)
-                    // Adhesive: Controlled by Bond Splitting (cNa)
                     divCac.classList.add('hidden'); 
-                    
-                    // Auto-suggest Lambda
                     if (lambdaSelect) {
                         if (type === '10' || type === 'screw') {
                             lambdaSelect.value = "1.0";
                         } else if (type === '7' || type === 'adhesive') {
-                            // Default to 0.8 for Expansion/Bonded unless user manually chose 0.6
                             if (lambdaSelect.value !== '0.6') {
                                 lambdaSelect.value = "0.8";
                             }
                         }
                     }
                 } else {
-                    divCac.classList.remove('hidden'); // Show for Post-installed Mechanical
-                    
-                    // Auto-Calculate Default cac based on ACI 318
+                    divCac.classList.remove('hidden'); 
                     let factor = 0;
                     if (type === '7') {
-                        factor = 4.0; // Expansion Anchors
+                        factor = 4.0; 
                         if (msgCac) msgCac.innerText = "Default: 4.0hef (Expansion)";
-                        if (lambdaSelect) lambdaSelect.value = "0.8"; // Expansion usually lower reliability
+                        if (lambdaSelect) lambdaSelect.value = "0.8"; 
                     } else if (type === 'screw') {
-                        factor = 2.5; // Undercut / Screw Anchors
+                        factor = 2.5; 
                         if (msgCac) msgCac.innerText = "Default: 2.5hef (Screw/Undercut)";
-                        if (lambdaSelect) lambdaSelect.value = "1.0"; // Screw usually high performance
+                        if (lambdaSelect) lambdaSelect.value = "1.0"; 
                     }
-                    
                     if (factor > 0 && hef > 0) {
                         inpCac.value = (factor * hef).toFixed(2);
                     }
                 }
             }
-
             performCalculation();
         };
-
-        // REVISION: Toggle Moment Inputs
         window.toggleMoments = function() {
             const show = document.getElementById('chk_moments').checked;
             document.getElementById('div_moments').classList.toggle('hidden', !show);
@@ -1699,122 +1462,77 @@
             performCalculation();
         };
         window.togglePulloutInputs = function() {
-            const kcVal = document.getElementById('kc_select').value; // Get Anchor Type
+            const kcVal = document.getElementById('kc_select').value; 
             const mode = document.getElementById('pullout_mode').value;
-
-            // 1. Headed/Hooked/Post inputs visibility
-            // Only show Abrg if mode is Headed
             document.getElementById('div_abrg').classList.toggle('hidden', mode !== 'headed');
-            // Only show Hook Length if mode is Hooked
             document.getElementById('div_eh').classList.toggle('hidden', mode !== 'hooked');
-            
-            // 2. Certified Pullout (Np) Visibility Logic
-            // Show Np ONLY if it is Post-installed (Expansion or Screw)
-            // HIDE Np if it is Cast-in OR Adhesive
             const isAdhesive = (kcVal === 'adhesive');
             const isCastIn = (kcVal === '10');
-            
-            // If it's Cast-in (headed/hooked), we don't need certified Np (we calc it).
-            // If it's Adhesive, we don't need Np (we use Bond Stress).
-            // If it's Screw or Expansion, we NEED Np.
             const showNp = !isCastIn && !isAdhesive; 
-
             document.getElementById('div_np').classList.toggle('hidden', !showNp);
         };
-
-        // NEW Feature: Toggle Shear Lug Inputs
         window.toggleShearLug = function() {
             const isSL = document.getElementById('is_shearlug').checked;
             document.getElementById('div_shearlug').classList.toggle('hidden', !isSL);
         }
-
-        // NEW Feature: Toggle Reinforcement Inputs
         window.toggleReinf = function() {
             const isRe = document.getElementById('is_reinf').checked;
             document.getElementById('div_reinf').classList.toggle('hidden', !isRe);
         }
-        // NEW Feature: Toggle Seismic Detailing Input
         window.toggleSeismicDetailing = function() {
             const isSeis = document.getElementById('is_seismic').checked;
             const isDuctile = document.getElementById('steel_ductility').value === 'ductile';
             document.getElementById('div_stretch').classList.toggle('hidden', !(isSeis && isDuctile));
         }
-
         let scene, camera, renderer, controls;
         let currentVizMode = '2d';
         let showDims = true;
-        let displayMode2D = 'numbers'; // Possible values: 'numbers' or 'loads'
-        let displayMode3D = 'numbers'; // Modes: 'numbers' or 'loads'
-
-        // Revised Snippet
+        let displayMode2D = 'numbers'; 
+        let displayMode3D = 'numbers'; 
         window.toggleLoads = function() {
             displayMode2D = (displayMode2D === 'numbers') ? 'loads' : 'numbers';
-            
             const btn = document.getElementById('btn-toggle-loads');
             if (btn) {
-                // If the NEW state is 'loads', the button should offer to switch back to 'numbers' (ID Mode)
                 if (displayMode2D === 'loads') {
-                    // Update: Added px-3 py-1 to match new layout AND Translation
                     btn.className = "text-[10px] bg-green-600 text-white px-3 py-1 rounded border border-green-700 transition font-medium flex items-center";
                     btn.innerHTML = `<i class="fa-solid fa-list-ol mr-1"></i> <span>${t('btn_id_mode')}</span>`; 
                 } else {
-                    // Update: Added px-3 py-1 to match new layout
                     btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
                     btn.innerHTML = `<i class="fa-solid fa-arrow-up-long mr-1"></i> <span>${t('btn_loads')}</span>`;
                 }
             }
             drawVisualization();
         };
-
         window.toggle3DDimensions = function() {
             showDims = !showDims;
             const btn = document.getElementById('btn-3d-dims');
             if(showDims) {
-                // Update: Added px-3 py-1
                 btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
             } else {
-                // Update: Added px-3 py-1
                 btn.className = "text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-400 px-3 py-1 rounded border border-gray-200 transition font-medium flex items-center";
             }
             if (currentData) update3DScene(currentData.anchors, currentData.inputs);
         };
-
         window.toggle3DLoads = function() {
-            // Switch between modes
             displayMode3D = (displayMode3D === 'numbers') ? 'loads' : 'numbers';
-            
             const btn = document.getElementById('btn-3d-loads');
             if (btn) {
-                // Update button text/style based on what is currently ACTIVE
                 if (displayMode3D === 'loads') {
-                    // Show "ID Mode" button (to switch back)
                     btn.innerHTML = `<i class="fa-solid fa-arrow-up-long mr-1"></i> <span>${t('btn_loads')}</span>`;
                     btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
                 } else {
-                    // Show "Loads" button (to switch to loads)
-                    // FIXED: Corrected logic to show ID Mode text when we are actually looking at loads? 
-                    // Actually, if displayMode is 'numbers', the button should say "Loads" (to switch to loads).
-                    // If displayMode is 'loads', the button should say "ID Mode" (to switch to IDs).
-                    
-                    // Let's align this exactly with the 2D logic:
                     if (displayMode3D === 'loads') {
-                         // Active state is Loads, button allows switching to IDs
                          btn.innerHTML = `<i class="fa-solid fa-list-ol mr-1"></i> <span>${t('btn_id_mode')}</span>`;
                          btn.className = "text-[10px] bg-green-600 text-white px-3 py-1 rounded border border-green-700 transition font-medium flex items-center";
                     } else {
-                         // Active state is IDs, button allows switching to Loads
                          btn.innerHTML = `<i class="fa-solid fa-arrow-up-long mr-1"></i> <span>${t('btn_loads')}</span>`;
                          btn.className = "text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded border border-blue-200 transition font-medium flex items-center";
                     }
                 }
             }
-            // Refresh the scene
             if (currentData) update3DScene(currentData.anchors, currentData.inputs);
         };
-        // --- NEW: Custom Anchor Manager ---
         let anchorData = []; 
-
-        // Helper to parse hidden textarea back to array
         function parseCoords() {
             const raw = document.getElementById('custom_coords').value.trim();
             if(!raw) return [];
@@ -1823,27 +1541,20 @@
                 return { x: parseFloat(p[0])||0, y: parseFloat(p[1])||0 };
             });
         }
-
-        // Sync Array -> Hidden Textarea -> Calculation
         function syncToTextarea() {
             const str = anchorData.map(a => `${a.x},${a.y}`).join(' ; ');
             document.getElementById('custom_coords').value = str;
             performCalculation();
         }
-
-        // Render the visual table
         function renderAnchorTable() {
             const tbody = document.getElementById('anchor_table_body');
             if(!tbody) return;
             tbody.innerHTML = '';
-            
             if(anchorData.length === 0) {
-                // UPDATE: Added translation support for this message
                 const msg = translations[currentLang]['msg_no_def'] || "No anchors defined";
                 tbody.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 py-2 italic">${msg}</td></tr>`;
                 return;
             }
-
             anchorData.forEach((a, i) => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b last:border-0 hover:bg-blue-50";
@@ -1858,8 +1569,6 @@
                 tbody.appendChild(tr);
             });
         }
-
-        // --- Layout Actions ---
         window.addSingleAnchor = function() {
             const x = parseFloat(document.getElementById('new_x').value);
             const y = parseFloat(document.getElementById('new_y').value);
@@ -1870,21 +1579,17 @@
             document.getElementById('new_x').value = '';
             document.getElementById('new_y').value = '';
         };
-
         window.removeAnchor = function(idx) {
             anchorData.splice(idx, 1);
             renderAnchorTable();
             syncToTextarea();
         };
-
         window.clearAllAnchors = function() {
             if(!confirm("Clear all custom anchors?")) return;
             anchorData = [];
             renderAnchorTable();
             syncToTextarea();
         };
-
-        // Updated Generator with Offsets
         window.generateGridAnchors = function () {
             const rows = parseInt(document.getElementById('grid_rows').value) || 1;
             const cols = parseInt(document.getElementById('grid_cols').value) || 1;
@@ -1892,8 +1597,6 @@
             const sy = parseFloat(document.getElementById('grid_sy').value) || 0;
             const stx = parseFloat(document.getElementById('grid_st_x').value) || 0;
             const sty = parseFloat(document.getElementById('grid_st_y').value) || 0;
-            
-            // Append new grid to existing list
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
                     anchorData.push({ 
@@ -1905,26 +1608,17 @@
             renderAnchorTable();
             syncToTextarea();
         };
-
-        // Layout Toggle
         window.toggleLayoutMode = function () {
             const mode = document.getElementById('layout_mode').value;
             const isCustom = mode === 'custom';
-            
-            // Show/hide the Custom Table UI
             document.getElementById('div_custom_coords').classList.toggle('hidden', !isCustom);
-            
-            // MODIFY: Freeze Spacing (S1, S2) AND Top/Side Edges (Ca1, Ca2) in Custom Mode.
-            // Keep Ca1,1 (Bottom Edge) editable.
             const inputsToFreeze = [
                 document.getElementById('s1'), 
                 document.getElementById('s2'),
                 document.getElementById('ca1'),
                 document.getElementById('ca2')
             ];
-            
             const ca1_1 = document.getElementById('ca1_1');
-
             inputsToFreeze.forEach(input => {
                 if (input) {
                     input.disabled = isCustom;
@@ -1937,29 +1631,23 @@
                     }
                 }
             });
-
-            // Ensure Ca1,1 is always enabled
             if (ca1_1) {
                 ca1_1.disabled = false;
                 ca1_1.classList.remove('bg-gray-100', 'text-gray-400', 'cursor-not-allowed', 'border-gray-200');
                 ca1_1.classList.add('border-gray-300');
             }
-
             if (isCustom) {
                 if (anchorData.length === 0) anchorData = parseCoords();
                 renderAnchorTable();
             }
             performCalculation();
         };
-
         window.changeVizMode = function (mode) {
             currentVizMode = mode;
             const btn2d = document.getElementById('btn-viz-2d');
             const btn3d = document.getElementById('btn-viz-3d');
             btn2d.className = (mode === '2d') ? "px-4 py-1.5 text-xs font-medium bg-eng-primary text-white border border-eng-primary rounded-l-lg" : "px-4 py-1.5 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-l-lg";
             btn3d.className = (mode === '3d') ? "px-4 py-1.5 text-xs font-medium bg-eng-primary text-white border border-eng-primary rounded-r-lg" : "px-4 py-1.5 text-xs font-medium bg-white text-gray-700 border border-gray-200 rounded-r-lg";
-
-            // Initialize 3D when switching to 3D mode
             if (mode === '3d' && !renderer) {
                 setTimeout(() => {
                     init3D();
@@ -1968,48 +1656,36 @@
                     }
                 }, 100);
             }
-
             updateUI();
         };
-
-        // --- Initialize 3D Environment ---
         window.init3D = function () {
             const container = document.getElementById('canvas-3d-container');
             if (!container) return;
-
-            // Cleanup if exists
             if (renderer) {
                 container.removeChild(renderer.domElement);
                 renderer.dispose();
                 renderer = null;
             }
-
             scene = new THREE.Scene();
             scene.background = new THREE.Color(isDarkMode ? 0x1e293b : 0xffffff);
-
             const width = container.clientWidth || 800;
             const height = container.clientHeight || 256;
-
             camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
             camera.position.set(60, 60, 60);
             camera.lookAt(0, 0, 0);
-
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(width, height);
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
-
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
             const spotLight = new THREE.SpotLight(0xffffff, 0.5);
             spotLight.position.set(100, 100, 100);
             scene.add(spotLight);
-
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.update();
-
             function animate() {
                 requestAnimationFrame(animate);
                 controls.update();
@@ -2017,40 +1693,29 @@
             }
             animate();
         };
-
-        // --- 3D Text Helper (Billboard Sprites) ---
         function makeTextSprite(message, color, scale = 0.1) {
             var fontface = "Arial";
-            var fontsize = 80; // High res font for texture
+            var fontsize = 80; 
             var canvas = document.createElement('canvas');
             canvas.width = 512; 
-            canvas.height = 256; // 2:1 Aspect Ratio
+            canvas.height = 256; 
             var context = canvas.getContext('2d');
-            
-            // Draw background pill (Solid White for contrast)
             /*
             context.fillStyle = "rgba(255, 255, 255, 0.95)";
             context.beginPath();
             context.ellipse(256, 128, 230, 100, 0, 0, 2 * Math.PI);
             context.fill();
-            
-            // Border
             context.lineWidth = 12;
             context.strokeStyle = color || "#004a99";
             context.stroke();
             */
-
-            // Text
             context.font = "Bold " + fontsize + "px " + fontface;
             context.textAlign = "center";
             context.textBaseline = "middle";
             context.fillStyle = color || "#004a99";
             context.fillText(message, 256, 128);
-
             var texture = new THREE.Texture(canvas);
             texture.needsUpdate = true;
-            
-            // sizeAttenuation: false ensures text stays same size on screen regardless of zoom
             var spriteMaterial = new THREE.SpriteMaterial({ 
                 map: texture, 
                 sizeAttenuation: false, 
@@ -2058,24 +1723,13 @@
                 depthWrite: false 
             });
             var sprite = new THREE.Sprite(spriteMaterial);
-            
-            // Scale is relative to viewport height. 
-            // 0.1 means 10% of screen height.
-            // Width is 2x height because canvas is 2:1.
             sprite.scale.set(scale * 2, scale, 1); 
             sprite.renderOrder = 999; 
             return sprite;
         }
-
         window.update3DScene = function (anchors, I) {
-            // Attempt to initialize if renderer doesn't exist
             if (!renderer && typeof init3D === 'function') init3D();
-
-            // CRITICAL FIX: Stop execution if scene is still undefined (init3D failed)
-            // This prevents "Cannot read properties of undefined (reading 'children')"
             if (!scene) return;
-
-            // Clear existing scene objects (Include Groups and ArrowHelpers for loads)
             scene.children.filter(c => 
                 c.type === "Mesh" || 
                 c.type === "Sprite" || 
@@ -2084,123 +1738,82 @@
                 c.type === "Group" || 
                 c.type === "ArrowHelper"
             ).forEach(m => scene.remove(m));
-
-            // 1. Calculate Bounds
             let maxAnchorX = 0, maxAnchorY = 0;
             if (anchors.length > 0) {
                 maxAnchorX = Math.max(...anchors.map(a => a.x));
                 maxAnchorY = Math.max(...anchors.map(a => a.y));
             }
-
             const margin = 10;
             const slabW = maxAnchorX + I.ca2; 
             const slabH = maxAnchorY + I.ca1_1;
-            
-            // Validation Thresholds for Red coloring
             const min_s = 6 * I.da;
             const min_c = 6 * I.da;
             const limit_3hef = 3 * I.hef;
-            
-            // 2. Concrete Slab
             const slabGeo = new THREE.BoxGeometry(slabW, I.ha, slabH);
             const slabMat = new THREE.MeshPhongMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
             const slab = new THREE.Mesh(slabGeo, slabMat);
             slab.position.set(0, -I.ha/2, 0); 
             scene.add(slab);
-
-            // Wireframe Edges
             const edges = new THREE.EdgesGeometry(slabGeo);
             const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x94a3b8 }));
             line.position.copy(slab.position);
             scene.add(line);
-
-            // --- Coordinate Mapping ---
             const mapX = (x) => -slabW/2 + x;
             const mapZ = (y) => -slabH/2 + y;
-
-            // 3. Anchors & ID Labels
             anchors.forEach((a, index) => {
                 const rodGeo = new THREE.CylinderGeometry(I.da / 2, I.da / 2, I.hef + 2, 16);
-                
-                // Dynamic Color: Blue (Tension), Red (Compression), Grey (Neutral)
                 let hexColor = 0xe2e8f0;
                 if (!a.excluded) {
-                    if ((a.forceN || 0) > 0.1) hexColor = 0x3b82f6; // blue-500
-                    else if ((a.forceN || 0) < -0.1) hexColor = 0xef4444; // red-500
+                    if ((a.forceN || 0) > 0.1) hexColor = 0x3b82f6; 
+                    else if ((a.forceN || 0) < -0.1) hexColor = 0xef4444; 
                 }
-
                 const rodMat = new THREE.MeshPhongMaterial({ color: hexColor });
                 const rod = new THREE.Mesh(rodGeo, rodMat);
-                
                 const tx = mapX(a.x);
                 const tz = mapZ(a.y);
-
                 rod.position.set(tx, -I.hef / 2, tz);
                 scene.add(rod);
-
-                // Only show ID label if dimensions are on, or keep it always? 
-                // Let's keep ID labels always visible, but you can move this into the 'if(showDims)' block if you want them hidden too.
                 if (displayMode3D === 'numbers') {
                     const label = makeTextSprite(`#${index + 1}`, "#0f172a", 0.08);
                     label.position.set(tx, 5, tz); 
                     scene.add(label);
                 }
             });
-            
-            // --- 4. 3D Architectural Dimensions Helper ---
             function draw3DDim(p1, p2, text, offset, isVert, isBad) {
                 const mainColor = isBad ? 0xef4444 : 0x475569;
                 const extColor = isBad ? 0xffaaaa : 0xa0aec0; 
                 const fontColor = isBad ? "#b91c1c" : "#0f172a";
-
                 let startV, endV;
-
-                // Determine positions based on orientation
                 if (isVert) {
-                    // Vertical Dims on RIGHT side
                     const lineX = slabW/2 + offset;
                     startV = new THREE.Vector3(lineX, 0, mapZ(p1));
                     endV = new THREE.Vector3(lineX, 0, mapZ(p2));
-                    
                     const objZ1 = mapZ(p1);
                     const objZ2 = mapZ(p2);
                     const objX = slabW/2; 
-                    
                     drawExtension(new THREE.Vector3(objX, 0, objZ1), new THREE.Vector3(lineX, 0, objZ1), extColor);
                     drawExtension(new THREE.Vector3(objX, 0, objZ2), new THREE.Vector3(lineX, 0, objZ2), extColor);
-
                 } else {
-                    // Horizontal Dims on BOTTOM side
                     const lineZ = slabH/2 + offset;
                     startV = new THREE.Vector3(mapX(p1), 0, lineZ);
                     endV = new THREE.Vector3(mapX(p2), 0, lineZ);
-
                     const objX1 = mapX(p1);
                     const objX2 = mapX(p2);
                     const objZ = slabH/2; 
-
                     drawExtension(new THREE.Vector3(objX1, 0, objZ), new THREE.Vector3(objX1, 0, lineZ), extColor);
                     drawExtension(new THREE.Vector3(objX2, 0, objZ), new THREE.Vector3(objX2, 0, lineZ), extColor);
                 }
-
-                // Draw Main Line
                 const geo = new THREE.BufferGeometry().setFromPoints([startV, endV]);
                 const mat = new THREE.LineBasicMaterial({ color: mainColor });
                 scene.add(new THREE.Line(geo, mat));
-
-                // Draw Ticks
                 drawTick(startV, mainColor);
                 drawTick(endV, mainColor);
-
-                // Draw Text Label - Scale 0.09 (Readable text)
                 const mid = new THREE.Vector3().addVectors(startV, endV).multiplyScalar(0.5);
                 const label = makeTextSprite(text + " cm", fontColor, 0.09);
                 label.position.copy(mid);
                 label.position.y = 2; 
                 scene.add(label);
             }
-
-            // Sub-helper: Extension Line
             function drawExtension(from, to, color) {
                 const points = [from, to];
                 const geo = new THREE.BufferGeometry().setFromPoints(points);
@@ -2215,8 +1828,6 @@
                 line.computeLineDistances();
                 scene.add(line);
             }
-
-            // Sub-helper: Tick Mark
             function drawTick(pos, color) {
                 const size = 1.5;
                 const p1 = new THREE.Vector3(pos.x - size, 0, pos.z + size);
@@ -2225,17 +1836,11 @@
                 const mat = new THREE.LineBasicMaterial({ color: color });
                 scene.add(new THREE.Line(geo, mat));
             }
-
-            // --- 5. Draw the Dimensions (WRAPPED IN CONDITION) ---
-            // Use typeof check to avoid ReferenceError if showDims wasn't declared globally
             if (typeof showDims !== 'undefined' && showDims) { 
                 const uniqueX = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
                 const uniqueY = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
-
-                // A. Vertical Dimensions (Right Side)
                 const bad_ca1 = I.ca1 < min_c;
                 draw3DDim(0, uniqueY[0], `Ca1=${I.ca1}`, 15, true, bad_ca1); 
-
                 for(let i=0; i<uniqueY.length-1; i++) {
                     const val = uniqueY[i+1] - uniqueY[i];
                     if (val > 0.1) {
@@ -2243,18 +1848,12 @@
                         draw3DDim(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 30 + (i*15), true, isBad);
                     }
                 }
-
-                // ADD: Draw Ca1,1 (Bottom Edge)
-                // From the lowest anchor (last in uniqueY) to the concrete bottom (slabH)
                 const lastY = uniqueY[uniqueY.length - 1];
-                const slabBottom = slabH; // slabH was calculated as maxAnchorY + I.ca1_1
+                const slabBottom = slabH; 
                 const bad_ca1_1 = I.ca1_1 < min_c;
                 draw3DDim(lastY, slabBottom, `Ca1,1=${I.ca1_1}`, 15, true, bad_ca1_1);
-
-                // B. Horizontal Dimensions (Bottom Side)
                 const bad_ca2 = I.ca2 < min_c;
                 draw3DDim(0, uniqueX[0], `Ca2=${I.ca2}`, 15, false, bad_ca2);
-
                 for(let i=0; i<uniqueX.length-1; i++) {
                     const val = uniqueX[i+1] - uniqueX[i];
                     if (val > 0.1) {
@@ -2262,14 +1861,10 @@
                         draw3DDim(uniqueX[i], uniqueX[i+1], `s2=${val.toFixed(1)}`, 30 + (i*15), false, isBad);
                     }
                 }
-            } // <--- END CONDITIONAL
-            // --- 7. 3D LOADS VISUALIZATION ---
+            } 
             if (displayMode3D === 'loads') {
-                // Calculate Centroid of ACTIVE anchors only
                 const activeAnchors = anchors.filter(a => !a.excluded);
                 let cx = 0, cy = 0;
-                
-                // Fallback to geometric center if no active anchors
                 if (activeAnchors.length > 0) {
                     cx = activeAnchors.reduce((s, a) => s + a.x, 0) / activeAnchors.length;
                     cy = activeAnchors.reduce((s, a) => s + a.y, 0) / activeAnchors.length;
@@ -2277,106 +1872,69 @@
                     cx = anchors.reduce((s, a) => s + a.x, 0) / anchors.length;
                     cy = anchors.reduce((s, a) => s + a.y, 0) / anchors.length;
                 }
-                
-                // Base Origin (Centroid)
                 const centerV = new THREE.Vector3(mapX(cx), 2, mapZ(cy));
-                
-                // Eccentric Origin for Forces (Shifted by input e'x, e'y)
-                // Note: e'y is shift in Z-axis in 3D world (Vertical on 2D plan)
                 const eccX = I.e_prime_n_x || 0;
                 const eccY = I.e_prime_n_y || 0;
                 const forceOrigin = new THREE.Vector3(mapX(cx + eccX), 2, mapZ(cy + eccY));
-
                 const textScale = 0.09; 
-
-                // 1. Straight Arrow Helper
                 const addArrow = (dir, color, len, labelText, originPoint) => {
                     const arrowHelper = new THREE.ArrowHelper(dir, originPoint, len, color, 4, 2);
                     scene.add(arrowHelper);
                     if (labelText) {
                         const lbl = makeTextSprite(labelText, color, textScale);
-                        // Position at the END of the arrow
                         lbl.position.copy(originPoint).add(dir.clone().multiplyScalar(len + 5));
                         scene.add(lbl);
                     }
                 };
-
-                // 2. Curved Moment Arrow (Stays at Centroid)
                 const addCurvedMomentArrow = (axis, color, labelText) => {
                     const radius = 15;
                     const tube = 0.3; 
                     const arc = Math.PI; 
-
-                    // Geometry
                     const torusGeo = new THREE.TorusGeometry(radius, tube, 8, 32, arc);
                     const mat = new THREE.MeshBasicMaterial({ color: color });
                     const curveMesh = new THREE.Mesh(torusGeo, mat);
-
-                    // Arrowhead
                     const coneGeo = new THREE.ConeGeometry(1.5, 4, 16);
                     const head = new THREE.Mesh(coneGeo, mat);
-                    
-                    // Position head at end of arc
                     head.position.set(radius * Math.cos(arc), radius * Math.sin(arc), 0);
                     head.rotation.z = Math.PI; 
-
                     const group = new THREE.Group();
                     group.add(curveMesh);
                     group.add(head);
-                    group.position.copy(centerV); // Moments stay at Centroid
-
-                    // Rotation Logic
+                    group.position.copy(centerV); 
                     if (axis === 'x') {
-                        // Mux rotates around X axis
                         group.rotation.y = -Math.PI / 2; 
                     } 
-                    // axis 'z' (Muy) uses default orientation in XY plane relative to camera
-                    
-                    // Add Label to the GROUP so it rotates with the arrow
                     if (labelText) {
                         const lbl = makeTextSprite(labelText, color, textScale);
                         lbl.position.set(radius + 8, 0, 0);
                         group.add(lbl);
                     }
-
                     scene.add(group);
                 };
-
-                // A. Tension (Tu) - Upward (+Y) at Eccentric Location
                 if (I.T > 0) {
                     addArrow(new THREE.Vector3(0, 1, 0), 0x2563eb, 25, `Tu=${I.T} kgf`, forceOrigin);
                 }
-
-                // B. Shear (Vu) at Eccentric Location
                 if (I.V > 0) {
                     const shearDir = (I.v_dir === 'para') ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 0, -1);
                     addArrow(shearDir, 0xdc2626, 20, `Vu=${I.V} kgf`, forceOrigin);
                 }
-
-                // C. Moment X (Mux) at Centroid
                 if (Math.abs(I.Mux) > 0) {
                     addCurvedMomentArrow('x', 0x059669, `Mux=${I.Mux}`);
                 }
-
-                // D. Moment Y (Muy) at Centroid
                 if (Math.abs(I.Muy) > 0) {
                     addCurvedMomentArrow('z', 0x7c3aed, `Muy=${I.Muy}`);
                 }
             }
             renderer.render(scene, camera);
         };
-
         window.reset3DView = function () {
             if (!camera || !controls || !currentData) return;
             const I = currentData.inputs;
-            // Approximation of scale
             const size = Math.max(I.s1*2, I.s2*2, 50);
             camera.position.set(size, size, size);
             camera.lookAt(0, 0, 0);
             controls.reset();
         };
-
-        // --- 2D Visualization (Right/Bottom Dims, AutoCad Style, Dotted Extensions, "cm") ---
         window.drawVisualization = function (targetCanvas = null, forceFit = false) {
             const canvas = targetCanvas || document.getElementById('viz-canvas');
             if (!canvas || !currentData) return;
@@ -2385,92 +1943,60 @@
             const h = canvas.height;
             const I = currentData.inputs;
             const anchors = currentData.anchors || [];
-
-            // Validation Thresholds
             const min_s = 6 * I.da;
             const min_c = 6 * I.da;
             const limit_3hef = 3 * I.hef; 
-
-            // Clear background
             ctx.clearRect(0, 0, w, h);
             ctx.fillStyle = isDarkMode ? '#0f172a' : '#f8fafc';
             ctx.fillRect(0, 0, w, h);
-
-            // 1. Determine Logic Bounds
             let maxX = 0, maxY = 0;
             if (anchors.length > 0) {
                 maxX = Math.max(...anchors.map(a => a.x));
                 maxY = Math.max(...anchors.map(a => a.y));
             }
-            
-            const internalMargin = 20; // Extra concrete past the last anchor
-            
-            // Real world concrete dimensions (Logic)
+            const internalMargin = 20; 
             const realW = maxX + I.ca2; 
             const realH = maxY + I.ca1_1; 
-
-            // Canvas Layout Config
-            const topMargin = 50;  // Increased margin for bigger text
-            const leftMargin = 50; // Increased margin for bigger text
-            const rightSpace = 120; // Reserved for vertical dims text
+            const topMargin = 50;  
+            const leftMargin = 50; 
+            const rightSpace = 120; 
             const bottomSpace = 110; 
-
-            // Calculate Base Scale to fit within (w - margins)
             const availableW = w - leftMargin - rightSpace;
             const availableH = h - topMargin - bottomSpace;
-            
             const scaleX = availableW / realW;
             const scaleY = availableH / realH;
             let scale = Math.min(scaleX, scaleY);
-
-            // Origin (Top-Left of Concrete)
             let ox = leftMargin;
             let oy = topMargin;
-
-            // --- APPLY ZOOM/PAN (If not printing and not forced) ---
             if (!targetCanvas && !forceFit && typeof vizState !== 'undefined') {
                 scale *= vizState.scale;
                 ox += vizState.panX;
                 oy += vizState.panY;
             }
-
-            // Concrete Visual Dimensions
             const visW = realW * scale;
             const visH = realH * scale;
-
-            // --- Helper: Draw Architectural Dimension Line ---
             function drawDimLine(p1, p2, text, offset, isVert, isBad) {
                 const mainColor = isBad ? '#ef4444' : (isDarkMode ? '#94a3b8' : '#475569'); 
                 const extColor = isBad ? 'rgba(239, 68, 68, 0.4)' : (isDarkMode ? 'rgba(148, 163, 184, 0.3)' : 'rgba(71, 85, 105, 0.3)'); 
                 const fontColor = isBad ? '#ef4444' : (isDarkMode ? '#e2e8f0' : '#0f172a');
-                
                 let dimX1, dimY1, dimX2, dimY2, textX, textY;
-
-                // Calculate Coordinates
                 if (isVert) {
-                    // Vertical Dimension (Right Side)
                     const lineX = ox + visW + offset;
                     dimX1 = lineX; dimY1 = oy + p1 * scale;
                     dimX2 = lineX; dimY2 = oy + p2 * scale;
-                    
                     textX = dimX1 + 8;
                     textY = (dimY1 + dimY2) / 2;
                 } else {
-                    // Horizontal Dimension (Bottom Side)
                     const lineY = oy + visH + offset;
                     dimX1 = ox + p1 * scale; dimY1 = lineY;
                     dimX2 = ox + p2 * scale; dimY2 = lineY;
-
                     textX = (dimX1 + dimX2) / 2;
-                    textY = dimY1 + 16; // Increased offset for bigger text
+                    textY = dimY1 + 16; 
                 }
-
-                // 1. Draw Extension Lines (Dotted & Transparent)
                 ctx.beginPath();
                 ctx.lineWidth = 1;
                 ctx.strokeStyle = extColor;
                 ctx.setLineDash([2, 3]); 
-
                 if (isVert) {
                     ctx.moveTo(ox + internalMargin, dimY1); ctx.lineTo(dimX1, dimY1); 
                     ctx.moveTo(ox + internalMargin, dimY2); ctx.lineTo(dimX2, dimY2); 
@@ -2479,39 +2005,28 @@
                     ctx.moveTo(dimX2, oy + internalMargin); ctx.lineTo(dimX2, dimY2); 
                 }
                 ctx.stroke();
-                ctx.setLineDash([]); // Reset to solid
-
-                // 2. Draw Main Dimension Line (Solid)
+                ctx.setLineDash([]); 
                 ctx.beginPath();
                 ctx.strokeStyle = mainColor;
                 ctx.lineWidth = 1;
                 ctx.moveTo(dimX1, dimY1); ctx.lineTo(dimX2, dimY2);
-                
-                // Small extensions past the tick marks
                 if (isVert) {
                     ctx.moveTo(dimX1, dimY1 - 5); ctx.lineTo(dimX1, dimY2 + 5);
                 } else {
                     ctx.moveTo(dimX1 - 5, dimY1); ctx.lineTo(dimX2 + 5, dimY1);
                 }
                 ctx.stroke();
-
-                // 3. Draw Architectural Ticks (/)
                 const tickSize = 4;
                 ctx.lineWidth = 2; 
                 ctx.beginPath();
                 ctx.moveTo(dimX1 - tickSize, dimY1 + tickSize); ctx.lineTo(dimX1 + tickSize, dimY1 - tickSize);
                 ctx.moveTo(dimX2 - tickSize, dimY2 + tickSize); ctx.lineTo(dimX2 + tickSize, dimY2 - tickSize);
                 ctx.stroke();
-
-                // 4. Draw Text
                 const fullText = text + " cm";
-                // UPDATED: Increased Font Size to 14px
                 ctx.font = isBad ? "bold 14px Arial" : "14px Arial";
                 const metrics = ctx.measureText(fullText);
                 const tw = metrics.width;
-                const th = 16; // Increased box height
-                
-                // Text Background
+                const th = 16; 
                 ctx.save();
                 ctx.fillStyle = "rgba(255,255,255,0.9)"; 
                 if(isVert) {
@@ -2523,20 +2038,15 @@
                     ctx.textAlign = "center"; 
                     ctx.textBaseline = "bottom";
                 }
-                
                 ctx.fillStyle = fontColor;
                 ctx.fillText(fullText, textX, textY);
                 ctx.restore();
             }
-
-            // 2. Draw Concrete Slab
-            ctx.fillStyle = isDarkMode ? '#1e293b' : '#e2e8f0'; // Slate-800 vs Slate-200
+            ctx.fillStyle = isDarkMode ? '#1e293b' : '#e2e8f0'; 
             ctx.strokeStyle = isDarkMode ? '#475569' : '#475569';
             ctx.lineWidth = 2;
             ctx.fillRect(ox, oy, visW, visH);
             ctx.strokeRect(ox, oy, visW, visH);
-
-            // Infinite Lines (Visual Cue)
             ctx.beginPath();
             ctx.strokeStyle = '#94a3b8';
             ctx.lineWidth = 1;
@@ -2545,19 +2055,15 @@
             ctx.moveTo(ox, oy + visH); ctx.lineTo(ox, h); 
             ctx.stroke();
             ctx.setLineDash([]);
-
-            // 3. Draw Anchors
             anchors.forEach((a, i) => {
                 const cx = ox + a.x * scale;
                 const cy = oy + a.y * scale;
                 const r = Math.max(I.da * scale / 2, 4); 
-
                 let fillCol = '#94a3b8'; 
                 if (!a.excluded && typeof a.forceN === 'number') {
                     if (a.forceN > 0.1) fillCol = '#2563eb';      
                     else if (a.forceN < -0.1) fillCol = '#dc2626'; 
                 }
-
                 ctx.beginPath();
                 ctx.arc(cx, cy, r, 0, 2 * Math.PI);
                 ctx.fillStyle = fillCol;
@@ -2565,8 +2071,6 @@
                 ctx.strokeStyle = '#1e293b';
                 ctx.lineWidth = 1;
                 ctx.stroke();
-
-                // Only draw the ID label if we are in 'numbers' mode
                 if (displayMode2D === 'numbers') {
                     ctx.fillStyle = isDarkMode ? '#f1f5f9' : '#0f172a';
                     ctx.font = 'bold 14px sans-serif';
@@ -2575,15 +2079,10 @@
                     ctx.fillText("#" + (i + 1), cx + r + 2, cy + 2);
                 }
             });
-
-            // 4. Draw Dimensions (Right & Bottom)
             const uniqueX = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
             const uniqueY = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
-
-            // --- Vertical Dimensions (Right Side) ---
             const bad_ca1 = I.ca1 < min_c;
             drawDimLine(0, uniqueY[0], `Ca1=${I.ca1}`, 20, true, bad_ca1);
-
             for(let i=0; i<uniqueY.length-1; i++) {
                 const val = uniqueY[i+1] - uniqueY[i];
                 if (val > 0.1) {
@@ -2591,17 +2090,12 @@
                     drawDimLine(uniqueY[i], uniqueY[i+1], `s1=${val.toFixed(1)}`, 45 + (i*20), true, isBad);
                 }
             }
-            
-            // ADD: Draw Ca1,1 (Bottom Edge)
             const lastY = uniqueY[uniqueY.length - 1];
             const bad_ca1_1 = I.ca1_1 < min_c;
             drawDimLine(lastY, realH, `Ca1,1=${I.ca1_1}`, 20, true, bad_ca1_1);
-            // realH was calculated as maxY + I.ca1_1
             const slabBottom = realH;
-            // --- Horizontal Dimensions (Bottom Side) ---
             const bad_ca2 = I.ca2 < min_c;
             drawDimLine(0, uniqueX[0], `Ca2=${I.ca2}`, 20, false, bad_ca2);
-
             for(let i=0; i<uniqueX.length-1; i++) {
                 const val = uniqueX[i+1] - uniqueX[i];
                 if (val > 0.1) {
@@ -2609,11 +2103,7 @@
                     drawDimLine(uniqueX[i], uniqueX[i+1], `s2=${val.toFixed(1)}`, 45 + (i*20), false, isBad);
                 }
             }
-
-            // --- 5. Draw Loads (Tu, Vu, Mux, Muy) ---
             if (displayMode2D === 'loads') {
-                
-                // Helper: Draw Straight Arrow
                 function drawForceArrow(x, y, len, angle, label, color) {
                     ctx.save();
                     ctx.translate(x, y);
@@ -2621,27 +2111,20 @@
                     ctx.strokeStyle = color;
                     ctx.fillStyle = color;
                     ctx.lineWidth = 3;
-                    
-                    // Shaft
                     ctx.beginPath();
                     ctx.moveTo(0, 0);
                     ctx.lineTo(len, 0);
                     ctx.stroke();
-                    
-                    // Head
                     ctx.beginPath();
                     ctx.moveTo(len, 0);
                     ctx.lineTo(len - 10, -5);
                     ctx.lineTo(len - 10, 5);
                     ctx.closePath();
                     ctx.fill();
-
-                    // Label
                     if (label) {
                         ctx.translate(len + 5, 0);
-                        ctx.rotate(-angle); // Keep text horizontal
+                        ctx.rotate(-angle); 
                         ctx.fillStyle = color;
-                        // UPDATED: Increased Font Size to 16px
                         ctx.font = "bold 16px sans-serif";
                         ctx.textAlign = "left";
                         ctx.textBaseline = "middle";
@@ -2649,51 +2132,34 @@
                     }
                     ctx.restore();
                 }
-
-                // Helper: Draw Curved Moment Arrow (Half-Circle)
                 function drawMomentArrow(x, y, r, startAngle, endAngle, label, color, anticlockwise = false) {
                     ctx.save();
                     ctx.strokeStyle = color;
                     ctx.fillStyle = color;
                     ctx.lineWidth = 3;
-                    
-                    // 1. Draw the Arc
                     ctx.beginPath();
                     ctx.arc(x, y, r, startAngle, endAngle, anticlockwise);
                     ctx.stroke();
-
-                    // 2. Draw Arrow Head at the endAngle
                     const headX = x + r * Math.cos(endAngle);
                     const headY = y + r * Math.sin(endAngle);
-                    
                     ctx.save();
                     ctx.translate(headX, headY);
-                    
-                    // Calculate tangent angle based on drawing direction
                     let tan = anticlockwise ? (endAngle - Math.PI/2) : (endAngle + Math.PI/2);
-                    
                     ctx.rotate(tan);
                     ctx.beginPath();
-                    // Sharper, more balanced arrowhead
                     ctx.moveTo(0, 0);
                     ctx.lineTo(-10, -5); 
                     ctx.lineTo(-10, 5);
                     ctx.closePath();
                     ctx.fill();
                     ctx.restore();
-
-                    // 3. Draw Label
                     if (label) {
-                        // Position text slightly further out from the apex of the arc
                         const midAngle = anticlockwise 
                             ? (startAngle + (endAngle - startAngle) / 2) 
                             : (startAngle + (endAngle - startAngle) / 2);
-                        
-                        // For half circles, the apex is the simplest anchor
                         const textDist = r + 20;
                         const lx = x + textDist * Math.cos((startAngle + endAngle) / 2);
                         const ly = y + textDist * Math.sin((startAngle + endAngle) / 2);
-                        
                         ctx.fillStyle = color;
                         ctx.font = "bold 16px sans-serif";
                         ctx.textAlign = "center";
@@ -2702,40 +2168,28 @@
                     }
                     ctx.restore();
                 }
-
-                // Calculate Centroid (Visual) - ACTIVE ANCHORS ONLY
                 let cx = ox + visW / 2;
                 let cy = oy + visH / 2;
-                
                 const activeAnchors = anchors.filter(a => !a.excluded);
-                
                 if (activeAnchors.length > 0) {
                      const avgX = activeAnchors.reduce((s, a) => s + a.x, 0) / activeAnchors.length;
                      const avgY = activeAnchors.reduce((s, a) => s + a.y, 0) / activeAnchors.length;
                      cx = ox + avgX * scale;
                      cy = oy + avgY * scale;
                 } else if (anchors.length > 0) {
-                     // Fallback if all excluded
                      const avgX = anchors.reduce((s, a) => s + a.x, 0) / anchors.length;
                      const avgY = anchors.reduce((s, a) => s + a.y, 0) / anchors.length;
                      cx = ox + avgX * scale;
                      cy = oy + avgY * scale;
                 }
-
-                // Calculate Eccentric Shift for Forces (Inputs e'x, e'y)
                 const shiftX = (I.e_prime_n_x || 0) * scale;
                 const shiftY = (I.e_prime_n_y || 0) * scale;
                 const forceCx = cx + shiftX;
                 const forceCy = cy + shiftY;
-
-                // Draw Vu (Shear) - Red Straight Arrow at Eccentric Location
-                // UPDATED: Added Unit (kgf)
                 if (I.V > 0) {
                     const ang = (I.v_dir === 'para') ? 0 : -Math.PI / 2;
                     drawForceArrow(forceCx, forceCy, 60, ang, `Vu=${I.V} kgf`, '#dc2626'); 
                 }
-                // Draw Tu (Tension) - Blue Dot + Leader at Eccentric Location
-                // UPDATED: Added Unit (kgf)
                 if (I.T > 0) {
                     ctx.beginPath();
                     ctx.arc(forceCx, forceCy, 5, 0, 2*Math.PI);
@@ -2743,21 +2197,14 @@
                     ctx.fill();
                     drawForceArrow(forceCx, forceCy, 50, -Math.PI/4, `Tu=${I.T} kgf`, '#2563eb');
                 }
-
-                // Draw Mux (Moment X) - Green Curve at Centroid
-                // UPDATED: Added Unit (kgf-cm)
                 if (Math.abs(I.Mux) > 0) {
                     drawMomentArrow(cx + 50, cy, 25, Math.PI/2, -Math.PI/2, `Mux=${I.Mux} kgf-cm`, '#059669');
                 }
-
-                // Draw Muy (Moment Y) - Purple Curve at Centroid
-                // UPDATED: Added Unit (kgf-cm)
                 if (Math.abs(I.Muy) > 0) {
                     drawMomentArrow(cx, cy + 50, 25, 0, Math.PI, `Muy=${I.Muy} kgf-cm`, '#7c3aed');
                 }
             }
         };
-        
         window.performCalculation = function () {
             const val = (id) => {
                 const el = document.getElementById(id);
@@ -2772,51 +2219,36 @@
                 return el ? el.checked : false;
             };
             const warnings = [];
-
-            // REVISION: Determine Anchor Type & Adhesive Status from Dropdown
             let kcVal = 10; 
             let isAdh = false;
             const typeRaw = str('kc_select');
-
             if (typeRaw === 'adhesive') {
-                kcVal = 7; // Base factor, will use Bond Strength equations
+                kcVal = 7; 
                 isAdh = true;
             } else if (typeRaw === 'screw') {
-                kcVal = 10; // Treat similar to cast-in for basic breakout, or custom factor
+                kcVal = 10; 
             } else {
                 kcVal = parseFloat(typeRaw) || 10;
             }
-
-            // REVISION: Calculate Ase internally (Input removed)
             const daVal = val('da');
-            // Approx Effective Area = 0.8 * Gross Area
             const calcAse = (daVal > 0) ? (Math.PI / 4 * Math.pow(daVal, 2) * 0.8) : 0;
-
             const I = {
                 fc: val('fc'), ha: val('ha'), da: daVal, hef: val('hef'), 
                 s1: val('s1'), s2: val('s2'),
                 ca1: val('ca1'), ca1_1: val('ca1_1'), ca2: val('ca2'), 
                 T: val('loadT'), V: val('loadV'),
                 Mux: val('loadMux'), Muy: val('loadMuy'),
-                
-                // Factors
                 lambda: parseFloat(str('lambda_select')) || 1.0, 
                 le_mode: str('le_select'), 
                 psi_c_V: parseFloat(str('psi_c_V_select')) || 1.0,
                 e_prime_n_x: val('e_prime_n_x'), 
                 e_prime_n_y: val('e_prime_n_y'),
-                
-                // Key Configs
                 kc: kcVal, 
                 kc_raw: typeRaw,
                 is_adhesive: isAdh,
-                
-                // Steel (Use calculated Ase)
                 futa: val('futa'), fya: val('fya'), 
-                ase: calcAse, // <--- Calculated here
+                ase: calcAse, 
                 is_grouted: chk('is_grouted'),
-                
-                // Other inputs...
                 pull_mode: str('pullout_mode'), abrg: val('abrg'), eh: val('eh'), np_cert: val('np_certified'), psi_c_P: parseFloat(str('crack_cond_p')) || 1.0,
                 tau: val('tau'),
                 cond_ab: str('condition_ab'), category: parseFloat(str('anchor_category')) || 1, ductility: str('steel_ductility'),
@@ -2829,37 +2261,22 @@
                 layout_mode: str('layout_mode'),
                 custom_coords: str('custom_coords')
             };
-            // --- REVISION: Automatic Critical Edge Distance (cac) Logic ---
             let cac_auto = 0;
-            // 1. Determine cac based on Anchor Type
             if (I.kc_raw === '7') {
-                // Post-installed Expansion: 4.0 * hef
                 cac_auto = 4.0 * I.hef;
             } else if (I.kc_raw === 'screw') {
-                // Post-installed Screw/Undercut: 2.5 * hef
                 cac_auto = 2.5 * I.hef;
             }
-            // Cast-in and Adhesive use different mechanisms (cover or cNa), so cac_auto remains 0 (ignored)
-
-            // 2. Check for Splitting Failure (Uncracked Concrete Only)
             let psi_cp_N = 1.0;
             const ca_min_actual = Math.min(I.ca1, I.ca1_1, I.ca2);
-            
-            // Check if Concrete is Uncracked (Derived from Pullout Cracking Factor input)
             const isUncracked = (I.psi_c_P >= 1.4); 
-
             if (cac_auto > 0 && isUncracked) {
                 if (ca_min_actual < cac_auto) {
-                    // Calculate Splitting Reduction Factor
-                    // ACI 318-19 Eq 17.6.2.6.1b
                     const factor = Math.max(ca_min_actual / cac_auto, (1.5 * I.hef) / cac_auto);
                     psi_cp_N = factor;
                 }
             }
-
-            // Store cac in Input object for report usage (even though not in UI)
             I.cac = cac_auto;
-            // --- STEP 10: Dynamic Anchor Array ---
             let anchors = [];
             const lMode = I.layout_mode;
             if (lMode === 'grid') {
@@ -2869,9 +2286,7 @@
                 if (I.s1 > 0 && I.s2 > 0) anchors.push({ x: I.ca2 + I.s2, y: I.ca1 + I.s1 });
             } else {
                 const raw = I.custom_coords.trim();
-
                 if (!raw) {
-                    // UPDATE: Translation for empty warning
                     const wMsg = translations[currentLang]['warn_custom_empty'] || "Custom coordinates empty. Using default 2x2 grid.";
                     warnings.push(wMsg);
                     anchors = [
@@ -2885,7 +2300,6 @@
                         const parts = pair.trim().split(',');
                         const x = parseFloat(parts[0]);
                         const y = parseFloat(parts[1]);
-
                         if (isNaN(x) || isNaN(y)) {
                             warnings.push(`Invalid coordinate: "${pair.trim()}" (non-numeric)`);
                             return null;
@@ -2896,7 +2310,6 @@
                         }
                         return { x, y };
                     }).filter(a => a !== null);
-
                     if (anchors.length === 0) {
                         warnings.push("All custom coordinates invalid. Using default 2x2 grid.");
                         anchors = [
@@ -2907,24 +2320,17 @@
                         ];
                     }
                 }
-
-                // Auto-calculate S1, S2, Ca1, Ca2 from custom anchors
                 if (anchors.length >= 2) {
                     const xs = anchors.map(a => a.x).sort((a, b) => a - b);
                     const ys = anchors.map(a => a.y).sort((a, b) => a - b);
-
-                    I.ca2 = xs[0]; // Leftmost anchor = ca2
-                    I.ca1 = ys[0]; // Topmost anchor = ca1
-
-                    // Find smallest non-zero spacing in X direction
+                    I.ca2 = xs[0]; 
+                    I.ca1 = ys[0]; 
                     let minSpacingX = Infinity;
                     for (let i = 1; i < xs.length; i++) {
                         const diff = xs[i] - xs[i - 1];
                         if (diff > 0.1 && diff < minSpacingX) minSpacingX = diff;
                     }
                     I.s2 = minSpacingX === Infinity ? 0 : minSpacingX;
-
-                    // Find smallest non-zero spacing in Y direction
                     let minSpacingY = Infinity;
                     for (let i = 1; i < ys.length; i++) {
                         const diff = ys[i] - ys[i - 1];
@@ -2933,16 +2339,11 @@
                     I.s1 = minSpacingY === Infinity ? 0 : minSpacingY;
                 }
             }
-
-            // Re-calculate eccentricities based on centroid of the custom group
             const sumX = anchors.reduce((s, a) => s + a.x, 0);
             const sumY = anchors.reduce((s, a) => s + a.y, 0);
             const n_anchors = anchors.length;
-
-            // --- NEW: Cluster Analysis (Identify Active Group) ---
             const limit_dist = 3.0 * I.hef;
             const adj = Array.from({ length: anchors.length }, () => []);
-            
             for(let i=0; i<anchors.length; i++) {
                 for(let j=i+1; j<anchors.length; j++) {
                     const dx = anchors[i].x - anchors[j].x;
@@ -2954,8 +2355,6 @@
                     }
                 }
             }
-
-            // Find connected components
             const visited = new Set();
             let components = [];
             for(let i=0; i<anchors.length; i++) {
@@ -2976,126 +2375,79 @@
                     components.push(comp);
                 }
             }
-
-            // Keep only the largest component
             components.sort((a,b) => b.length - a.length);
             const activeIndices = new Set(components[0] || []);
-            
-            // Mark anchors
             anchors.forEach((a, i) => {
                 a.excluded = !activeIndices.has(i);
-                a.forceN = 0; // Reset
+                a.forceN = 0; 
             });
-
-            // --- REVISED: Geometric Properties (Active Only) ---
             const activeAnchors = anchors.filter(a => !a.excluded);
             const n_active = activeAnchors.length;
-
-            // Distribute shear equally among ACTIVE anchors
             const shear_per_anchor = (n_active > 0) ? (I.V / n_active) : 0;
-            // Note: ratio_sv calculation moved down to Step 1 section where phi_Vsa is defined
-            
             let centroid = { x: 0, y: 0 };
             if (n_active > 0) {
                 const sumX = activeAnchors.reduce((s, a) => s + a.x, 0);
                 const sumY = activeAnchors.reduce((s, a) => s + a.y, 0);
                 centroid = { x: sumX / n_active, y: sumY / n_active };
             }
-
-            // Moments of Inertia (Active Only)
             const Ixx = activeAnchors.reduce((s, a) => s + Math.pow(a.y - centroid.y, 2), 0);
             const Iyy = activeAnchors.reduce((s, a) => s + Math.pow(a.x - centroid.x, 2), 0);
-            
-            // --- FIX: CALCULATE ECCENTRICITY BEFORE FORCE DISTRIBUTION ---
             let calc_ex = 0;
             let calc_ey = 0;
             if (I.T > 0) {
                 calc_ex = Math.abs(I.Muy / I.T); 
                 calc_ey = Math.abs(I.Mux / I.T); 
             }
-
-            // 1. Calculate Total Design Moments (Input Moment + Tension * Eccentricity)
-            // e'y creates Moment about X-axis. e'x creates Moment about Y-axis.
             const Mux_total = I.Mux + (I.T * (I.e_prime_n_y || 0)); 
             const Muy_total = I.Muy + (I.T * (I.e_prime_n_x || 0));
-
-            // 2. Back-calculate resultant system eccentricity for Psi factors (ACI Code factors)
             let e_use_x = 0;
             let e_use_y = 0;
             if (I.T > 0) {
                 e_use_x = Math.abs(Muy_total / I.T);
                 e_use_y = Math.abs(Mux_total / I.T);
             }
-
             let max_anchor_tension = 0;
-
-            // Distribute Forces (Loop all, but only calculate for active)
-            // Distribute Forces (Loop all, but only calculate for active)
             anchors.forEach(a => {
-                if (a.excluded) return; // Skip excluded
-
+                if (a.excluded) return; 
                 let force = 0;
-                
-                // Axial Component (T/n)
                 if (n_active > 0) force += I.T / n_active;
-
-                // Moment X Component (Mux * y / Ixx)
                 if (Ixx > 0.01 && Math.abs(Mux_total) > 0.01) {
                     force += ((Mux_total) * (a.y - centroid.y)) / Ixx;
                 }
-
-                // Moment Y Component (Muy * x / Iyy)
                 if (Iyy > 0.01 && Math.abs(Muy_total) > 0.01) {
                     force += ((Muy_total) * (a.x - centroid.x)) / Iyy;
                 }
-                
                 a.forceN = force; 
                 if (force > max_anchor_tension) max_anchor_tension = force;
             });
-            // Safety: If compression dominates, max tension might be 0
             if (max_anchor_tension < 0) max_anchor_tension = 0;
-
-            // --- LOGIC UPDATE: Concrete Limits ---
             let fc_calc = I.fc;
-            if (I.kc_raw === '10' && I.fc > 700) { // Cast-in
+            if (I.kc_raw === '10' && I.fc > 700) { 
                 fc_calc = 700;
                 warnings.push(`Concrete Strength capped at 700 kgf/cm² (Cast-in limit).`);
-            } else if ((I.kc_raw === '7' || I.kc_raw === 'screw') && I.fc > 560) { // Post-installed / Screw
+            } else if ((I.kc_raw === '7' || I.kc_raw === 'screw') && I.fc > 560) { 
                 fc_calc = 560;
                 warnings.push(`Concrete Strength capped at 560 kgf/cm² (Post-installed limit).`);
             }
-            I.fc = fc_calc; // Use capped value for calcs
-
-            // --- LOGIC UPDATE: Seismic Detailing ---
+            I.fc = fc_calc; 
             if (I.is_seismic && I.ductility === 'ductile') {
                 if (I.stretch_len < 8 * I.da) {
                     warnings.push(`Seismic Violation: Stretch Length (${I.stretch_len}) < 8da (${(8*I.da).toFixed(2)}).`);
                 }
             }
-
-            // --- STEP 7: Minimum Geometry Validation ---
             const min_s = 6 * I.da; 
             const min_c = 6 * I.da; 
-
             if (I.s1 > 0 && I.s1 < min_s) warnings.push(`Vertical Spacing (S1): ${I.s1} < ${min_s.toFixed(2)} cm (6da)`);
             if (I.s2 > 0 && I.s2 < min_s) warnings.push(`Horizontal Spacing (S2): ${I.s2} < ${min_s.toFixed(2)} cm (6da)`);
             if (I.ca1 < min_c) warnings.push(`Top Edge (Ca1): ${I.ca1} < ${min_c.toFixed(2)} cm (6da)`);
             if (I.ca1_1 < min_c) warnings.push(`Bottom Edge (Ca1,1): ${I.ca1_1} < ${min_c.toFixed(2)} cm (6da)`);
             if (I.ca2 < min_c) warnings.push(`Side Edge (Ca2): ${I.ca2} < ${min_c.toFixed(2)} cm (6da)`);
-            
-            // ------------------------------------------
-
-            // --- Determine Factors ---
             const isDuctile = I.ductility === 'ductile';
             const isCondA = I.cond_ab === 'A';
             const isCastIn = I.kc >= 10; 
             const cat = I.category;
-
-            // 1. Steel Phi
             const phi_st = isDuctile ? 0.75 : 0.65;
             const phi_sv = isDuctile ? 0.65 : 0.60;
-
-            // 2. Concrete Breakout / Bond Phi
             let phi_c = 0.70; 
             if (isCondA) { 
                 if (isCastIn) phi_c = 0.75;
@@ -3112,8 +2464,6 @@
                     else phi_c = 0.45;
                 }
             }
-            
-            // 3. Pullout / Pryout Phi
             let phi_p = 0.70;
             if (isCastIn) {
                 phi_p = 0.70;
@@ -3122,64 +2472,33 @@
                 else if (cat === 2) phi_p = 0.55;
                 else phi_p = 0.45;
             }
-            
             const phi_bond = phi_c; 
-            const phi_reinf = 0.75; // Reinforcement Phi
-
-            // --- SEISMIC REDUCTION FACTORS ---
+            const phi_reinf = 0.75; 
             const seis_conc = I.is_seismic ? 0.75 : 1.0;
             const seis_pull = I.is_seismic ? 0.75 : 1.0;
             let seis_bond = 1.0;
             if (I.is_seismic) {
                 seis_bond = (I.psi_c_P > 1.0) ? 0.4 : 0.8;
             }
-
-            // -------------------------------------
-
             let le_val = 12.7; if (I.le_mode === 'sleeve') le_val = I.hef; else if (I.le_mode === 'torque') le_val = 2 * I.da;
             const ca_min = Math.min(I.ca1, I.ca1_1, I.ca2);
             let psi_ed_N = (ca_min < 1.5 * I.hef) ? (0.7 + 0.3 * (ca_min / (1.5 * I.hef))) : 1.0;
             let psi_ed_V = (I.ca2 < 1.5 * I.ca1_1) ? (0.7 + 0.3 * (I.ca2 / (1.5 * I.ca1_1))) : 1.0;
-
-            // Calculate Psi for X and Y directions
             const psi_ec_N_x = 1.0 / (1.0 + (2.0 * e_use_x) / (3.0 * I.hef));
             const psi_ec_N_y = 1.0 / (1.0 + (2.0 * e_use_y) / (3.0 * I.hef));
-            
-            // Combine biaxially (Product of factors)
             let psi_ec_N = psi_ec_N_x * psi_ec_N_y;
-
-            // Locate this section in window.performCalculation
-            // --- AUTO-LINK SHEAR ECCENTRICITY ---
-            // If the user didn't explicitly enter a separate Shear Eccentricity (e_prime_v),
-            // infer it from the Tension Eccentricities (e_prime_n_x/y) based on shear direction.
-            
-            // REPLACE the block starting with "let e_shear_effective = I.e_prime_v;" with:
-            
             let e_shear_effective = 0;
-            
             if (I.v_dir === 'para') {
-                // Shear is Parallel (X-direction load). Eccentricity is offset in Y.
                 e_shear_effective = Math.abs(I.e_prime_n_y);
             } else {
-                // Shear is Perpendicular (Y-direction load). Eccentricity is offset in X.
                 e_shear_effective = Math.abs(I.e_prime_n_x);
             }
-
             let psi_ec_V = 1.0;
-            // ACI 318 Eq 17.7.2.3.1
             if (e_shear_effective > 0) {
                 psi_ec_V = 1.0 / (1.0 + (2.0 * e_shear_effective) / (3.0 * I.ca1_1));
             }
-
-            // --- Step 8: Splitting Factor (psi_cp_N) ---
-            // ACI 318-19 Sec 17.6.2.6: For post-installed anchors in uncracked concrete
-            
-            // Check if Concrete is Uncracked (Derived from Pullout Cracking Factor input)
-            // 1.4 implies Uncracked, 1.0 implies Cracked
             const isPostInstalled = (I.kc_raw === '7' || I.kc_raw === 'screw');
-
             if (isPostInstalled && isUncracked) {
-                // If edge distance is less than critical cac, splitting governs
                 if (I.cac > 0 && ca_min < I.cac) {
                     psi_cp_N = ca_min / I.cac;
                     let warnMsg = "";
@@ -3194,53 +2513,35 @@
                     warnings.push(warnMsg);
                 }
             }
-
-            // --- STEP 1: Steel Strength Logic ---
             const futa_limit = Math.min(1.9 * I.fya, 8750);
             const futa_eff = Math.min(I.futa, futa_limit);
             const Nsa = I.ase * futa_eff;
             const phi_Nsa = phi_st * Nsa; 
             const ratio_st = (max_anchor_tension > 0) ? (max_anchor_tension / phi_Nsa) : 0;
-
             let Vsa_coeff = 0.6; 
             let Vsa = Vsa_coeff * I.ase * futa_eff;
             if (I.is_grouted) Vsa *= 0.8;
             const phi_Vsa = phi_sv * Vsa;
-
             const ratio_sv = shear_per_anchor > 0 ? (shear_per_anchor / phi_Vsa) : 0;
-
-            // --- 1. GEOMETRY & BOUNDING BOX ---
-            // Hoisted to top so Anc_1 can use actual dimensions
             const xs = anchors.map(a => a.x);
             const ys = anchors.map(a => a.y);
             const minX = Math.min(...xs);
             const maxX = Math.max(...xs);
             const minY = Math.min(...ys);
             const maxY = Math.max(...ys);
-            
-            // Actual Dimensions of the anchor group
-            const total_s1 = maxY - minY; // Height
-            const total_s2 = maxX - minX; // Width
-            
+            const total_s1 = maxY - minY; 
+            const total_s2 = maxX - minX; 
             const Nb = I.kc * I.lambda * Math.sqrt(I.fc) * Math.pow(I.hef, 1.5);
             const Anco = 9 * Math.pow(I.hef, 2);
             const hef15 = 1.5 * I.hef;
-            // --- 2. ANc CALCULATION (Revised Logic) ---
             let h_single = (I.ca1 < hef15) ? (I.ca1 + hef15) : (2 * hef15);
             let w_single = (I.ca2 < hef15) ? (I.ca2 + hef15) : (2 * hef15);
             const Anc_1 = h_single * w_single;
-            
-            // Single Ratio
             let ratio_Anc1 = Anc_1 / Anco;
             if (ratio_Anc1 > 1.0) ratio_Anc1 = 1.0;
-
-            // Single Capacity (Concrete Breakout)
             const phi_Ncb_concrete = seis_conc * phi_c * ratio_Anc1 * psi_ed_N * 1.0 * psi_cp_N * Nb;
-            
-            // Single Final (Check Reinforcement)
             let phi_Ncb_final = phi_Ncb_concrete;
-            let N_reinf_single_cap = 0; // Cap per anchor
-            
+            let N_reinf_single_cap = 0; 
             if (I.is_reinf && I.reinf_area > 0) {
                 N_reinf_single_cap = I.reinf_area * I.reinf_fy * phi_reinf; 
                 phi_Ncb_final = Math.min(phi_Ncb_concrete, N_reinf_single_cap);
@@ -3252,30 +2553,21 @@
             } else {
                 h_group = hef15 + total_s1 + hef15;
             }
-
             let w_group = 0;
             if (I.ca2 < hef15) {
                 w_group = I.ca2 + total_s2 + hef15;
             } else {
                 w_group = hef15 + total_s2 + hef15;
             }
-
             const Anc_3 = h_group * w_group;
-
             const uniqueX_sorted = [...new Set(anchors.map(a => a.x))].sort((a,b)=>a-b);
             const uniqueY_sorted = [...new Set(anchors.map(a => a.y))].sort((a,b)=>a-b);
-            
             let max_sx = 0;
             for(let i=1; i<uniqueX_sorted.length; i++) max_sx = Math.max(max_sx, uniqueX_sorted[i] - uniqueX_sorted[i-1]);
-            
             let max_sy = 0;
             for(let i=1; i<uniqueY_sorted.length; i++) max_sy = Math.max(max_sy, uniqueY_sorted[i] - uniqueY_sorted[i-1]);
-
-            // [MODIFIED] Spacing Separation Logic (Cluster Analysis)
             const limit_3hef = 3.0 * I.hef;
             let override_Ncbg = null;
-
-            // Helper to find valid continuous ranges (zones) in one dimension
             const getRanges = (vals) => {
                 const unique = [...new Set(vals)].sort((a, b) => a - b);
                 const ranges = [];
@@ -3283,7 +2575,6 @@
                 let start = unique[0]; 
                 let prev = unique[0];
                 for (let i = 1; i < unique.length; i++) {
-                    // Check if the gap to the next anchor exceeds the limit
                     if (unique[i] - prev >= limit_3hef) {
                         ranges.push({min: start, max: prev});
                         start = unique[i];
@@ -3293,15 +2584,11 @@
                 ranges.push({min: start, max: prev});
                 return ranges;
             };
-
             const xRanges = getRanges(anchors.map(a => a.x));
             const yRanges = getRanges(anchors.map(a => a.y));
-
-            // Find the largest cluster of anchors falling within overlapping valid zones
             let max_cluster_size = 0;
             xRanges.forEach(xr => {
                 yRanges.forEach(yr => {
-                    // Count how many anchors exist in this specific X/Y intersection
                     const count = anchors.filter(a => 
                         a.x >= xr.min - 0.01 && a.x <= xr.max + 0.01 && 
                         a.y >= yr.min - 0.01 && a.y <= yr.max + 0.01
@@ -3309,57 +2596,38 @@
                     if (count > max_cluster_size) max_cluster_size = count;
                 });
             });
-
-            // --- 3. VALIDATION & CLAMPING ---
-            // Check Geometric Limits
             if (I.ca1 >= hef15) {
                 const w_ca1 = currentLang === 'zh' 
                     ? `警告: Ca1 (${I.ca1}) ≥ 1.5hef (超出範圍)` 
                     : `Warning: Ca1 (${I.ca1}) ≥ 1.5hef.`;
                 warnings.push(w_ca1);
             }
-
-            // If the largest connected cluster is smaller than total anchors, separation occurred
             if (max_cluster_size < n_anchors) {
-                // Translated: Spacing > 3hef (25.5cm). Cones separate.
                 const w1 = currentLang === 'zh' 
                     ? `${t('warn_spacing')} (${limit_3hef.toFixed(1)}cm)`
                     : `Spacing > 3hef (${limit_3hef.toFixed(1)}cm). Cones separate.`;
                 warnings.push(w1);
-
-                // Translated: Strength calculated using only the largest cluster: 12 of 14 anchors.
                 const w2 = currentLang === 'zh'
                     ? `${t('warn_cluster')} ${max_cluster_size} / ${n_anchors} ${t('lbl_list_title').split('.')[1]}`
                     : `Strength calculated using only the largest cluster: ${max_cluster_size} of ${n_anchors} anchors.`;
                 warnings.push(w2);
-                
                 override_Ncbg = max_cluster_size * phi_Ncb_concrete;
             }
-
-            // Group Ratio Cap (Anc / Anco <= n_active)
             let ratio_Anc3 = Anc_3 / Anco;
             const limit_n = (override_Ncbg) ? n_active : n_anchors; 
-            
             if (ratio_Anc3 > limit_n) {
-                // Translated: Group ANc/ANco (27.05) > 12. Capped to 12.
                 const w3 = currentLang === 'zh'
                     ? `${t('warn_group_cap')} (${ratio_Anc3.toFixed(2)} > ${limit_n}) -> ${limit_n}`
                     : `Group ANc/ANco (${ratio_Anc3.toFixed(2)}) > ${limit_n}. Capped to ${limit_n}.`;
                 warnings.push(w3);
                 ratio_Anc3 = limit_n;
             }
-            // Group Capacity (Concrete Breakout)
             let phi_Ncbg = seis_conc * phi_c * ratio_Anc3 * psi_ec_N * psi_ed_N * 1.0 * psi_cp_N * Nb;
-
-            // Group Final (Check Reinforcement)
             if (I.is_reinf && I.reinf_area > 0) {
-                // If reinf exists, Group Cap is Min(GroupBreakout, n * ReinfPerAnchor)
                 const group_reinf_cap = N_reinf_single_cap * n_anchors;
                 phi_Ncbg = Math.min(phi_Ncbg, group_reinf_cap);
             }
             const ratio_3 = I.T > 0 ? (I.T / phi_Ncbg) : 0;
-
-			// Helper for Shear Breakout
 			const calcShearBreakout = (edgeDist) => {
 				const Vb1_local = 1.86 * Math.pow(le_val / I.da, 0.2) * Math.sqrt(I.da) * I.lambda * Math.sqrt(I.fc) * Math.pow(edgeDist, 1.5);
 				const Vb2_local = 3.8 * I.lambda * Math.sqrt(I.fc) * Math.pow(edgeDist, 1.5);
@@ -3370,7 +2638,6 @@
 				let psi_ed_V_local = (orthEdge < 1.5 * edgeDist) ? (0.7 + 0.3 * (orthEdge / (1.5 * edgeDist))) : 1.0;
 				let psi_h_V_local = Math.pow((1.5 * edgeDist) / I.ha, 0.5);
 				if (psi_h_V_local < 1.0) psi_h_V_local = 1.0;
-				
 				return { 
 					cap: seis_conc * phi_c * (Avc_local / Avco_local) * psi_ed_V_local * I.psi_c_V * psi_h_V_local * Vb_local,
 					vb: Vb_local,
@@ -3379,77 +2646,43 @@
 					psih: psi_h_V_local
 				};
 			};
-
-			// Logic Update: Corner Shear Analysis
 			let phi_Vcb_final = 0;
-            // Determine critical edge distance based on shear direction
-            let critical_shear_edge = I.ca1_1; // Default: perpendicular (front edge)
+            let critical_shear_edge = I.ca1_1; 
             const shear_para_factor = (I.v_dir === 'para') ? 2.0 : 1.0;
-
-            // Then use critical_shear_edge in calcShearBreakout
             let shear_result = calcShearBreakout(critical_shear_edge);
-
-            // Logic Update: Corner Shear Analysis
             let phi_Vcb_governing = 0;
-            const res_front = calcShearBreakout(I.ca1_1); // Standard Perp (Front Edge)
-            
-            // Populate display data with standard perp values by default
+            const res_front = calcShearBreakout(I.ca1_1); 
             let Vb = res_front.vb;
             let Avc_2 = res_front.avc;
             let Avco = res_front.avco;
             let psi_h_V = res_front.psih;
-
             if (I.v_dir === 'para') {
-                // Parallel Mode: Check 2 failure modes (PDF 17.7.2.1)
-                
-                // Mode A: Shear towards Side Edge (Perpendicular failure of side edge)
                 const res_side = calcShearBreakout(I.ca2);
                 const Vcb_side = res_side.cap;
-
-                // Mode B: Shear Parallel to Front Edge (2x factor, psi_ed = 1.0)
-                // Recalculate Front capacity with psi_ed_V forced to 1.0 and 2.0 multiplier
                 const cap_para_front = seis_conc * phi_c * (res_front.avc / res_front.avco) * 1.0 * I.psi_c_V * res_front.psih * (2.0 * res_front.vb);
-
-                // Governing is the minimum of Side-Perp and Front-Parallel
                 phi_Vcb_governing = Math.min(Vcb_side, cap_para_front);
-
-                // Update display data to show the governing mode's values
                 if (Vcb_side < cap_para_front) {
                     Vb = res_side.vb; Avc_2 = res_side.avc; Avco = res_side.avco; psi_h_V = res_side.psih;
                 }
             } else {
-                // Perpendicular Mode: Check Front and Corner effects
                 const res_corner = calcShearBreakout(I.ca2);
                 phi_Vcb_governing = Math.min(res_front.cap, res_corner.cap);
-                // (Display data remains as Front Edge default)
             }
-
-            // Logic Update: Anchor Reinforcement Replacement (Shear)
             const phi_Vcb_concrete = phi_Vcb_governing;
-
             phi_Vcb_final = phi_Vcb_concrete;
             let V_reinf_cap = 0;
-
             if (I.is_reinf && I.reinf_area > 0) {
                 V_reinf_cap = I.reinf_area * I.reinf_fy;
                 const phi_Vreinf = phi_reinf * V_reinf_cap;
-                // Take MINIMUM (governing failure mode)
                 phi_Vcb_final = Math.min(phi_Vcb_concrete, phi_Vreinf);
             }
 			const ratio_2 = I.V > 0 ? (I.V / phi_Vcb_final) : 0;
-
-            // --- GROUP VALIDATION ---
-            // Determine Rows/Cols
             const uniqueX = [...new Set(anchors.map(a => a.x))];
             const uniqueY = [...new Set(anchors.map(a => a.y))];
             const num_cols = uniqueX.length;
             const num_rows = uniqueY.length;
-
-            // Check Dimensions: width < cols * 1.5hef ?
             const limit_width = num_cols * (1.5 * I.hef);
             const limit_height = num_rows * (1.5 * I.hef);
-            
-            // Group shear area based on actual layout
             const Avc_4 = ((maxX - minX) + 2 * (1.5 * I.ca1_1)) * I.ha;
             const Vb_basic = Math.min(
                 1.86 * Math.pow(le_val / I.da, 0.2) * Math.sqrt(I.da) * I.lambda * Math.sqrt(I.fc) * Math.pow(I.ca1_1, 1.5),
@@ -3458,17 +2691,13 @@
             const Avco_basic = 4.5 * Math.pow(I.ca1_1, 2);
             let phi_Vcbg = shear_para_factor * seis_conc * phi_c * (Avc_4 / Avco_basic) * psi_ec_V * psi_ed_V * I.psi_c_V * 1.0 * Vb_basic;
             if (I.is_reinf && I.reinf_area > 0) phi_Vcbg = phi_Vcb_final * anchors.length;
-            const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0; // Total load scales with anchors
-
-            // --- STEP 2: Pullout & Pryout Logic ---
+            const ratio_4 = I.V > 0 ? (I.V / phi_Vcbg) : 0; 
             let Np = 0;
             let Npn = 0;
             let phi_Npn = 0;
             let ratio_pn = 0;
             let pullout_applicable = true;
-
             if (I.is_adhesive) {
-                // Adhesive anchors do NOT check Pullout (Np). They check Bond (Na).
                 pullout_applicable = false;
             } else {
                 if (I.pull_mode === 'headed') {
@@ -3476,7 +2705,6 @@
                 } else if (I.pull_mode === 'hooked') {
                     Np = 0.9 * I.fc * I.eh * I.da;
                 } else {
-                    // Screw or Expansion
                     Np = I.np_cert;
                 }
                 Npn = Np * I.psi_c_P;
@@ -3484,13 +2712,9 @@
                 ratio_pn = max_anchor_tension > 0 ? (max_anchor_tension / phi_Npn) : 0;
             }
             const kcp = (I.hef >= 6.35) ? 2.0 : 1.0;
-            // Nominal Breakout Ncp (approximate reverse calc)
             const N_breakout_nominal = Math.min(phi_Ncb_final / (phi_c * seis_conc), phi_Ncbg / (phi_c * seis_conc)); 
-            
-            // NEW Step 9: Adhesive Pryout Refinement
             let Ncp = N_breakout_nominal;
             let bond_res = { nba: 0, cna: 0, na: 0, cap: 0, ratio: 0, ok: true, sust_ok: true, sust_cap: 0, na_nominal: 999999999 };
-
             if (I.is_adhesive) {
                 const cNa = 10 * I.da * Math.sqrt(I.tau / 77.0);
                 const ANao = Math.pow(2 * cNa, 2);
@@ -3499,24 +2723,18 @@
                 const psi_ed_Na = (ca_min_bond < cNa) ? (0.7 + 0.3 * (ca_min_bond / cNa)) : 1.0;
                 let psi_cp_Na = 1.0;
                 if (isUncracked && ca_min < I.cac) psi_cp_Na = ca_min / I.cac;
-
                 const Nba = I.lambda * I.tau * Math.PI * I.da * I.hef;
-                // Include psi_ec_N for eccentricity in bond group (ACI 17.6.5.3.1)
                 const Na = (ANa_val / ANao) * psi_ed_Na * psi_cp_Na * psi_ec_N * Nba;
                 const phi_Na = seis_bond * phi_bond * Na; 
                 const ratio_b = I.T > 0 ? (I.T / phi_Na) : 0;
                 const sust_cap = 0.4 * phi_bond * Na;
                 const sust_ok = I.loadT_sust <= sust_cap;
                 bond_res = { nba: Nba, cna: cNa, na: Na, cap: phi_Na, ratio: ratio_b, ok: ratio_b < 1.0, sust_ok: sust_ok, sust_cap: sust_cap, na_nominal: Na };
-
                 Ncp = Math.min(N_breakout_nominal, bond_res.na_nominal);
             }
-
             const Vcp = kcp * Ncp;
             const phi_Vcp = seis_conc * phi_p * Vcp; 
             const ratio_cp = I.V > 0 ? (I.V / phi_Vcp) : 0;
-
-            // --- STEP 5: Side-Face Blowout (Nsb) ---
             let Nsb = 0;
             let phi_Nsb = 0;
             let ratio_sb = 0;
@@ -3530,54 +2748,39 @@
                 phi_Nsb = seis_conc * phi_c * Nsb; 
                 ratio_sb = I.T > 0 ? (I.T / phi_Nsb) : 0;
             }
-
-            // --- NEW FEATURE: Shear Lug Analysis ---
             let sl_res = { vbrg: 0, vcbsl: 0, cap: 0, ratio: 0, applicable: false };
             if (I.is_shearlug) {
                 sl_res.applicable = true;
-                // Bearing Strength
-                // Aef_sl approx Wsl * hsl
                 const Aef_sl = I.sl_w * I.sl_h;
-                const phi_brg = 0.65; // Bearing phi
+                const phi_brg = 0.65; 
                 const Vbrg = phi_brg * 1.7 * I.fc * Aef_sl;
-
-                // Concrete Breakout for Shear Lug
-                // Uses c_sl instead of ca1
                 const c_sl = I.sl_c;
-                const Avc_sl = (2 * 1.5 * c_sl + I.sl_w) * I.ha; // Approx projected area for lug
+                const Avc_sl = (2 * 1.5 * c_sl + I.sl_w) * I.ha; 
                 const Avco_sl = 4.5 * Math.pow(c_sl, 2);
-                const Vb_sl = 3.8 * I.lambda * Math.sqrt(I.fc) * Math.pow(c_sl, 1.5); // Simplified Vb eq
+                const Vb_sl = 3.8 * I.lambda * Math.sqrt(I.fc) * Math.pow(c_sl, 1.5); 
                 const phi_Vcbsl = phi_c * (Avc_sl / Avco_sl) * 1.0 * 1.0 * 1.0 * Vb_sl;
-
                 sl_res.vbrg = Vbrg;
                 sl_res.vcbsl = phi_Vcbsl;
                 sl_res.cap = Math.min(Vbrg, phi_Vcbsl);
                 sl_res.ratio = I.V > 0 ? (I.V / sl_res.cap) : 0;
             }
-
-            // --- STEP 4: Interaction Check (ACI Trilinear) ---
             let ratios_N = [ratio_st, ratio_1, ratio_3, ratio_pn];
             if (I.is_adhesive) ratios_N.push(bond_res.ratio);
             if (sb_applicable) ratios_N.push(ratio_sb); 
             const max_N = Math.max(...ratios_N);
-
             let ratios_V = [ratio_sv, ratio_2, ratio_4, ratio_cp];
             if (sl_res.applicable) ratios_V.push(sl_res.ratio);
             const max_V = Math.max(...ratios_V);
-
             let int_check = "OK";
             let int_val = max_N + max_V;
-            
-            // Trilinear Interaction Logic
             if (max_N <= 0.2 && max_V <= 1.0) {
                 int_check = "OK (N≤0.2)";
             } else if (max_V <= 0.2 && max_N <= 1.0) {
                 int_check = "OK (V≤0.2)";
             } else {
-                if (int_val > 1.2) int_check = t('val_fail'); // Uses "FAIL" or "失敗"
+                if (int_val > 1.2) int_check = t('val_fail'); 
                 else int_check = "OK";
             }
-
             currentData = {
                 inputs: I, anchors: anchors, factors: { psi_ed_N, psi_ed_V, psi_ec_N, psi_ec_V, psi_cp_N }, calcs: { 
                     s1: { nsa: Nsa, cap: phi_Nsa, load: I.T, ratio: ratio_st, ok: ratio_st < 1.0 },
@@ -3586,7 +2789,7 @@
                     cp: { vcp: Vcp, cap: phi_Vcp, load: I.V, ratio: ratio_cp, ok: ratio_cp < 1.0 },
                     bond: bond_res,
                     sb: { nsb: Nsb, cap: phi_Nsb, ratio: ratio_sb, ok: ratio_sb < 1.0, applicable: sb_applicable }, 
-                    sl: sl_res, // Shear Lug
+                    sl: sl_res, 
                     c1: { nb: Nb, anc: Anc_1, anco: Anco, cap: phi_Ncb_final, load: max_anchor_tension, ratio: ratio_1, ok: ratio_1 < 1.0, is_reinf: I.is_reinf },
                     c2: { vb: Vb, avc: Avc_2, avco: Avco, cap: phi_Vcb_final, load: I.V, ratio: ratio_2, psih: psi_h_V, ok: ratio_2 < 1.0, is_reinf: I.is_reinf },
                     c3: { anc: Anc_3, cap: phi_Ncbg, load: I.T, ratio: ratio_3, ok: ratio_3 < 1.0 },
@@ -3595,22 +2798,17 @@
                     geo_warnings: warnings 
                 }, timestamp: new Date()
             };
-
             if (renderer && currentVizMode === '3d') {
                 update3DScene(anchors, I);
             }
-
             updateUI();
         };
-
         function updateUI() {
             if (!currentData) return;
             const d = currentData.calcs; const f = currentData.factors;
             const I = currentData.inputs;
             document.getElementById('results-container').classList.remove('hidden');
             const set = (id, val, unit = '') => document.getElementById(id).innerText = Math.round(val) + unit;
-
-            // Step 7: Warning Display
             const warnBox = document.getElementById('geo-warn-box');
             const warnList = document.getElementById('geo-warn-list');
             if (d.geo_warnings.length > 0) {
@@ -3619,63 +2817,45 @@
             } else {
                 warnBox.classList.add('hidden');
             }
-
             const showTension = I.T > 0;
             const showShear = I.V > 0;
-
             document.getElementById('card-tension').classList.toggle('hidden', !showTension);
             document.getElementById('card-shear').classList.toggle('hidden', !showShear);
             document.getElementById('card-steel').classList.toggle('hidden', !(showTension || showShear));
             document.getElementById('card-pullout').classList.toggle('hidden', !(showTension || showShear));
             document.getElementById('card-bond').classList.toggle('hidden', !(showTension && I.is_adhesive));
             document.getElementById('card-interaction').classList.toggle('hidden', !(showTension || showShear));
-
-            // Toggle visibility based on selected mode
             document.getElementById('card-viz').style.display = (currentVizMode === '2d') ? 'block' : 'none';
             document.getElementById('card-3d').style.display = (currentVizMode === '3d') ? 'block' : 'none';
-            
-            // Populate Individual Force List
             const indivList = document.getElementById('indiv-force-list');
             const indivContent = document.getElementById('indiv-force-content');
-            
             if (indivList && indivContent) {
                 if (currentData.anchors && currentData.anchors.length > 0) {
                     indivList.classList.remove('hidden');
-                    // Calculate based on ACTIVE anchors only
                     const activeCount = currentData.anchors.filter(x => !x.excluded).length;
                     const shearPerAnchor = activeCount > 0 ? (I.V / activeCount) : 0;
-                    
                     indivContent.innerHTML = currentData.anchors.map((a, i) => {
                         const tensionVal = a.forceN || 0;
                         const isTension = tensionVal >= 0;
                         const typeLabel = isTension ? t('lbl_tension') : t('lbl_compression');
                         const valDisplay = Math.abs(Math.round(tensionVal));
-                        
                         let colorClass = isTension ? 'text-blue-700' : 'text-red-700';
                         let rowClass = "flex justify-between border-b last:border-0 pb-1 mb-1";
-                        
-                        // Define content vars
                         let tensionContent = `${typeLabel} = <strong>${valDisplay}</strong> kgf`;
-                        // Calculate shear text logic
                         const shearTextVal = Math.round(shearPerAnchor);
                         let shearContent = `${t('lbl_shear')} = <strong>${shearTextVal}</strong> kgf`;
-
-                        // Handle Excluded
                         if (a.excluded) {
                             colorClass = "text-gray-400 line-through";
                             rowClass += " bg-gray-50 opacity-60";
-                            // Override content to just show EXCLUDED (Translated) without the label prefix
                             const exText = `<span class="line-through">${t('val_excluded')}</span>`;
                             tensionContent = exText;
                             shearContent = exText;
                         }
-                        
                         return `<div class="${rowClass}">
                             <span class="font-mono font-bold text-gray-600">#${i+1}</span>
                             <span class="${colorClass}">${tensionContent}</span>
                             <span class="text-gray-600">${shearContent}</span>
                         </div>`;
-                        
                         return `<div class="flex justify-between border-b last:border-0 pb-1 mb-1">
                             <span class="font-mono font-bold text-gray-600">#${i+1}</span>
                             <span class="${colorClass}">${typeLabel} = <strong>${valDisplay}</strong> kgf</span>
@@ -3686,32 +2866,24 @@
                     indivList.classList.add('hidden');
                 }
             }
-
-            // Seismic Badge Display Logic
             const seisDisplay = I.is_seismic ? 'inline' : 'none';
             document.getElementById('badge-seis-t').style.display = seisDisplay;
             document.getElementById('badge-seis-v').style.display = seisDisplay;
             document.getElementById('badge-seis-pull').style.display = seisDisplay;
             document.getElementById('badge-seis-bond').style.display = seisDisplay;
-
             if (showTension || showShear) {
                 set('r-nsa', d.s1.nsa, ' kgf'); set('r-phi-nsa', d.s1.cap, ' kgf');
                 document.getElementById('r-st-ratio').innerText = (d.s1.ratio || 0).toFixed(2);
                 setStatus('badge-st', d.s1.ok);
-
                 set('r-vsa', d.s2.vsa, ' kgf'); set('r-phi-vsa', d.s2.cap, ' kgf');
                 document.getElementById('r-sv-ratio').innerText = (d.s2.ratio || 0).toFixed(2);
                 setStatus('badge-sv', d.s2.ok);
-
                 set('r-npn', d.pn.npn, ' kgf'); set('r-phi-npn', d.pn.cap, ' kgf');
                 document.getElementById('r-pn-ratio').innerText = (d.pn.ratio || 0).toFixed(2);
                 setStatus('badge-pn', d.pn.ok);
-
                 set('r-vcp', d.cp.vcp, ' kgf'); set('r-phi-vcp', d.cp.cap, ' kgf');
                 document.getElementById('r-cp-ratio').innerText = (d.cp.ratio || 0).toFixed(2);
                 setStatus('badge-cp', d.cp.ok);
-
-                // Interaction UI
                 document.getElementById('val-max-n').innerText = d.interaction.max_n.toFixed(2);
                 document.getElementById('val-max-v').innerText = d.interaction.max_v.toFixed(2);
                 document.getElementById('val-int-sum').innerText = d.interaction.val.toFixed(2);
@@ -3723,7 +2895,6 @@
                     badgeInt.className = "px-4 py-2 rounded font-bold text-center bg-red-600 animate-pulse";
                 }
             }
-
             if (showTension && I.is_adhesive) {
                 set('r-nba', d.bond.nba, ' kgf');
                 set('r-cna', d.bond.cna, ' cm');
@@ -3731,8 +2902,6 @@
                 set('r-phi-na', d.bond.cap, ' kgf');
                 document.getElementById('r-b-ratio').innerText = (d.bond.ratio || 0).toFixed(2);
                 setStatus('badge-b', d.bond.ok);
-
-                // Sustained Row
                 document.getElementById('row-sust').classList.remove('hidden');
                 set('r-sust-load', I.loadT_sust, ' kgf');
                 const badgeSust = document.getElementById('badge-sust');
@@ -3746,17 +2915,14 @@
             } else {
                 document.getElementById('row-sust').classList.add('hidden');
             }
-
             if (showTension) {
                 set('r1-nb', d.c1.nb, ' kgf'); set('r1-anc', d.c1.anc, ' cm²'); set('r1-cap', d.c1.cap, ' kgf');
                 document.getElementById('r1-ratio').innerText = (d.c1.ratio || 0).toFixed(2);
                 setStatus('badge-1', d.c1.ok);
                 document.getElementById('r1-psi-cp').innerText = f.psi_cp_N.toFixed(2);
-
                 set('r3-anc', d.c3.anc, ' cm²'); set('r3-cap', d.c3.cap, ' kgf'); set('r3-psi', f.psi_ec_N.toFixed(2));
                 document.getElementById('r3-ratio').innerText = (d.c3.ratio || 0).toFixed(2);
                 setStatus('badge-3', d.c3.ok);
-
                 const rowSb = document.getElementById('row-sb');
                 if (d.sb.applicable) {
                     rowSb.classList.remove('hidden');
@@ -3768,24 +2934,17 @@
                     rowSb.classList.add('hidden');
                 }
             }
-
             if (showShear) {
                 set('r2-vb', d.c2.vb, ' kgf'); set('r2-avc', d.c2.avc, ' cm²'); set('r2-cap', d.c2.cap, ' kgf');
                 document.getElementById('r2-ratio').innerText = (d.c2.ratio || 0).toFixed(2);
                 setStatus('badge-2', d.c2.ok);
-
                 set('r4-avc', d.c4.avc, ' cm²'); set('r4-cap', d.c4.cap, ' kgf');
-                // Show the calculated factor
                 document.getElementById('r4-psi').innerText = f.psi_ec_V.toFixed(2);
-                
-                // Optional: Add a visual cue if eccentricity was auto-linked
                 if (f.psi_ec_V < 1.0 && I.e_prime_v === 0) {
                      document.getElementById('r4-psi').innerHTML += " <span class='text-[9px] text-blue-500'>(Linked)</span>";
                 }
                 document.getElementById('r4-ratio').innerText = (d.c4.ratio || 0).toFixed(2);
                 setStatus('badge-4', d.c4.ok);
-
-                // Shear Lug Row
                 const rowSl = document.getElementById('row-sl');
                 if (d.sl.applicable) {
                     rowSl.classList.remove('hidden');
@@ -3797,34 +2956,23 @@
                     rowSl.classList.add('hidden');
                 }
             }
-
-            // --- Step 7: Draw Visualization ---
             drawVisualization();
-
-            // Force 3D refresh when in 3D mode
             if (currentVizMode === '3d' && currentData.anchors && renderer) {
                 update3DScene(currentData.anchors, currentData.inputs);
                 renderer.render(scene, camera);
             }
         }
-
-
         function setStatus(id, isOk) {
             const el = document.getElementById(id);
             if (isOk) { el.innerText = t('pass'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-green-100 text-green-800 border border-green-200"; }
             else { el.innerText = t('fail'); el.className = "text-xs px-2 py-0.5 rounded font-bold bg-red-100 text-red-800 border border-red-200"; }
         }
-
         window.saveResult = async function () {
             if (!currentUser) { alert("Please login first."); return; }
-            
             const btn = document.getElementById('save-btn'); 
-            // Use translation for "Saving..."
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>${t('btn_saving')}`;
-            
             performCalculation(); 
             if (!currentData) return;
-            
             try {
                 await db.collection('artifacts').doc('anchor_app').collection('users').doc(currentUser.uid).collection('history').add({
                     inputs: currentData.inputs, 
@@ -3837,10 +2985,7 @@
                     },
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                
-                // Use translation for "Saved!"
                 btn.innerHTML = `<i class="fa-solid fa-check mr-2"></i>${t('btn_saved')}`; 
-                
                 setTimeout(() => {
                     btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>${t('btn_save')}`;
                 }, 2000);
@@ -3849,7 +2994,6 @@
                 btn.innerHTML = t('btn_error'); 
             }
         };
-
         window.clearHistory = async function () {
             if (!currentUser) return; if (!confirm("Are you sure?")) return;
             const list = document.getElementById('history-list'); list.innerHTML = '<div class="p-6 text-center text-red-500"><i class="fa-solid fa-trash fa-bounce mr-2"></i>Deleting...</div>';
@@ -3858,102 +3002,67 @@
                 const batch = db.batch(); snapshot.docs.forEach((doc) => batch.delete(doc.ref)); await batch.commit(); loadHistory();
             } catch (e) { console.error(e); alert("Error deleting history."); }
         };
-
         window.deleteHistoryItem = async function (docId, event) {
-            // Prevent the parent div's click event (restore) from firing
             if (event) event.stopPropagation();
-
-            // Use a simple confirm; though custom UI is better, this fits your current logic
             if (!confirm("Delete this record?")) return;
-
             try {
                 await db.collection('artifacts').doc('anchor_app')
                     .collection('users').doc(currentUser.uid)
                     .collection('history').doc(docId).delete();
-                // History list will auto-refresh if using onSnapshot
             } catch (e) {
                 console.error("Error deleting document: ", e);
             }
         };
-
         window.restoreFromHistory = function (docId) {
             const data = historyCache[docId]; if (!data || !data.inputs) return;
             const setVal = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
             const setChk = (id, v) => { const el = document.getElementById(id); if(el) el.checked = v; };
-            
             const I = data.inputs;
             setVal('fc', I.fc); setVal('ha', I.ha); setVal('da', I.da); setVal('hef', I.hef); setVal('s1', I.s1); setVal('s2', I.s2);
             setVal('ca1', I.ca1); setVal('ca1_1', I.ca1_1); setVal('ca2', I.ca2); setVal('loadT', I.T); setVal('loadV', I.V);
             setVal('loadMux', I.Mux || 0); setVal('loadMuy', I.Muy || 0);
-            
-            // FIX: Restore Anchor Type correctly (Priority: Raw String > Legacy Adhesive Bool > Legacy KC Number)
             let typeVal = I.kc_raw || (I.is_adhesive ? 'adhesive' : (I.kc || 10));
             setVal('kc_select', typeVal);
-
             setVal('lambda_select', I.lambda % 1 === 0 ? I.lambda.toFixed(1) : I.lambda);            
             setVal('le_select', I.le_mode || 'default'); 
             setVal('psi_c_V_select', I.psi_c_V % 1 === 0 ? I.psi_c_V.toFixed(1) : I.psi_c_V);
             setVal('e_prime_n_x', I.e_prime_n_x || 0); setVal('e_prime_n_y', I.e_prime_n_y || 0);
-            
-            // Restore Step 1
             if (I.futa) setVal('futa', I.futa);
             if (I.fya) setVal('fya', I.fya);
             if (I.ase) setVal('ase', I.ase);
             if (I.is_grouted !== undefined) setChk('is_grouted', I.is_grouted);
-
-            // Restore Step 2
             if (I.pull_mode) {
                 setVal('pullout_mode', I.pull_mode);
-                // togglePulloutInputs will be called by updateAnchorConfig later
                 setVal('abrg', I.abrg || 0);
                 setVal('eh', I.eh || 0);
                 setVal('np_certified', I.np_cert || 0);
                 setVal('crack_cond_p', I.psi_c_P || 1.4);
             }
-
-            // Restore Step 3 (Adhesive)
-            // FIX: Removed call to crashing toggleAdhesive()
             if (I.is_adhesive !== undefined) {
                 setVal('tau', I.tau || 100);
             }
-
-            // Restore Step 4
             if (I.cond_ab) setVal('condition_ab', I.cond_ab);
             if (I.category) setVal('anchor_category', I.category);
             if (I.ductility) setVal('steel_ductility', I.ductility);
-
-            // Restore Step 6
             if (I.is_seismic !== undefined) setChk('is_seismic', I.is_seismic);
             if (I.loadT_sust !== undefined) setVal('loadT_sust', I.loadT_sust);
-
-            // Restore Step 8
             if (I.cac !== undefined) setVal('cac', I.cac);
-
-            // Restore Step 11
             if (I.v_dir) setVal('shear_dir', I.v_dir);
-
-            // Restore Shear Lug
             if (I.is_shearlug) {
                 setChk('is_shearlug', true);
                 toggleShearLug();
                 setVal('sl_h', I.sl_h); setVal('sl_w', I.sl_w); setVal('sl_t', I.sl_t); setVal('sl_c', I.sl_c);
             }
-
-            // Restore Reinf
             if (I.is_reinf) {
                 setChk('is_reinf', true);
                 toggleReinf();
                 setVal('reinf_area', I.reinf_area); setVal('reinf_fy', I.reinf_fy);
             }
-            
             if (I.stretch_len) setVal('stretch_len', I.stretch_len);
-            
-            // --- RESTORE LAYOUT & ANCHORS ---
             if (I.layout_mode) {
                 setVal('layout_mode', I.layout_mode);
                 toggleLayoutMode();
             }
-
             if (I.custom_coords) {
                 setVal('custom_coords', I.custom_coords);
                 anchorData = parseCoords(); 
@@ -3962,14 +3071,10 @@
                 anchorData = [];
                 renderAnchorTable();
             }
-            
-            // FIX: Ensure UI visibility states (Adhesive inputs, etc.) are synced
             updateAnchorConfig(); 
-            
             switchTab('calculator'); 
             performCalculation();
         };
-
         window.loadHistory = function () {
             if (!currentUser) return; const list = document.getElementById('history-list');
             list.innerHTML = '<div class="p-6 text-center text-gray-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Loading...</div>';
@@ -3996,13 +3101,8 @@
                 list.innerHTML = html;
             });
         };
-
-        // ==========================================
-        //  NEW PDF EXPORT (NATIVE PRINTING)
-        // ==========================================
         window.printReport = function () {
             if (!currentData) { alert("Please run the analysis first."); return; }
-
             const d = currentData;
             const f = currentData.factors;
             const dateStr = new Date().toLocaleDateString();
@@ -4010,67 +3110,41 @@
             const txt = (key) => translations[currentLang][key] || key;
             const showT = d.inputs.T > 0;
             const showV = d.inputs.V > 0;
-
-            // --- Generate High-Res 2D Image for Print (Auto-Fit) ---
             const printCanvas = document.createElement('canvas');
-            printCanvas.width = 800; // High resolution
+            printCanvas.width = 800; 
             printCanvas.height = 600;
-            // Draw to temp canvas with forceFit = true
             drawVisualization(printCanvas, true); 
             const layoutImgData = printCanvas.toDataURL();
-            // -------------------------------------------
-
-            // --- 1. DEFINING FORMATTED EQUATIONS ---
-            // Concrete Breakout (Tension)
             const e_Nb = `<span class="math-symbol">N<sub>b</sub> = k<sub>c</sub> λ<sub>a</sub> √f'<sub>c</sub> h<sub>ef</sub><sup>1.5</sup></span>`;
             const e_Anc = `<span class="math-symbol">A<sub>Nc</sub> = 2(1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
             const e_psiN = `<span class="math-symbol">ψ<sub>ed,N</sub> = 0.7 + 0.3(c<sub>a,min</sub>/1.5h<sub>ef</sub>)</span>`;
             const e_phiN = `<span class="math-symbol">ϕN<sub>cb</sub> = ϕ (A<sub>Nc</sub>/A<sub>Nco</sub>) ψ<sub>ed,N</sub> ψ<sub>c,N</sub> ψ<sub>cp,N</sub> N<sub>b</sub></span>`;
-
-            // Group Tension
             const e_Ancg = `<span class="math-symbol">A<sub>Nc(g)</sub> = (C<sub>a2</sub>+S<sub>2</sub>+1.5h<sub>ef</sub>)(C<sub>a1</sub>+S<sub>1</sub>+1.5h<sub>ef</sub>)</span>`;
             const e_pecN = `<span class="math-symbol">ψ<sub>ec,N</sub> = 1 / (1 + 2e'<sub>N</sub>/3h<sub>ef</sub>)</span>`;
             const e_phiNg = `<span class="math-symbol">ϕN<sub>cbg</sub> = ϕ (A<sub>Nc(g)</sub>/A<sub>Nco</sub>) ψ<sub>ec,N</sub> ψ<sub>ed,N</sub> ψ<sub>c,N</sub> ψ<sub>cp,N</sub> N<sub>b</sub></span>`;
-
-            // Concrete Breakout (Shear)
             const e_Vb = `<span class="math-symbol">V<sub>b</sub> = min(V<sub>b1</sub>, V<sub>b2</sub>)</span>`;
             const e_Avc = `<span class="math-symbol">A<sub>Vc</sub> = 2(1.5C<sub>a1</sub>)h<sub>a</sub></span>`;
             const e_psiV = `<span class="math-symbol">ψ<sub>ed,V</sub> = 0.7 + 0.3(C<sub>a2</sub>/1.5C<sub>a1</sub>)</span>`;
             const e_phiV = `<span class="math-symbol">ϕV<sub>cb</sub> = ϕ (A<sub>Vc</sub>/A<sub>Vco</sub>) ψ<sub>ed,V</sub> ψ<sub>c,V</sub> ψ<sub>h,V</sub> V<sub>b</sub></span>`;
-
-            // Group Shear
             const e_Avcg = `<span class="math-symbol">A<sub>Vc(g)</sub> = [(3C<sub>a1</sub>)+S<sub>2</sub>]h<sub>a</sub></span>`;
             const e_pecV = `<span class="math-symbol">ψ<sub>ec,V</sub> = 1 / (1 + 2e'<sub>V</sub>/3C<sub>a1</sub>)</span>`;
             const e_phiVg = `<span class="math-symbol">ϕV<sub>cbg</sub> = ϕ (A<sub>Vc(g)</sub>/A<sub>Vco</sub>) ψ<sub>ec,V</sub> ψ<sub>ed,V</sub> ψ<sub>c,V</sub> V<sub>b</sub></span>`;
-
-            // Steel Strength
             const e_Nsa = `<span class="math-symbol">N<sub>sa</sub> = A<sub>se</sub> f<sub>uta</sub></span>`;
             const e_phiNsa = `<span class="math-symbol">ϕN<sub>sa</sub> = ϕ A<sub>se</sub> f<sub>uta</sub></span>`;
             const e_Vsa = `<span class="math-symbol">V<sub>sa</sub> = 0.6 A<sub>se</sub> f<sub>uta</sub></span>`;
             const e_phiVsa = `<span class="math-symbol">ϕV<sub>sa</sub> = ϕ 0.6 A<sub>se</sub> f<sub>uta</sub></span>`;
-
-            // Pullout & Pryout
             const e_Npn = `<span class="math-symbol">N<sub>pn</sub> = ψ<sub>c,P</sub> N<sub>p</sub></span>`;
             const e_phiNpn = `<span class="math-symbol">ϕN<sub>pn</sub> = ϕ ψ<sub>c,P</sub> N<sub>p</sub></span>`;
             const e_Vcp = `<span class="math-symbol">V<sub>cp</sub> = k<sub>cp</sub> N<sub>cp</sub></span>`;
             const e_phiVcp = `<span class="math-symbol">ϕV<sub>cp</sub> = ϕ k<sub>cp</sub> N<sub>cp</sub></span>`;
-
-            // Adhesive Bond
             const e_Nba = `<span class="math-symbol">N<sub>ba</sub> = λ<sub>a</sub> τ<sub>cr</sub> π d<sub>a</sub> h<sub>ef</sub></span>`;
             const e_cNa = `<span class="math-symbol">c<sub>Na</sub> = 10 d<sub>a</sub> √(τ<sub>uncr</sub>/77)</span>`;
             const e_Na = `<span class="math-symbol">N<sub>a</sub> = (A<sub>Na</sub>/A<sub>Nao</sub>) ψ<sub>ed,Na</sub> ψ<sub>cp,Na</sub> N<sub>ba</sub></span>`;
             const e_phiNa = `<span class="math-symbol">ϕN<sub>a</sub> = ϕ N<sub>a</sub></span>`;
-
-            // Side-Face Blowout
             const e_Nsb = `<span class="math-symbol">N<sub>sb</sub> = 42.4 c<sub>a1</sub> √A<sub>brg</sub> λ<sub>a</sub> √f'<sub>c</sub></span>`;
             const e_phiNsb = `<span class="math-symbol">ϕN<sub>sb</sub> = ϕ N<sub>sb</sub></span>`;
-
-            // Shear Lug
             const e_Vbrg = `<span class="math-symbol">V<sub>brg</sub> = 1.7 f'<sub>c</sub> A<sub>ef,sl</sub></span>`;
             const e_Vcbsl = `<span class="math-symbol">V<sub>cb,sl</sub> = (A<sub>Vc,sl</sub>/A<sub>Vco,sl</sub>) ψ<sub>ed,V</sub>... V<sub>b,sl</sub></span>`;
-
-
-            // --- 2. GENERATING REPORT HTML ---
             let html = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-end; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
                     <div>
@@ -4081,19 +3155,16 @@
                         ${dateStr}
                     </div>
                 </div>
-
                 <h3>${txt('rpt_layout')} (${currentVizMode.toUpperCase()})</h3>
                 <div style="text-align:center; padding: 15px; border: 1px solid #eee; margin-bottom: 20px;">
                     <img src="${currentVizMode === '2d' ? document.getElementById('viz-canvas').toDataURL() : renderer.domElement.toDataURL()}" style="max-width: 100%; border: 1px solid #ccc; height: 200px; object-fit: contain;">
                 </div>
-                
                 ${(d.calcs.geo_warnings && d.calcs.geo_warnings.length > 0) ? `
                     <div style="background-color:#fee2e2; color:#b91c1c; padding: 0px 0px 0px 0px; margin-bottom:0px; border-left:5px solid #ef4444;">
                         <strong><i class="fa-solid fa-triangle-exclamation" style="margin-right:8px; margin-left:150px;"></i>${txt('warn_title')}</strong>
                         <ul style="list-style-type: disc; margin-left: 20px; margin-top: 5px;">${d.calcs.geo_warnings.map(w => `<li>${w}</li>`).join('')}</ul>
                     </div>
                 ` : ''}
-
                 <h4>${txt('sec_loads')}</h4>
                 <table style="margin-bottom: 20px;">
                     <tr>
@@ -4106,7 +3177,7 @@
                         const valT = d.inputs.T;
                         const isTen = valT >= 0;
                         const dirLabel = isTen ? txt('lbl_tension') : txt('lbl_compression');
-                        const dirColor = isTen ? '#1d4ed8' : '#b91c1c'; // Blue / Red
+                        const dirColor = isTen ? '#1d4ed8' : '#b91c1c'; 
                         return `
                         <tr>
                             <td>${txt('lbl_t')}</td>
@@ -4141,7 +3212,6 @@
                         <td>-</td>
                     </tr>` : ''}
                 </table>
-
                 <h4>${txt('lbl_indiv_forces')}</h4>
                 <table>
                     <tr>
@@ -4153,14 +3223,10 @@
                         const tVal = a.forceN || 0;
                         const isTen = tVal >= 0;
                         const label = isTen ? txt('lbl_tension') : txt('lbl_compression');
-                        // Color Swap: Tension=Blue (#1d4ed8), Compression=Red (#b91c1c)
                         const color = isTen ? '#1d4ed8' : '#b91c1c'; 
-                        const visualIcon = isTen ? '■' : '■'; // Uses the same character but styled by color
-
-                        // Handle active count for shear
+                        const visualIcon = isTen ? '■' : '■'; 
                         const activeCount = d.anchors.filter(x => !x.excluded).length;
                         const sVal = a.excluded ? 0 : (d.inputs.V / activeCount).toFixed(0);
-
                         if(a.excluded) {
                             return `<tr>
                                 <td style="text-align:center; color:#999;">#${i+1}</td>
@@ -4168,7 +3234,6 @@
                                 <td style="color:#999; text-decoration:line-through;">${txt('val_excluded')}</td>
                             </tr>`;
                         }
-
                         return `<tr>
                             <td style="text-align:center; font-weight:bold;">${i+1}</td>
                             <td style="color:${color}; font-weight:bold;">
@@ -4200,9 +3265,7 @@
                     <tr><td>${txt('lbl_v')}</td><td>${d.inputs.V}</td><td>kgf</td></tr>
                     ${d.inputs.is_adhesive ? `<tr><td>${txt('lbl_tsust')}</td><td>${d.inputs.loadT_sust}</td><td>kgf</td></tr>` : ''}
                 </table>
-                
                 <div class="page-break"></div>
-                
                 <h2>${txt('sec_factors')}</h2>
                 <table>
                     <tr><th>${txt('tbl_factor')}</th><th>${txt('tbl_val')}</th><th>${txt('tbl_note')}</th></tr>
@@ -4259,9 +3322,7 @@
                         <td>${d.inputs.v_dir === 'para' ? txt('opt_v_para') : txt('opt_v_perp')}</td>
                     </tr>
                 </table>
-
                 <div class="page-break"></div>`;
-
             if(showT || showV) {
                 html += `
                     <h3>${txt('res_int_title')}</h3>
@@ -4277,10 +3338,7 @@
                     </table>
                 `;
             }
-
-            // --- STEEL STRENGTH SECTION ---
             if(showT || showV) {
-                // Generate distribution boxes
                 let distHtml = `<div class="col-span-5 grid grid-cols-4 gap-2 mb-2">`;
                 if(d.anchors && d.anchors.length > 0) {
                     d.anchors.forEach((a, i) => {
@@ -4290,7 +3348,6 @@
                     });
                 }
                 distHtml += `</div>`;
-
                  html += `
                     <h3>${txt('res_s_title')}</h3>
                     <table>
@@ -4301,19 +3358,15 @@
                             <th>${txt('tbl_unit')}</th>
                             <th>${txt('tbl_stat')}</th>
                         </tr>
-
                         <tr><td>${txt('res_nsa')} (Max)</td><td>${e_Nsa}</td><td>${Math.round(d.calcs.s1.load)}</td><td>kgf</td><td>-</td></tr>
                         <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_nsa')}</strong></td><td>${e_phiNsa}</td><td><strong>${Math.round(d.calcs.s1.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s1.ok ? 'pass' : 'fail'}">${d.calcs.s1.ok ? txt('pass') : txt('fail')}</span></td></tr>
                         <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.s1.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
-
                         <tr><td>${txt('res_vsa')}</td><td>${e_Vsa}</td><td>${Math.round(d.calcs.s2.vsa)}</td><td>kgf</td><td>-</td></tr>
                         <tr style="background:#f0f9ff"><td><strong>${txt('res_phi_vsa')}</strong></td><td>${e_phiVsa}</td><td><strong>${Math.round(d.calcs.s2.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.s2.ok ? 'pass' : 'fail'}">${d.calcs.s2.ok ? txt('pass') : txt('fail')}</span></td></tr>
                         <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.s2.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
                     </table>
                  `;
             }
-
-            // --- PULLOUT & PRYOUT SECTION ---
             if(showT || showV) {
                  html += `
                     <div class="page-break"></div>
@@ -4326,19 +3379,15 @@
                             <th>${txt('tbl_unit')}</th>
                             <th>${txt('tbl_stat')}</th>
                         </tr>
-                        
                         <tr><td>${txt('res_npn')}</td><td>${e_Npn}</td><td>${Math.round(d.calcs.pn.npn)}</td><td>kgf</td><td>-</td></tr>
                         <tr style="background:#fffbe6"><td><strong>${txt('res_phi_npn')}</strong></td><td>${e_phiNpn}</td><td><strong>${Math.round(d.calcs.pn.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.pn.ok ? 'pass' : 'fail'}">${d.calcs.pn.ok ? txt('pass') : txt('fail')}</span></td></tr>
                         <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.pn.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
-
                         <tr><td>${txt('res_vcp')}</td><td>${e_Vcp}</td><td>${Math.round(d.calcs.cp.vcp)}</td><td>kgf</td><td>-</td></tr>
                         <tr style="background:#fffbe6"><td><strong>${txt('res_phi_vcp')}</strong></td><td>${e_phiVcp}</td><td><strong>${Math.round(d.calcs.cp.cap)}</strong></td><td>kgf</td><td><span class="${d.calcs.cp.ok ? 'pass' : 'fail'}">${d.calcs.cp.ok ? txt('pass') : txt('fail')}</span></td></tr>
                         <tr><td><strong>${txt('res_ratio')}</strong></td><td><strong>${txt('tbl_ratio_lbl')}</strong></td><td><strong>${(d.calcs.cp.ratio || 0).toFixed(2)}</strong></td><td><strong>-</strong></td><td>-</td></tr>
                     </table>
                  `;
             }
-
-            // --- BOND SECTION ---
             if (showT && d.inputs.is_adhesive) {
                 html += `
                     <h3>${txt('res_b_title')}</h3>
@@ -4375,18 +3424,13 @@
                             <td><span class="${d.calcs.bond.sust_ok ? 'pass' : 'fail'}">${d.calcs.bond.sust_ok ? txt('pass') : txt('fail')}</span></td>
                         </tr>
                     </table>
-                    
                 `;
             }
-
-            
-            // --- CONCRETE BREAKOUT (TENSION) ---
             if (showT) {
                 html += `
                     <div class="page-break"></div>
                     <h3>${txt('res_t_title')}</h3>
                     <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Nb_pdf}</div>
-
                     <h4>${txt('res_t1_sub')}</h4>
                     <table>
                         <tr>
@@ -4415,7 +3459,6 @@
                             <td>-</td>
                         </tr>
                     </table>
-                    
                     <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Ncbg_pdf}</div>
                     <h4>${txt('res_tg_sub')}</h4>
                     <table>
@@ -4471,13 +3514,10 @@
                     ` : ''}
                     `;
             }
-
-            // --- CONCRETE BREAKOUT (SHEAR) ---
             if (showV) {
                 html += `
                     <h3>${txt('res_v_title')}</h3>
                     <div style="margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vb_pdf}</div>
-
                     <h4>${txt('res_v1_sub')}</h4>
                     <table>
                         <tr>
@@ -4505,7 +3545,6 @@
                             <td>-</td>
                         </tr>
                     </table>
-                    
                     ${d.calcs.sl.applicable ? `
                         <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99"></div>
                         <h4>${txt('lbl_is_sl')}</h4>
@@ -4526,7 +3565,6 @@
                              </tr>
                         </table>
                     ` : ''}
-
                     <div style="margin-top:10px; margin-bottom:5px; padding-left:5px; border-left:3px solid #004a99">${math_Vcbg_pdf}</div>
                     <h4>${txt('res_vg_sub')}</h4>
                     <table>
@@ -4556,19 +3594,16 @@
                     </table>
                 `;
             }
-
             html += `
                 <div class="report-footer">
                     Generated by Anchor Analysis Web App | ${new Date().getFullYear()}
                 </div>
             `;
-
             staging.innerHTML = html;
             setTimeout(() => {
                 window.print();
             }, 500);
         };
-
         window.switchTab = function (tab) {
             document.getElementById('view-calculator').classList.add('hidden');
             document.getElementById('view-history').classList.add('hidden');
@@ -4576,29 +3611,21 @@
             document.getElementById('tab-history').classList.remove('border-eng-primary', 'text-eng-primary');
             document.getElementById('tab-calculator').classList.add('text-gray-500');
             document.getElementById('tab-history').classList.add('text-gray-500');
-
             document.getElementById('view-' + tab).classList.remove('hidden');
             document.getElementById('tab-' + tab).classList.add('border-eng-primary', 'text-eng-primary');
             document.getElementById('tab-' + tab).classList.remove('text-gray-500');
-
             if (tab === 'history') loadHistory();
         };
-
-        // Initialize UI States
         togglePulloutInputs();
         toggleShearLug();
         toggleReinf();
         toggleSeismicDetailing();
         updateAnchorConfig();
         init3D();
-
-        // --- NIGHT MODE LOGIC ---
-
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             const html = document.documentElement;
             const icon = document.getElementById('dark-icon');
-
             if (isDarkMode) {
                 html.classList.add('dark');
                 icon.classList.remove('fa-moon');
@@ -4608,17 +3635,12 @@
                 icon.classList.remove('fa-sun');
                 icon.classList.add('fa-moon');
             }
-
-            // Update 3D Scene Background
             if (scene) {
-                scene.background = new THREE.Color(isDarkMode ? 0x1e293b : 0xffffff); // Slate-800 vs White
+                scene.background = new THREE.Color(isDarkMode ? 0x1e293b : 0xffffff); 
                 if (renderer) renderer.render(scene, camera);
             }
-
-            // Redraw 2D Visualization with new colors
             drawVisualization();
         }
-
         initVizControls();
     </script>
 </body>
